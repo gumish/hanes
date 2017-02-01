@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load l10n staticfiles custom_filters %}
+
+{% block title %}
+    FORMULÁŘ STARTÉRA | {{ rocnik }}
+{% endblock title %}
+
+{% block section %}section_zavody{% endblock %}
+{% block body_class %}teal{% endblock %}
+
+{% block custom_js %}
+    <script src="{% static 'js/formular_startera.js' %}" type="text/javascript"></script>
+{% endblock custom_js %}
+
+{% block breadcrumb %}
+    <div class="ui breadcrumb">
+        <a href="{% url 'zavody:zavody_list' %}" class="section">závody</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.zavod.get_absolute_url }}" class="section">detail závodu</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.get_absolute_url }}" class="section">detail ročníku</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">formulář startéra</div>
+    </div>
+{% endblock breadcrumb %}
+
+{% block header %}
+    <h1 class="ui header">
+        <a href="{{ rocnik.get_absolute_url }}" title="na detail závodu">
+            <i class="ui reply mail link big icon"></i>
+        </a>
+        <div class="content">
+            <i class="checkered flag big icon"></i>
+            {{ rocnik }}
+            <div class="sub header">formulář startéra</div>
+        </div>
+    </h1>
+{% endblock header %}
+
+{% block staff %}
+    <div class="ui stacked secondary sticky segment">
+        {# <div class="ui checkbox"><input type="checkbox" id="zaznam_casu"><label>záznam startovních časů</label></div> #}
+        .
+        <button type="submit" class="ui primary icon right floated button" form="formular_startera">
+            <i class="save icon"></i> odeslat
+        </button>
+    </div>
+{% endblock staff %}
+
+{% block content %}
+{#<div class="ui info icon message"><i class="close icon"></i><i class="ui info icon"></i><div class="content">Pro aktivaci automatického záznamu času při stiknutí tlačítka <i class="green checkmark icon"></i> je zaškrtnuto: <b>záznam startovních časů</b>. Tyto časy budou při odeslání formuláře uloženy do databáze. Pokud je přítomen čas a je zadáno <i class="grey question icon"></i>/<i class="red remove icon"></i>, pak čas zčervená pro upozornění, že je čas zřejmě zbytečný. Ale i tak je pak po odeslání uložen do databáze.</div></div>#}
+    <form action="" method="POST" id="formular_startera" class="ui small {% if formset.errors %}error{% endif %} form">
+
+        {% if formset.errors %}
+            <div class="ui error message">
+                CHYBA: {{ formset.non_form_errors }}
+            </div>
+        {% endif %}
+
+        {% for kategorie, zavodnici in kategorie_list %}
+            <table class="ui large table">
+                <caption>
+                    <div class="ui stackable grid">
+                        <div class="column">
+                            {% if kategorie.znacka %}
+                                {{ kategorie.znacka }}
+                            {% endif %}
+                        </div>
+                        <div class="six wide column">
+                            <a href="{{ kategorie.get_absolute_url }}" title="na detail kategorie">
+                                {{ kategorie.nazev }}
+                            </a>
+                        </div>
+                        <div class="four wide column">
+                            nar. {{ kategorie.rozsah_narozeni.0|unlocalize }} - {{ kategorie.rozsah_narozeni.1|unlocalize }}
+                        </div>
+                        <div class="three wide column">
+                            {{ kategorie.delka_trate|default:'-' }}
+                        </div>
+                        <div class="two wide column" title="počet závodníků v kategorii">
+                            {{ zavodnici|length }}
+                            <i class="user icon"></i>
+                        </div>
+                    </div>
+                </caption>
+                <thead>
+                    <tr>
+                        <th>číslo</th>
+                        <th>příjmení</th>
+                        <th>jméno</th>
+                        <th>nar.</th>
+                        <th>klub</th>
+                        <th style="width: 10em;">startovní čas</th>
+                        <th style="width: 10em;">odstartoval</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for zavodnik, formular in zavodnici %}
+                        <tr>
+                            <td class="cislo">
+                                {{ formular.id }}
+                                <a href="{% url 'zavodnici:editace_zavodnika' zavodnik.id %}" title="editovat závodníka">
+                                    {{ zavodnik.cislo|unlocalize|default:'?' }}
+                                </a>
+                            </td>
+                            <td>{{ zavodnik.clovek.prijmeni }}</td>
+                            <td>{{ zavodnik.clovek.jmeno }}</td>
+                            <td>{{ zavodnik.clovek.narozen|unlocalize }}</td>
+                            <td>{{ zavodnik.klub.nazev }}</td>
+                            <td class="startovni_cas">
+                                {% comment %}
+                                    <div class="ui action input">
+                                        {{ formular.startovni_cas }}
+                                        <button type="button" class="ui icon button" title="smaže hodnotu času">
+                                            <i class="remove icon"></i>
+                                        </button>
+                                    </div>
+                                {% endcomment %}
+                                {{ zavodnik.startovni_cas|desetiny_sekundy|default:'' }}
+                            </td>
+                            <td class="odstartoval">
+                                {{ formular.odstartoval }}
+                                <div class="ui icon big buttons">
+                                    <button type="button" class="ui green inverted button" title="ANO" value="1">
+                                        <i class="green checkmark icon"></i>
+                                    </button>
+                                    <button type="button" class="ui grey inverted button" title="nevím" value="">
+                                        <i class="grey question icon"></i>
+                                    </button>
+                                    <button type="button" class="ui red inverted button" title="NE" value="0">
+                                        <i class="red remove icon"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+
+        {% csrf_token %}
+
+        {{ formset.management_form }}
+        <button type="submit" class="ui primary icon right floated button" form="formular_startera">
+            <i class="save icon"></i> odeslat
+        </button>
+    </form>
+{% endblock content %}

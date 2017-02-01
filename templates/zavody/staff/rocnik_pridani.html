@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}
+    PŘIDÁNÍ ROČNÍKŮ | {{ block.super }}
+{% endblock title %}
+
+{% block custom_js %}{% endblock %}
+
+{% block section %}section_zavody{% endblock %}
+
+{% block header %}
+    <h1 class="ui header">
+        <i class="ui browser big icon"></i>
+        <div class="content">
+            <i class="checkered flag big icon"></i>
+            Přidání ročníku
+            <div class="sub header">{{ zavod }}</div>
+        </div>
+    </h1>    
+{% endblock header %}
+
+{% block staff %}
+{% endblock staff %}
+
+{% block content %}
+    <div class="ui grid">
+
+        <div class="ui eight wide column">
+            <h3>Formulář nového ročníku</h3>
+            <form method="POST" action="." enctype="multipart/form-data" class="ui form">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    {% include "elements/_form_error_field.html" with label=True help=True required=True %}
+                {% endfor %}
+
+                <button type="submit" class="ui primary icon button">
+                    <i class="save icon"></i>
+                    odeslat
+                </button>
+                <a href="{{ zavod.get_absolute_url }}" title="neuložit a zpět" class="ui icon button">
+                    <i class="ui reply mail icon"></i>
+                    zrušit
+                </a>           
+            </form>           
+        </div>
+
+        <div class="ui eight wide column">
+            <h3>Kategorie předchozího ročníku</h3>
+            {% if posledni_rocnik %}
+                <table class="ui celled table">
+                    <thead>
+                        <tr>
+                            <th colspan="4">
+                                {{ posledni_rocnik.datum }}
+                            </th>
+                            <th colspan="2">
+                                <a href="{% url 'zavody:kategorie_export' posledni_rocnik.id %}" class="ui blue icon button">
+                                    <i class="download icon"></i>
+                                    export kategorie
+                                </a>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>značka</th>
+                            <th>název kategorie</th>
+                            <th>pohlaví</th>
+                            <th>věk</th>
+                            <th>
+                                vlastnosti
+                                <i class="help circle icon"
+                                    title="požadované vlastnosti na závodníka"></i>
+                            </th>
+                            <th>délka[m]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for kategorie in posledni_rocnik.kategorie.all %}
+                            <tr>
+                                <td>
+                                    {{ kategorie.znacka }}
+                                </td>
+                                <td>
+                                    {{ kategorie.nazev }}
+                                </td>
+                                <td>
+                                    {{ kategorie.get_pohlavi_display|default:'unisex' }}
+                                </td>
+                                <td title="narozeni v rozmezí: {{ kategorie.rozsah_narozeni.0|unlocalize }} - {{ kategorie.rozsah_narozeni.1|unlocalize }}">
+                                    {{ kategorie.vek_od|default:0 }} - {{ kategorie.vek_do|default:'starší' }}
+                                </td>
+                                <td>
+                                    {% if kategorie.atributy.all.exists %}
+                                        <ul>
+                                            {% for attr in kategorie.atributy.all %}
+                                                <li>
+                                                    {{ attr.nazev }}    
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}                        
+                                </td>
+                                <td>
+                                    {{ kategorie.delka_trate }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>            
+            {% else %}
+                závod nemá žádný předchozí ročník
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock content %}

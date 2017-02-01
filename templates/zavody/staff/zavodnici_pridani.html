@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load staticfiles l10n %}
+
+{% block title %}
+    PŘIDÁNÍ ZÁVODNÍKŮ | {{ rocnik }}
+{% endblock title %}
+
+{% block section %}section_zavody{% endblock %}
+
+{% block custom_js %}
+    <script type="text/javascript">
+        var clovek_autocomplete_url = "{% url 'lide:clovek_autocomplete' rocnik.pk %}";
+        var klub_autocomplete_url = "{% url 'kluby:klub_autocomplete' %}";
+    </script>
+{% endblock %}
+
+{% block breadcrumb %}
+    <div class="ui breadcrumb">
+        <a href="{% url 'zavody:zavody_list' %}" class="section">závody</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.zavod.get_absolute_url }}" class="section">detail závodu</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.get_absolute_url }}" class="section">detail ročníku</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">přidání lidí</div>
+    </div>
+{% endblock breadcrumb %}
+
+{% block header %}
+    <h1 class="ui header">
+        <a href="{% url 'zavody:startovni_listina' rocnik.id %}" title="na startovní listinu">
+            <i class="ui reply mail link big icon"></i>
+        </a>
+        <div class="content">
+            <i class="ui html5 big icon"></i>
+            {{ rocnik }}
+            <div class="sub header">přidání závodníků</div>
+        </div>
+    </h1>
+{% endblock header %}
+
+
+{% block content %}
+    <div class="ui info icon message">
+        <i class="close icon"></i>
+        <i class="ui info icon"></i>
+        <div class="content">
+            <u>příjmení závodníka</u> i <u>název klubu</u> lze zadávat <b>bez diakritiky</b> ... viz nápověda <i class="help circle icon"></i>u hlavičky sloupce
+        </div>
+    </div>
+    <form autocomplete="off" action="" method="POST" id="zavodnici_forms" class="ui {% if formset.errors %}error{% endif %} form">
+        {% if formset.non_form_errors %}
+            <div class="ui error message">
+                {{ formsets.0.non_form_errors }}
+                {{ formsets.1.non_form_errors }}
+            </div>
+        {% endif %}
+        <table class="ui unstackable celled table">
+            <thead>
+                <tr>
+                    <th colspan=6>
+                        <h2>zapsat nové závodníky</h2>
+                    </th>
+                    <th colspan=2>
+                        <button type="submit" class="ui primary fluid icon large button">
+                            <i class="save large icon"></i>
+                        </button>
+                    </th>
+                </tr>
+                <tr>
+                    <th style="width:6em;">číslo</th>
+                    <th title="povinné pole">
+                        příjmení*
+                        <i class="help circle icon"
+                        title="pro vyhledávání lidí lze napsat jména v těchto formátech:
+                        'Šorfa Luboš', 'sorf', 'sorfa lu' ..."></i>
+                    </th>
+                    <th title="povinné pole">jméno*</th>
+                    <th style="width:8em;">pohlaví
+                        <i class="help circle icon"
+                            title="pokud není pohlaví vyplněno, pak se určí dle posledího písmene příjmení, tj.: 'á'=žena jinak muž"></i>
+                    </th>
+                    <th style="width:8em;" title="povinné pole">narozen*</th>
+                    <th>
+                        klub
+                        <i class="help circle icon"
+                        title="pro vyhledávání klubů lze napsat názvy v těchto formátech:
+                        'AC Náchod', 'ac nachod', 'nachod', 'Náchod' ..."></i>
+                    </th>
+                    <th>
+                        kategorie
+                        <i class="help circle icon"
+                        title="pokud je zadána kategorie, pak závodník není automaticky zařazen, a může být v ročníku vícekrát v různých kategoriích"></i>
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in formset %}
+                    <tr {% if form.non_field_errors %}class="error"{% endif %}>
+                        {% for field in form %}
+                            <td>
+                                {% include "elements/_form_error_field.html" with field=field %}
+                            </td>
+                        {% endfor %}
+                        <td>
+                            <i class="ui remove red link large icon smaz_inputy" title="smaže data z řádku"></i>
+                        </td>
+                    </tr>
+                    {% if form.non_field_errors %}
+                        <tr>
+                            <td colspan=7>
+                                {% include "elements/_error_pointing_ label.html" with error=form.non_field_errors.0|safe %}
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% csrf_token %}
+
+        {{ formset.management_form }}
+
+    </form>
+{% endblock content %}

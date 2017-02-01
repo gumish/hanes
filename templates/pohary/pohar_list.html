@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}
+    PŘEHLED POHÁRŮ
+{% endblock title %}
+
+{% block section %}section_pohary{% endblock %}
+
+{% block header %}
+    <h1 class="ui header">
+        <i class="ui trophy big icon"></i>
+        <div class="content">
+            Poháry
+            <div class="sub header">přehled pohárů</div>
+        </div>
+    </h1>    
+{% endblock header %}
+
+{% block staff %}
+    {% if user.is_staff %}
+        <div class="ui stacked secondary segment">
+            <a href="{% url 'pohary:pohar_create' %}" class="ui blue icon button">
+                <i class="plus icon"></i>
+                přidat pohár
+            </a>
+            <a href="{% url 'admin:pohary_pohar_changelist' %}" class="ui black icon button">
+                <i class="settings icon"></i>
+                admin pohárů
+            </a>
+        </div>
+    {% endif %}
+{% endblock staff %}
+
+{% block content %}
+    <table class="ui celled unstackable collapsing table">
+        <thead>
+            <tr>
+                <th>název</th>
+                <th>datum</th>
+                <th>ročníky</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pohar in object_list %}
+                <tr>
+                    <td>
+                        <a href="{{ pohar.get_absolute_url }}">
+                            {{ pohar.nazev }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ pohar.datum }}
+                    </td>
+                    <td>
+                        {% for rocnik in pohar.rocniky.all %}
+                            <a href="{{ rocnik.get_absolute_url }}">
+                                {{ rocnik }}
+                            </a>
+                            {% if not forloop.last %}
+                                &nbsp;|&nbsp;
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan=5>
+                        žádný pohár
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}

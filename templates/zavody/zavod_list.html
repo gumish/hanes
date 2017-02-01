@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}
+    PŘEHLED ZÁVODŮ
+{% endblock title %}
+
+{% block section %}section_zavody{% endblock %}
+
+{% block header %}
+    <h1 class="ui header">
+        <i class="checkered flag icon"></i>
+        <div class="content">
+            Závody
+            <div class="sub header">přehled závodů</div>
+        </div>
+    </h1>    
+{% endblock header %}
+
+{% block staff %}
+    {% if user.is_staff %}
+        <div class="ui stacked secondary segment">
+            <a href="{% url 'zavody:zavod_pridani' %}" class="ui blue icon button">
+                <i class="plus icon"></i>
+                přidat závod
+            </a>
+        </div>
+    {% endif %}
+{% endblock staff %}
+
+{% block content %}
+    <table class="ui celled unstackable collapsing table">
+        <thead>
+            <tr>
+                <th>název</th>
+                <th>sport</th>
+                <th>ročníky</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for zavod in zavody %}
+                <tr>
+                    <td>
+                        <a href="{{ zavod.get_absolute_url }}">
+                            {{ zavod.nazev }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ zavod.sport }}
+                    </td>
+                    <td>
+                        {% for rocnik in zavod.rocniky.all %}
+                            <a href="{{ rocnik.get_absolute_url }}" class="bold">
+                                {{ rocnik.datum|date:'Y' }}
+                            </a>
+                            {% if not forloop.last %}
+                                &nbsp;|&nbsp;
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan=5>
+                        žádný závod
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}

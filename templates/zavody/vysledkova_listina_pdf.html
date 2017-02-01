@@ -1,0 +1,123 @@
+{% load l10n custom_filters %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ rocnik }} | cílovní listina</title>
+    <style type="text/css">
+        @page {
+            size: A4;
+            margin: 1cm;
+            @frame footer {
+                -pdf-frame-content: footerContent;
+                bottom: 0cm;
+                margin-left: 9cm;
+                margin-right: 9cm;
+                height: 1cm;
+            }
+        }
+        .right.aligned {text-align: right;}
+        .center.aligned {text-align: center;}
+        tr.disabled td {color: gray;}
+    </style>
+</head>
+<body>
+    <h1>
+        {{ rocnik }}
+    </h1>
+    {% for kategorie, zavodnici in kategorie_list %}
+        <table>
+
+            <thead>
+                <tr>
+                    <th>
+                        {{ kategorie.znacka|default:'' }}
+                    </th>
+                    <th colspan="2">
+                        {{ kategorie.nazev }}
+                    </th>
+                    <th>
+                        nar. {{ kategorie.rozsah_narozeni.0|unlocalize }} - {{ kategorie.rozsah_narozeni.1|unlocalize }}
+                    </th>
+                    <th>
+                        {% if kategorie.atributy.all.exists %}
+                            {% for attr in kategorie.atributy.all %}
+                                {{ attr.nazev }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </th>
+                    <th>
+                        {{ kategorie.get_pohlavi_display|default:'unisex' }}
+                    </th>
+                    <th colspan="10">
+                        {{ kategorie.delka_trate|default:'-' }}
+                    </th>
+                </tr>
+                <tr>
+                    <th>pořadí</th>
+                    <th>číslo</th>
+                    <th>příjmení</th>
+                    <th>jméno</th>
+                    <th>nar.</th>
+                    <th>klub</th>
+                        <th style="width:10em">
+                            startovní čas
+                        </th>
+                        <th>
+                            cílový čas
+                        </th>
+                    <th>
+                        výsledný čas
+                    </th>
+                        <th>
+                            na trati
+                        </th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for zavodnik in zavodnici %}
+                        <tr {% if not zavodnik.vysledny_cas %}class="disabled"{% endif %}>
+
+                            <td class="right aligned">
+                                {{ zavodnik.poradi_v_kategorii|default:'' }}
+                            </td>
+                            <td class="right aligned">
+                                {{ zavodnik.cislo|default:''|unlocalize }}
+                            </td>
+                            <td>
+                                {{ zavodnik.clovek.prijmeni }}
+                            </td>
+                            <td>
+                                {{ zavodnik.clovek.jmeno }}
+                            </td>
+                            <td>
+                                {{ zavodnik.clovek.narozen|unlocalize }}
+                            </td>
+                            <td>
+                                {{ zavodnik.klub.nazev }}
+                            </td>
+                                <td>
+                                    {{ zavodnik.startovni_cas|time:'H:i:s' }}
+                                </td>
+                                <td>
+                                    {{ zavodnik.cilovy_cas|desetiny_sekundy }}
+                                </td>
+                            <td>
+                                {{ zavodnik.vysledny_cas|desetiny_sekundy|default:'' }}
+                            </td>
+                                <td class="right aligned">
+                                    {{ zavodnik.poradi_na_trati|default:'' }}
+                                </td>
+                        </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan=5>
+                            žádný závodník
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+</body>
+</html>

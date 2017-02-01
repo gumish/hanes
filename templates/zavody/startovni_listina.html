@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}
+    STARTOVNÍ LISTINA | {{ rocnik }}
+{% endblock title %}
+
+{% block section %}section_zavody{% endblock %}
+
+{% block breadcrumb %}
+    <div class="ui breadcrumb">
+        <a href="{% url 'zavody:zavody_list' %}" class="section">závody</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.zavod.get_absolute_url }}" class="section">detail závodu</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.get_absolute_url }}" class="section">detail ročníku</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">startovní listina</div>
+    </div>
+{% endblock breadcrumb %}
+
+{% block header %}
+    <h1 class="ui header">
+        <a href="{{ rocnik.get_absolute_url }}" title="na detail závodu">
+            <i class="ui reply mail link big icon"></i>
+        </a>
+        <div class="content">
+            <i class="checkered flag big icon"></i>
+            {{ rocnik }}
+            <div class="sub header">startovní listina ročníku</div>
+        </div>
+    </h1>
+{% endblock header %}
+
+{% block staff %}
+    <div class="ui stacked secondary sticky segment">
+        <a href="{% url 'zavody:vysledkova_listina' rocnik.id %}" title="výsledková listina - dle kategorií" class="ui icon violet button">
+            <i class="checkered flag icon"></i>
+            výsledková listina
+        </a>
+        <a href="{% url 'zavody:startovka_export' rocnik.id ordering_str %}" title="vyexportovat data do CSV:excel" class="ui icon grey button">
+            <i class="download icon"></i>
+            export startovní listiny
+        </a>
+        <a href="{% url 'zavody:startovka_rocnik_PDF' rocnik.pk %}" target="_blank" class="ui icon grey button" title="převod startovní listiny všech kategorií do PDF v novém okně prohlížeče">
+            <i class="file pdf outline icon"></i>
+            startovka v PDF
+        </a>
+    </div>
+{% endblock staff %}
+
+{% block content %}
+    <div id="startovni_listina">
+        {% for kategorie, zavodnici in kategorie_list %}
+            {% include "zavody/_startovka_kategorie.html" %}
+        {% endfor %}
+
+        {% if nezarazeni %}
+           {% include "zavody/_startovka_kategorie.html" with kategorie=None zavodnici=nezarazeni color='red inverted' %}
+        {% endif %}
+    </div>
+{% endblock content %}

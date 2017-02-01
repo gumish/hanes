@@ -1,0 +1,94 @@
+{% load l10n custom_filters %}
+<div id="kat_{{kategorie.id}}" class="ui sortable unstackable large table" style="border-top: 1px solid {% if kategorie.pohlavi == 'm' %}blue{% endif %}{% if kategorie.pohlavi == 'z' %}red{% endif %}">
+    <div class="caption">
+        {% if kategorie %}
+            <div class="ui grid">
+                <div class="one wide column">
+                    {% if kategorie.znacka %}
+                        {{ kategorie.znacka }}
+                    {% endif %}
+                </div>
+                <div class="five wide column">
+                    <a href="{{ kategorie.get_absolute_url }}" title="na detail kategorie">
+                        {{ kategorie.nazev }}
+                    </a>
+                </div>
+                <div class="three wide column">
+                    nar. {{ kategorie.rozsah_narozeni.0|unlocalize }} - {{ kategorie.rozsah_narozeni.1|unlocalize }}
+                </div>
+                <div class="column">
+                    {{ kategorie.delka_trate|default:'-' }}
+                </div>
+                <div class="four wide column" title="požadované vlastnosti závodníka">
+                    {% if kategorie.atributy.all.exists %}
+                        {% for attr in kategorie.atributy.all %}
+                            {{ attr.nazev }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="column" title="počet závodníků v kategorii">
+                    {{ zavodnici|length }}
+                    <i class="user icon"></i>
+                </div>
+                <div class="column">
+                    <a href="{% url 'zavody:startovka_kategorie_PDF' kategorie.pk %}" target="_blank" title="zobrazit startovku kategorie na nové kartě prohlížeče ve formátu PDF" class="auto-pdf">
+                        <i class="file pdf outline icon"></i>
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            nezařazení
+        {% endif %}
+    </div>
+    <div class="thead">
+        <div class="tr">
+            {% th_sortable 'číslo' 'cislo' 4 kategorie.id %}
+            {% th_sortable 'příjmení' 'clovek__prijmeni_slug_sorting' 10 kategorie.id %}
+            {% th_sortable 'jméno' 'clovek__jmeno_slug' 9 kategorie.id %}
+            {% th_sortable 'nar.' 'clovek__narozen' 3 kategorie.id %}
+            {% th_sortable 'klub' 'klub' kategorie.id %}
+            {% th_sortable 'startovní čas' 'startovni_cas' 10 kategorie.id %}
+            {% th_sortable 'cílový čas' 'cilovy_cas' 10 kategorie.id %}
+            {% th_sortable 'výsledný čas' 'vysledny_cas' 10 kategorie.id %}
+        </div>
+    </div>
+
+    <div class="tbody">
+        {% for zavodnik in zavodnici %}
+            <div class="tr" id="zavodnik_{{ zavodnik.id }}" zavodnik="{{ zavodnik.id }}">
+
+                <span class="td right aligned">
+                    {{ zavodnik.cislo|default:''|unlocalize }}
+                </span>
+
+                <span class="td">
+                    <a href="{{ zavodnik.clovek.get_absolute_url }}" title="detail člověka">
+                        {{ zavodnik.clovek.prijmeni }}
+                    </a>
+                </span>
+                <span class="td">
+                    {{ zavodnik.clovek.jmeno }}
+                </span>
+                <span class="td">
+                    {{ zavodnik.clovek.narozen|unlocalize }}
+                </span>
+                <span class="td">
+                    {% if zavodnik.klub %}
+                        <a href="{{ zavodnik.klub.get_absolute_url }}" title="detail klubu">
+                            {{ zavodnik.klub.nazev }}
+                        </a>
+                    {% endif %}
+                </span>
+                <span class="td">
+                    {{ zavodnik.startovni_cas|time:'H:i:s' }}
+                </span>
+                <span class="td">
+                    {{ zavodnik.cilovy_cas|desetiny_sekundy }}
+                </span>
+                <span class="td">
+                    {{ zavodnik.vysledny_cas|desetiny_sekundy }}
+                </span>
+            </div>
+        {% endfor %}
+    </div>
+</div>

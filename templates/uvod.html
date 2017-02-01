@@ -1,0 +1,59 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}
+    {{ flatpage.title|upper }}
+{% endblock title %}
+
+{% block section %}section_uvod{% endblock section %}
+
+{% block header %}
+    <h1 class="ui header">
+        {{ flatpage.title }}
+        {% if user.is_active %}
+            <a href="{% url 'flatpage_editace' flatpage.pk %}" title="upravit obsah stránky">
+                <i class="edit link icon"></i>
+            </a>
+        {% endif %}
+        <div class="sub header">vítejte v databázi výsledků</div>
+    </h1>
+{% endblock header %}
+
+{% block content %}
+    {{ flatpage.content|safe|urlize|linebreaks }}
+
+    <div class="ui four column stackable grid" id="seznam_zavodu">
+        {% for zavody in zavody_seznam %}
+            <div class="column">
+                <table class="ui {% cycle 'green' 'yellow' 'red' 'brown' %} large padded table">
+                    <thead>
+                        <tr>
+                            <th colspan="3">
+                                {% cycle 'budoucí závody' 'závody tento týden' 'dnešní závody!' 'předcházející závody' %}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rocnik in zavody %}
+                            <tr>
+                                <td>
+                                    <a href="{{ rocnik.get_absolute_url }}">
+                                        {{ rocnik }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {{ rocnik.datum|date:'SHORT_DATE_FORMAT' }}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td class="disabled">
+                                    žádný závod není registrován
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock content %}

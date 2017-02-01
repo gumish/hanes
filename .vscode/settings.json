@@ -1,0 +1,15 @@
+{
+    "python.pythonPath": "d:/WWW/PR/Hanes__root/virtualenv/scripts/python.exe",
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "**/.vscode": true,
+        "**/*.pyc": true,
+        "**/_DBs": true,
+        "**/_BACKUP_": true,
+        "**/_import": true,
+        "**/_sablony": true
+    }
+}

@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load l10n custom_filters %}
+
+{% block title %}
+    DETAIL KATEGORIE POHÁRU | {{ kategorie.nazev }} 
+{% endblock title %}
+
+{% block section %}section_pohary{% endblock %}
+
+{% block breadcrumb %}
+    <div class="ui breadcrumb">
+        <a href="{% url 'pohary:pohary_list' %}" class="section">poháry</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ pohar.get_absolute_url }}" class="section">{{ pohar }}</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">detail kategorie poháru</div>
+    </div>
+{% endblock breadcrumb %}
+
+{% block header %}
+    <h1 class="ui header">
+        <a href="{{ pohar.get_absolute_url }}" title="na pohár">
+            <i class="ui reply mail link big icon"></i>
+        </a>
+        <div class="content">
+            <i class="ui trophy big icon"></i>
+            {{ kategorie }}
+            <div class="sub header">detail kategorie poháru</div>
+        </div>
+    </h1>
+{% endblock header %}
+
+{% block staff %}
+    <div class="ui stacked secondary segment">
+    {% comment %}
+        {% if user.is_active %}
+            <a href="{% url 'pohary:rocnik_pridani' pohar.slug %}" class="ui blue icon button">
+                <i class="plus icon"></i>
+                nový ročník
+            </a>
+            <a href="{% url 'pohary:pohar_editace' pohar.id %}" class="ui black icon button">
+                <i class="edit icon"></i>
+                editace poháru
+            </a>
+        {% endif %}
+    {% endcomment %}
+        {% if user.is_staff %}
+            <a href="{% url 'admin:pohary_kategoriepoharu_change' kategorie.id %}" title="editovat kategorii poháru v administraci" target="_blank" class="ui icon black button">
+                <i class="settings icon"></i>
+                admin kategorie
+            </a>
+        {% endif %}
+    </div>
+{% endblock staff %}
+
+{% block content %}
+    {% with kategorie.pohar.rocniky_chronologicky as rocniky %}
+        <style>
+            th.rocnik {width: calc(70% / {{ rocniky.count }})}
+        </style>
+
+        <h2>žebříček lidí v kategorii</h2>
+        <table class="ui compact small celled definition blue table" id="zebricek_kategorie">
+            <thead class="full-width">
+                <tr>
+                    <th style="width: 4em;">místo</th>
+                    <th style="width: 20em;">člověk</th>
+                    {% for rocnik in rocniky %}
+                        <th class="rocnik">
+                            <a href="{{ rocnik.get_absolute_url }}">
+                                {{ rocnik }}
+                            </a>
+                        </th>
+                    {% endfor %}
+                    <th title="počet nejlepších započtených výsledků" style="width: 5em;">
+                        body<br>
+                        {{ kategorie.pocet_zavodu }}<i class="help circle icon"></i>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for clovek, zavody, soucet, pozice in kategorie.poradi_zavodniku %}
+                    <tr class="{{ clovek.varovani|default:'' }} {% ifchanged clovek.varovani %}zmena-varovani{% endifchanged %} {% ifchanged pozice %}pozice{% endifchanged %}">
+                        <td class="right aligned">{{ pozice }}.</td>
+                        <td>
+                            <a href="{{ clovek.get_absolute_url }}">
+                                {{ clovek }}
+                            </a>
+                        </td>
+                        {% for zavodnik in zavody %}
+                            {% if zavodnik %}
+                                <td class="{% if zavodnik.zapocitane %}active bold{% endif %} center aligned"
+                                    title="pořadí: {{ zavodnik.poradi }}   čas: {{ zavodnik.vysledny_cas }}  kategorie: {{ zavodnik.kategorie_temp.znacka }}">
+                                    {{ zavodnik.body }}
+                                    {% comment %}{% if user.is_staff %}
+                                        <a href="{{ zavodnik.get_absolute_url }}">
+                                            <i class="wrench icon"></i>
+                                        </a>
+                                    {% endif %}{% endcomment %}
+                                </td>
+                            {% else %}
+                                <td> </td>
+                            {% endif %}
+                        {% endfor %}
+                        <td class="right aligned" title="{{ soucet }}">
+                            {% if clovek.varovani == 'warning' %}
+                                <i class="warning icon"></i>
+                            {% elif clovek.varovani == 'error' %}
+                                <i class="warning sign icon" title="závodníci mají stejné časy ve společném závodě"></i>
+                            {% endif %}
+                            {{ soucet|floatformat:0 }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="full-width">
+                <tr>
+                    <th>místo</th>
+                    <th>člověk</th>
+                    {% for rocnik in rocniky %}
+                        <th>
+                            <a href="{{ rocnik.get_absolute_url }}">
+                                {{ rocnik }}
+                            </a>
+                        </th>
+                    {% endfor %}
+                    <th>body</th>
+                </tr>
+            </tfoot>
+        </table>
+
+{% comment %}
+    <h2>Závodníci zahrnutí v této kategorii poháru</h2>
+    <table id="zavodnici_kategorie" class="ui blue inverted compact small table">
+        <thead>
+            <tr>
+                <th>závodník</th>
+                <th>kategorie</th>
+                <th>čas</th>
+                <th title="pořadí v původní kategorii ročníku">
+                    pořadí
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for zavodnik in kategorie.zavodnici %}
+                {% ifchanged zavodnik.rocnik %}
+                    <tr>
+                        <td class="rocnik" colspan="4">
+                            <a href="{{ zavodnik.rocnik.get_absolute_url }}" title="na detail ročníku">
+                                <i class="ui checkered flag icon"></i>
+                                {{ zavodnik.rocnik }}
+                            </a>
+                        </td>
+                    </tr>
+                {% endifchanged %}
+                <tr>
+                    <td>
+                        <a href="{{ zavodnik.clovek.get_absolute_url }}" title="na detail člověka">
+                            {{ zavodnik.clovek }}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{{ zavodnik.kategorie_temp.get_absolute_url }}" title="na detail kategorie">
+                            {{ zavodnik.kategorie_temp.znacka }}
+                        </a>
+                    </td>
+                    <td>{{ zavodnik.vysledny_cas|desetiny_sekundy|default:'' }}</td>
+                    <td class="right aligned">{{ zavodnik.poradi_v_kategorii|default:'' }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endcomment %}
+    {% endwith %}
+{% endblock content %}

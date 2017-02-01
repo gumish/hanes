@@ -1,0 +1,79 @@
+{% load l10n custom_filters %}
+<table class="ui unstackable celled compact small blue inverted table" id="zavodnici_list">
+    <thead>
+        <tr>
+            <th colspan="8">
+                celkem {{ zavodnici|length }} závodníků
+            </th>
+        </tr>
+        <tr>
+            <th>číslo</th>
+            <th>příjmení</th>
+            <th>jméno</th>
+            <th>nar.</th>
+            {% if klub %}
+                <th>klub</th>
+            {% endif %}
+            {% if odstartoval %}
+                <th title="informace od startéra">
+                    start
+                </th>
+            {% endif %}
+            {% if vysledny_cas %}
+                <th>výsledný čas</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for zavodnik in zavodnici %}
+            <tr zavodnik="{{ zavodnik.id }}">
+                <td>
+                    {% if user.is_active %}
+                        <a href="{% url 'zavodnici:editace_zavodnika' zavodnik.id %}" title="editovat závodníka">
+                    {{ zavodnik.cislo|default:''|unlocalize }}
+                        </a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if zavodnik.clovek and user.is_active %}
+                        <a href="{% url 'lide:clovek_update' zavodnik.clovek.slug %}" title="editovat člověka">
+                            {{ zavodnik.clovek.prijmeni }}
+                        </a>
+                    {% endif %}
+                </td>
+                <td>
+                    {{ zavodnik.clovek.jmeno }}
+                </td>
+                <td>
+                    {{ zavodnik.clovek.narozen|unlocalize }}
+                </td>
+                {% if klub %}
+                    <td>
+                        {{ zavodnik.klub.nazev }}
+                    </td>
+                {% endif %}
+                {% if odstartoval %}
+                    <td>
+                        {{ zavodnik.odstartoval|yesno:'+,' }}
+                    </td>
+                {% endif %}
+                {% if vysledny_cas %}
+                    <td>
+                        {% if zavodnik.nedokoncil %}
+                            {{ zavodnik.nedokoncil }}
+                        {% elif zavodnik.vysledny_cas %}
+                            {{ zavodnik.vysledny_cas|desetiny_sekundy }}
+                        {% endif %}
+                    </td>
+                {% endif %}
+
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan=5>
+                    žádný závodník
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ block.super }} | úvod
+{% endblock title %}
+
+{% block section %}section_login{% endblock section %}
+
+{% block custom_js %}
+    <script type="text/javascript" charset="utf-8">
+        $(function(){
+            $("#id_username").focus();
+        });
+    </script>
+{% endblock %}
+
+{% block custom_css %}
+  <style type="text/css">
+    body {
+      background-color: #DADADA;
+    }
+    body > .grid {
+      height: 100%;
+    }
+    .column {
+      max-width: 450px;
+    }
+  </style>    
+{% endblock custom_css %}
+
+{% block content %}
+    <div class="ui middle aligned center aligned grid">
+        <div class="column">
+        
+            <h1 class="ui header">
+                <i class="sign in icon big icon"></i>
+                <div class="content">
+                    Přihlášení
+                </div>
+            </h1>
+            <form action="." method="POST" class="ui large form">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
+                <div class="ui stacked segment">
+                    {% for f in form %}
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <input type="text" name="{{ f.html_name }}" placeholder="{{ f.label|lower }}"
+                                    {% if forloop.first %}autofocus{% endif %}>
+                                <i class="{% cycle 'user' 'lock' %} icon"></i>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    {% if form.errors %}
+                        <div class="ui error message">
+                            <p>
+                                Špatně zadané uživatelské jméno nebo heslo. Zkuste se prosím přihlásit znovu.
+                            </p>
+                        </div>
+                    {% endif %}
+
+                    <input type="submit" class="ui large fluid blue submit button" value="přihlásit se">
+                </div>
+            </form>            
+        </div>        
+    </div>
+
+
+{% endblock %}

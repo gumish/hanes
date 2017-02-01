@@ -1,0 +1,1770 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"ord",
+				"ordering	statement"
+			],
+			[
+				"order",
+				"ordering_list	param"
+			],
+			[
+				"css",
+				"css	.css() - single"
+			],
+			[
+				"fun",
+				"fun	Function"
+			],
+			[
+				"read",
+				"ready	$(document).ready"
+			],
+			[
+				"rea",
+				"ready	document.ready - $(function(){})"
+			],
+			[
+				"re",
+				"ready	jQuery(document).ready"
+			],
+			[
+				"va",
+				"value	Attr"
+			],
+			[
+				"op",
+				"option	Tag"
+			],
+			[
+				"wi",
+				"width"
+			],
+			[
+				"star",
+				"startovni_cas	statement"
+			],
+			[
+				"requ",
+				"request"
+			],
+			[
+				"sub",
+				"submit	.submit()"
+			],
+			[
+				"max",
+				"max_value	param"
+			],
+			[
+				"min",
+				"min_value	param"
+			],
+			[
+				"remo",
+				"remove	.remove()"
+			],
+			[
+				"ma",
+				"margin-right"
+			],
+			[
+				"font",
+				"font-weight"
+			],
+			[
+				"fon",
+				"font-size"
+			],
+			[
+				"pa",
+				"padding-top"
+			],
+			[
+				"ms",
+				"msmallint	SmallIntegerField (msmallint)"
+			],
+			[
+				"add",
+				"addClass	.addClass()"
+			],
+			[
+				"cl",
+				"click	.click()"
+			],
+			[
+				"if",
+				"if	if"
+			],
+			[
+				"tim",
+				"timeNow"
+			],
+			[
+				"remove",
+				"removeClass	.removeClass()"
+			],
+			[
+				"w",
+				"widgets	module"
+			],
+			[
+				"clo",
+				"closest	.closest()"
+			],
+			[
+				"aja",
+				"ajaxsuccess	$.ajaxSuccess()"
+			],
+			[
+				"ajax",
+				"ajax"
+			],
+			[
+				"fos",
+				"font-size"
+			],
+			[
+				"mess",
+				"message"
+			],
+			[
+				"new",
+				"new_filename	statement"
+			],
+			[
+				"lis",
+				"listdir	function"
+			],
+			[
+				"BA",
+				"BASE_DIR	instance"
+			],
+			[
+				"s",
+				"settings	module"
+			],
+			[
+				"st",
+				"style	Attr"
+			],
+			[
+				"con",
+				"console"
+			],
+			[
+				"fonts",
+				"font-size"
+			],
+			[
+				"te",
+				"templatetags	module"
+			],
+			[
+				"ne",
+				"nezarazeni_temp	statement"
+			],
+			[
+				"ba",
+				"background-color"
+			],
+			[
+				"ta",
+				"table-row"
+			],
+			[
+				"di",
+				"display"
+			],
+			[
+				"fiel",
+				"fields"
+			],
+			[
+				"T",
+				"TextInput	class"
+			],
+			[
+				"ge",
+				"get_or_create"
+			],
+			[
+				"Zavod",
+				"Zavodnik	class"
+			],
+			[
+				"zavo",
+				"zavodnik	forflow"
+			],
+			[
+				"za",
+				"zavodnik	forflow"
+			],
+			[
+				"help",
+				"help_text"
+			],
+			[
+				"v",
+				"v_akt	statement"
+			],
+			[
+				"v_",
+				"v_tab"
+			],
+			[
+				"vy",
+				"vyska_tabulky	statement"
+			],
+			[
+				"get",
+				"get_and_close	function"
+			],
+			[
+				"wh",
+				"wh_table	statement"
+			],
+			[
+				"width",
+				"widths	param"
+			],
+			[
+				"value",
+				"values_list"
+			],
+			[
+				"pd",
+				"pdf_utils	module"
+			],
+			[
+				"fin",
+				"finally	keyword"
+			],
+			[
+				"clean",
+				"cleaned_data"
+			],
+			[
+				"Rocde",
+				"RocnikDeleteView	class"
+			],
+			[
+				"Clo",
+				"ClovekAdmin	class"
+			],
+			[
+				"sl",
+				"slugify〔module〕"
+			],
+			[
+				"mt",
+				"mtime	TimeField (mtime)"
+			],
+			[
+				"cle",
+				"clenove	statement"
+			],
+			[
+				"novy",
+				"novy_lide	statement"
+			],
+			[
+				"edi",
+				"editace_zavodnika	function"
+			],
+			[
+				"vysl",
+				"vysledky"
+			],
+			[
+				"no",
+				"novy_klub	statement"
+			],
+			[
+				"Impo",
+				"ImportZavodnikuCSVForm	class"
+			],
+			[
+				"li",
+				"LideImportCSVForm	class"
+			],
+			[
+				"nove",
+				"nove_kluby	statement"
+			],
+			[
+				"form",
+				"form_valid	function"
+			],
+			[
+				"clovek",
+				"clovek_data	statement"
+			],
+			[
+				"I",
+				"IndexError	class"
+			],
+			[
+				"Fo",
+				"FormView	class"
+			],
+			[
+				"im",
+				"import_formular	statement"
+			],
+			[
+				"impo",
+				"import_formular"
+			],
+			[
+				"ro",
+				"rozsah_narozeni"
+			],
+			[
+				"uniq",
+				"unique"
+			],
+			[
+				"posle",
+				"posledni_rocnik	statement"
+			],
+			[
+				"posledni",
+				"posledni_rocnik"
+			],
+			[
+				"rocnik",
+				"rocniky"
+			],
+			[
+				"Z",
+				"ZavodnikInlineForm	class"
+			],
+			[
+				"Rocni",
+				"RocnikPridejView	class"
+			],
+			[
+				"katego",
+				"kategorie_csv"
+			],
+			[
+				"Va",
+				"ValidationError"
+			],
+			[
+				"ka",
+				"kategorie_csv"
+			],
+			[
+				"zá",
+				"závodů"
+			],
+			[
+				"en",
+				"endfor"
+			],
+			[
+				"Za",
+				"Zavod	class"
+			],
+			[
+				"text",
+				"text-decoration"
+			],
+			[
+				"fch",
+				"fchar	CharField (fchar)"
+			],
+			[
+				"he",
+				"help_text	param"
+			],
+			[
+				"required",
+				"required=False"
+			],
+			[
+				"template",
+				"template_name"
+			],
+			[
+				"class",
+				"class	keyword"
+			],
+			[
+				"tr",
+				"try	Try/Except"
+			],
+			[
+				"korek",
+				"korekce_sezony"
+			],
+			[
+				"fla",
+				"flatpage"
+			],
+			[
+				"flatpa",
+				"flatpages"
+			],
+			[
+				"prij",
+				"prijmeni	statement"
+			],
+			[
+				"se",
+				"self	param"
+			],
+			[
+				"na",
+				"nazev_slug	statement"
+			],
+			[
+				"jm",
+				"jmeno_slug	statement"
+			],
+			[
+				"prijm",
+				"prijmeni_slug	statement"
+			],
+			[
+				"un",
+				"unique"
+			],
+			[
+				"slu",
+				"slugified	statement"
+			],
+			[
+				"slug",
+				"slugify	function"
+			],
+			[
+				"obje",
+				"objekt"
+			],
+			[
+				"pres",
+				"presunout_vysledky"
+			],
+			[
+				"clen",
+				"clenstvi_formset〔variable〕"
+			],
+			[
+				"is",
+				"is_valid"
+			],
+			[
+				"Clove",
+				"ClovekUpdateForm〔module〕"
+			],
+			[
+				"Cl",
+				"ClenstviFormSet"
+			],
+			[
+				"CLovekUpda",
+				"ClovekUpdateView"
+			],
+			[
+				"temp",
+				"template_name"
+			],
+			[
+				"conte",
+				"context_object_name"
+			],
+			[
+				"t",
+				"title	Attr"
+			],
+			[
+				"Error",
+				"ErrorDict"
+			],
+			[
+				"jme",
+				"jmenovci"
+			],
+			[
+				"cel",
+				"cele_jmeno"
+			],
+			[
+				"content",
+				"content_type"
+			],
+			[
+				"ex",
+				"exportuj_vysledkovku"
+			],
+			[
+				"zprav",
+				"zpravy"
+			],
+			[
+				"dup",
+				"duplikati	statement"
+			],
+			[
+				"zpr",
+				"zpravy	statement"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "/D/WWW/APPS/Sublime Text Build 3083 x64/Data/Packages/User/Preferences.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 824,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "Packages/Python/Python.sublime-build",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 374.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"pac",
+				"Package Control: Install Package"
+			],
+			[
+				"package",
+				"Package Control: Advanced Install Package"
+			],
+			[
+				"packa li",
+				"Package Control: List Packages"
+			],
+			[
+				"packa",
+				"Package Control: List Packages"
+			],
+			[
+				"pa",
+				"Package Control: List Packages"
+			],
+			[
+				"list",
+				"Package Control: List Packages"
+			],
+			[
+				"anac",
+				"Package Control: List Packages"
+			],
+			[
+				"ana",
+				"Anaconda: Vagrant Reload"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"ena",
+				"Package Control: Enable Package"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"trai",
+				"Trailing Spaces: Delete Trailing Spaces"
+			],
+			[
+				"tra",
+				"Trailing Spaces: Delete Trailing Spaces"
+			],
+			[
+				"trail",
+				"Trailing Spaces: Delete Trailing Spaces"
+			],
+			[
+				"dele tr",
+				"Trailing Spaces: Delete Trailing Spaces"
+			],
+			[
+				"space",
+				"Trailing Spaces: Delete Trailing Spaces"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"pack",
+				"Package Control: Install Package"
+			],
+			[
+				"pac li",
+				"Package Control: List Packages"
+			],
+			[
+				"TRA",
+				"Trailing Spaces: Delete Trailing Spaces"
+			],
+			[
+				"rope",
+				"Rope: New Project"
+			],
+			[
+				"selec",
+				"Zen Coding: Select matching tag name"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Disable Package"
+			],
+			[
+				"colo",
+				"Color picker"
+			],
+			[
+				"docu",
+				"Rope: Show Documentation"
+			],
+			[
+				"doc",
+				"Snippet: TypedMultipleChoiceField (ftmuchoice)"
+			],
+			[
+				"defin",
+				"Rope: Go to Definition"
+			],
+			[
+				"docum",
+				"Rope: Show Documentation"
+			],
+			[
+				"do",
+				"Rope: Show Documentation"
+			],
+			[
+				"def",
+				"Rope: Go to Definition"
+			],
+			[
+				"defi",
+				"Rope: Go to Definition"
+			],
+			[
+				"impo",
+				"Rope: Import Assist"
+			],
+			[
+				"",
+				"HTML: Wrap Selection With Tag"
+			],
+			[
+				"defini",
+				"Rope: Go to Definition"
+			],
+			[
+				"key",
+				"Preferences: Key Bindings - User"
+			],
+			[
+				"definit",
+				"Rope: Go to Definition"
+			],
+			[
+				"docume",
+				"Rope: Show Documentation"
+			],
+			[
+				"js",
+				"Format: Javascript"
+			],
+			[
+				"paca",
+				"Package Control: List Packages"
+			],
+			[
+				"Snippet: jque",
+				"Snippet: A basic jQuery selector"
+			],
+			[
+				"Snippet: ",
+				"Snippet: jQuery ready function"
+			],
+			[
+				"jq",
+				"Snippet: jQuery ready function"
+			],
+			[
+				"rop",
+				"Rope: Import Assist"
+			],
+			[
+				"packe",
+				"Package Control: List Packages"
+			],
+			[
+				"hg",
+				"SublimeHg: Open CLI"
+			],
+			[
+				"subli",
+				"Set Syntax: SublimeHg Command Line"
+			],
+			[
+				"packag",
+				"Package Control: Install Package"
+			],
+			[
+				"pro",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 400.0
+	},
+	"console":
+	{
+		"height": 520.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/D/WWW/PR/Hanes__root/Hanes",
+		"/D/WWW/PR/Hanes__root/Hanes/templates",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/staff"
+	],
+	"file_history":
+	[
+		"/D/WWW/APPS/Sublime Text Build 3083 x64/Data/Packages/Default/Preferences.sublime-settings",
+		"/D/WWW/APPS/Sublime Text Build 3083 x64/Data/Packages/User/Preferences.sublime-settings",
+		"/D/WWW/PR/Hanes__root/Hanes/zavody/models.py",
+		"/D/WWW/PR/Hanes__root/Hanes/static/css/base.css",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/staff/_startovka_kategorie.html",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/staff/startovni_listina.html",
+		"/D/WWW/PR/Hanes__root/Hanes/zavodnici/forms.py",
+		"/D/WWW/PR/Hanes__root/Hanes/zavody/views.py",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/_startovka_kategorie.html",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/staff/zavodnik_editace.html",
+		"/D/WWW/PR/Hanes__root/Hanes/zavodnici/models.py",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/_vysledkova_listina_kategorie.html",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/staff/formular_startera.html",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/rocnik_detail.html",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/vysledkova_listina_pdf.html",
+		"/D/WWW/PR/Hanes__root/Hanes/static/js/startovni_casy.js",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/staff/startovni_casy.html",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/base.html",
+		"/D/WWW/PR/Hanes__root/Hanes/static/js/formular_startera.js",
+		"/D/WWW/PR/Hanes__root/Hanes/static/js/base.js",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/objekt_editace.html",
+		"/D/WWW/PR/Hanes__root/Hanes/hanes/nested_formsets.py",
+		"/C/Program Files (x86)/Python27/Lib/site-packages/django_nested_formset-0.1.4-py2.7.egg/nested_formset/__init__.py",
+		"/D/WWW/ZIP/DJANGO/nested-formset-master/demo/blocks/views.py",
+		"/D/WWW/ZIP/DJANGO/nested-formset-master/demo/blocks/templates/blocks/block_form.html",
+		"/D/WWW/PR/Hanes__root/Hanes/zavody/urls.py",
+		"/D/WWW/ZIP/DJANGO/nested-formset-master/demo/blocks/templates/blocks/building_form.html",
+		"/D/WWW/PR/Hanes__root/Hanes/hanes/settings.py",
+		"/D/WWW/APPS/LightTPD/conf/lighttpd.conf",
+		"/D/WWW/APPS/LightTPD/htdocs/404.html",
+		"/D/WWW/APPS/nginx-1.0.4/conf/nginx.conf",
+		"/D/WWW/APPS/Sublime Text Build 3083 x64/Data/Packages/Theme - Flatland/Flatland Dark.sublime-theme",
+		"/D/WWW/APPS/Sublime Text Build 3083 x64/Data/Packages/Theme - Flatland/Flatland Dark/Widget - Flatland Dark.sublime-settings",
+		"/D/WWW/APPS/Sublime Text Build 3083 x64/Data/Packages/Theme - Flatland/Flatland Dark/Widget - Flatland Dark.stTheme",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/staff/zavodnici_pridani.html",
+		"/D/WWW/PR/Hanes__root/Hanes/lide/models.py",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/staff/cilovy_formular.html",
+		"/D/WWW/PR/Hanes__root/Hanes/zavody/forms.py",
+		"/D/WWW/PR/Hanes__root/Hanes/zavodnici/views.py",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/_zavodnici_tabulka.html",
+		"/D/WWW/PR/Hanes__root/Hanes/zavody/templatetags/custom_filters.py",
+		"/D/WWW/PR/Hanes__root/Hanes/static/js/startovka.js",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/elements/_form_error_field.html",
+		"//adsw0102/c$/LightTPD/conf/lighttpd.conf",
+		"/D/WWW/PR/rescue/rescue.html",
+		"/D/__DOWNLOAD__/semantic.min (2).css",
+		"/D/__DOWNLOAD__/semantic.min.css",
+		"//adsw0102/c$/LightTPD/htdocs/index.html",
+		"/D/WWW/PR/rescue.html",
+		"/D/WWW/PR/Hanes__root/Hanes/zavody/admin.py",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/zavod_detail.html",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/vysledkova_listina.html",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/uvod.html",
+		"/D/WWW/PR/Hanes__root/Hanes__Backup/templates/zavody/staff/_startovka_kategorie.html",
+		"/D/WWW/PR/Hanes__root/Hanes__Backup/zavody/views.py",
+		"/D/WWW/PR/Hanes__root/Hanes/lide/forms.py",
+		"/D/WWW/PR/Hanes__root/Hanes__Backup/templates/zavody/staff/startovni_listina.html",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/lide/staff/clovek_editace.html",
+		"/D/WWW/APPS/Sublime Text Build 3083 x64/Data/Packages/User/Package Control.sublime-settings",
+		"/D/WWW/PR/Hanes__root/Hanes/hanes/middleware.py",
+		"/D/WWW/APPS/Sublime Text Build 3083 x64/Data/Packages/User/trailing_spaces.sublime-settings",
+		"/D/WWW/APPS/Sublime Text Build 3083 x64/Data/Packages/Anaconda/Anaconda.sublime-settings",
+		"/D/WWW/APPS/Sublime Text Build 3083 x64/Data/Packages/User/Anaconda.sublime-settings",
+		"/D/WWW/APPS/Sublime Text Build 3083 x64/Data/Packages/TrailingSpaces/trailing_spaces.sublime-settings",
+		"/D/WWW/PR/Hanes__root/Hanes/hanes/views.py",
+		"/D/WWW/PR/Hanes__root/Hanes/hanes/urls.py",
+		"/D/WWW/PR/03_DB__root/03_DB/db/models.py",
+		"/D/WWW/PR/03_DB__root/03_DB/db/templatetags/custom_filters.py",
+		"/D/WWW/PR/Hanes__root/test.html",
+		"/D/WWW/PR/Hanes__root/Hanes/zavodnici/urls.py",
+		"/D/WWW/PR/Hanes__root/Hanes__Backup/static/css/base.css",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/staff/_startovka_kategorie_backup.html",
+		"/D/WWW/PR/Hanes__root/Hanes/zavodnici/custom_fields.py",
+		"/D/WWW/PR/Hanes__root/Hanes/zavody/functions.py",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/zavody/staff/zavod_pridani.html",
+		"/D/WWW/PR/Hanes__root/Hanes/static/js/jquery.autocomplete.min.js",
+		"/D/WWW/PR/Hanes__root/Hanes/templates/elements/_error_pointing_ label.html",
+		"/D/WWW/PR/Hanes__root/Hanes/lide/views.py",
+		"/D/WWW/PR/Hanes__root/Hanes/zavody/pdf.py",
+		"/D/WWW/PR/Hanes__root/virtualenv/Scripts/python-django-exporting-files-master/ExportingFiles/views.py",
+		"/D/WWW/PR/Hanes__root/Hanes/zavody/pdf_utils.py",
+		"/D/WWW/PR/Hanes__root/Hanes/static/css/print.css",
+		"/D/WWW/PR/Hanes__root/Hanes/zavody/pdf_test.py",
+		"/D/WWW/PR/Hanes__root/virtualenv/Scripts/python-django-exporting-files-master/ExportingFiles/templates/base.html",
+		"/D/WWW/PR/Hanes__root/virtualenv/Scripts/python-django-exporting-files-master/ExportingFiles/templates/exportingfiles/all_towns.html",
+		"/D/WWW/PR/Hanes__root/virtualenv/Scripts/python-django-exporting-files-master/ExportingFiles/pdf_utils.py",
+		"/D/WWW/PR/Hanes/static/js/base.js",
+		"/D/WWW/PR/Hanes/templates/zavody/staff/cilovy_formular.html",
+		"/D/WWW/PR/Hanes/zavodnici/urls.py",
+		"/D/WWW/PR/Hanes/zavodnici/views.py",
+		"/D/WWW/PR/Hanes/templates/zavody/staff/zavodnici_pridani.html",
+		"/D/WWW/PR/Hanes/lide/urls.py",
+		"/D/WWW/PR/Hanes/templates/zavody/staff/zavod_pridani.html",
+		"/D/WWW/PR/Hanes/templates/zavody/staff/zavodnik_editace.html",
+		"/D/WWW/PR/Hanes/templates/zavody/staff/startovni_listina.html",
+		"/D/WWW/PR/Hanes/templates/zavody/staff/rocnik_pridani.html",
+		"/D/WWW/PR/Hanes/templates/zavody/zavod_list.html",
+		"/D/WWW/PR/Hanes/templates/zavody/zavod_detail.html",
+		"/D/WWW/PR/Hanes/templates/zavody/vysledkova_listina.html",
+		"/D/WWW/PR/Hanes/templates/zavody/startovni_listina.html",
+		"/D/WWW/PR/Hanes/templates/zavody/kategorie_detail.html",
+		"/D/WWW/PR/Hanes/templates/zavody/rocnik_detail.html",
+		"/D/WWW/PR/Hanes/templates/objekt_smazani.html",
+		"/D/WWW/PR/Hanes/templates/objekt_editace.html",
+		"/D/WWW/PR/Hanes/templates/uvod.html",
+		"/D/WWW/PR/Hanes/templates/zavody/_zavodnici_tabulka.html",
+		"/D/WWW/PR/Hanes/zavody/views.py",
+		"/D/WWW/PR/Hanes/zavody/forms.py",
+		"/D/WWW/PR/Hanes/templates/elements/_form_error_field.html",
+		"/D/WWW/PR/Hanes/templates/base.html",
+		"/D/WWW/PR/Hanes/zavodnici/models.py",
+		"/D/WWW/PR/Hanes/templates/zavody/staff/_startovka_kategorie.html",
+		"/D/WWW/PR/Hanes/static/css/base.css",
+		"/D/WWW/PR/Hanes/zavody/models.py",
+		"/D/WWW/PR/Hanes/zavodnici/forms.py",
+		"/C/Program Files (x86)/Python27/lib/site-packages/django/forms/models.py",
+		"/D/WWW/PR/Hanes/lide/views.py",
+		"/D/WWW/PR/Hanes/hanes/settings.py",
+		"/D/WWW/PR/fotogalerie3_root/fotogalerie3/gallery/settings/base.py",
+		"/D/WWW/PR/Hanes/lide/models.py",
+		"/D/WWW/PR/kategorie_detail.html",
+		"/D/WWW/PR/Hanes/zavody/functions.py",
+		"/D/WWW/PR/04_DB/static/css/base.scss",
+		"/D/WWW/PR/04_DB/templates/parts/part_thumb_list.html",
+		"/D/WWW/PR/Hanes/lide/admin.py",
+		"/D/WWW/PR/Hanes/templates/lide/klub_list.html",
+		"/D/WWW/PR/Hanes/lide/functions.py",
+		"/D/WWW/PR/Hanes/lide/forms.py"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 90.0,
+		"where_history":
+		[
+			"<open folders>",
+			"c:\\Program Files (x86)\\Python27\\",
+			"c:\\Program Files (x86)\\Python27\\Lib\\site-packages\\django_nested_formset-0.1.4-py2.7.egg\\nested_formset",
+			"<open folders>,D:\\WWW\\ZIP\\DJANGO\\nested-formset-master\\src\\nested_formset",
+			"<open folders>",
+			"D:\\WWW\\PR\\Hanes\\",
+			"D:\\WWW\\PR\\Hanes\\templates",
+			"D:\\WWW\\PR\\Hanes\\",
+			"D:\\WWW\\PR\\Hanes\\,D:\\WWW\\PR\\04_DB",
+			"D:\\WWW\\PR\\Hanes\\",
+			"D:\\WWW\\PR\\Hanes\\static\\semantic-ui",
+			"D:\\WWW\\PR\\Hanes",
+			"",
+			"D:\\WWW\\PR\\04_DB\\static\\css",
+			"",
+			"<open files>",
+			"D:\\WWW\\PR\\04_DB\\tubes",
+			"D:\\WWW\\PR\\04_DB",
+			"D:\\WWW\\PR",
+			"<open folders>",
+			"D:\\MBAN",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"proxy",
+			"ordering_str",
+			"ordering_string",
+			"ordering_list",
+			"kategorie_list",
+			"nestedformset_factory",
+			"nested_formset",
+			"nestedformset_factory",
+			"404",
+			"ZavodnikForm",
+			"error",
+			"widgets",
+			"text-decoration",
+			"submit",
+			"1500",
+			"parent",
+			"class=\"td\"",
+			"/div",
+			"div class=\"td\"",
+			"#kategorie_form",
+			"/td>",
+			"<td",
+			"\"th\"",
+			"</th>",
+			"<th>",
+			"th>",
+			"td>",
+			"ordering",
+			"errors.0",
+			"order",
+			"inline",
+			"vyska_tabulky",
+			"vyska_aktualni",
+			"VYSKA_LISTU_CELKEM",
+			"*cm",
+			"ZavodnikInlineForm",
+			"rever",
+			"commit=",
+			"rozsah_narozeni",
+			"slugify",
+			"messag",
+			"objekt_editace.html",
+			"reverse",
+			"revers",
+			"purple",
+			"violet",
+			" orange",
+			" green",
+			"green",
+			"ui vertical inverted",
+			"zavody:editace_zavodnika",
+			"editace_zavodnika",
+			"{{ clovek.get_absolute_url }}",
+			"lide_klub",
+			"lide:klub",
+			"CSVsouborFormular",
+			"CSVImportZavodnikuForm",
+			"message",
+			"messa",
+			"e,",
+			"clovek_novy",
+			"zavody_list_import",
+			"CSVsouborFormular",
+			"ZavodnikPridaniForm",
+			"kwargs",
+			"def form_valid",
+			"get_or_create",
+			"{{ objekt_nazev }}",
+			"{{ object_verbose }}",
+			"reverse_lazy",
+			"CustomTimeField",
+			"zavody_import",
+			"TODO",
+			"today()",
+			"TODO",
+			"fla",
+			"flat",
+			"pk",
+			"verbose_name",
+			"ForeignKey",
+			"CharField",
+			"”",
+			"“",
+			"{% include",
+			"count",
+			"klub",
+			"kluby",
+			"formular",
+			"_startovka_kategorie.html",
+			"startovni_listina_staff.html",
+			"startovni_listina.html",
+			"Lato,",
+			"Lato",
+			"'Lato', ",
+			"Lato",
+			"rocnik_startovka",
+			"cilova_listina",
+			"cilova_listina.html",
+			"_cilovka_kategorie.html",
+			"#kategorie_form",
+			"kategorie.get_pohlavi_display ",
+			"kategorie.get_pohlavi_display|default",
+			"formular",
+			"_rocnik_startovka_kategorie.html",
+			"startovka.html",
+			"rocnik_startovka.html",
+			"_kategorie_list",
+			"formular_pridani_zavodniku.html",
+			"Q(",
+			"pep8",
+			"ZavodnikTextForm",
+			".initial",
+			"form_zavodnik",
+			"ZavodnikRocnik",
+			"_format_hanes_time",
+			"meta",
+			"slugify",
+			"comment",
+			"zavody",
+			"lide",
+			"rocnik_detail",
+			"message",
+			"messages",
+			"mess",
+			"redire",
+			"kategorie_list",
+			"url",
+			"ZavodnikRocnikPridaniForm"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"#startovni_listina",
+			"violet",
+			"blue",
+			" purple",
+			" violet",
+			"zavodnici:editace_zavodnika",
+			"kluby_klub",
+			"kluby:klub",
+			"_startovka_kategorie_admin.html",
+			"startovni_listina_admin.html",
+			"startovni_listina_staff.html",
+			"startovni_listina",
+			"vysledkova_listina",
+			"vysledkova_listina.html",
+			"_vysledkova_listina_kategorie.html",
+			".list_tabulek_kategorii",
+			"_startovka_kategorie.html",
+			"startovni_listina.html",
+			"startovka.html",
+			"pridani_zavodniku.html",
+			"Zavodnik",
+			"rocnik_startovka",
+			"sport",
+			"lide",
+			"clovek",
+			"Clovek",
+			"detail_table",
+			"<table class=\"ui small table\">",
+			"ui table",
+			"top attached",
+			"submenu"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": true,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "/D/WWW/APPS/Sublime Text Build 3083 x64/Data/Packages/User/Preferences.sublime-settings",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 824,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 26.0
+	},
+	"input":
+	{
+		"height": 34.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.421638707722,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 376.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.rope_python_documentation":
+	{
+		"height": 118.0
+	},
+	"pinned_build_system": "",
+	"project": "projekt.sublime-project",
+	"replace":
+	{
+		"height": 48.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"basecss",
+				"static\\css\\base.css"
+			],
+			[
+				"startjs",
+				"static\\js\\startovni_casy.js"
+			],
+			[
+				"css",
+				"static\\css\\base.css"
+			],
+			[
+				"base",
+				"templates\\base.html"
+			],
+			[
+				"rodeta",
+				"templates\\zavody\\rocnik_detail.html"
+			],
+			[
+				"zaurl",
+				"zavody\\urls.py"
+			],
+			[
+				"sett",
+				"hanes\\settings.py"
+			],
+			[
+				"vi",
+				"zavody\\views.py"
+			],
+			[
+				"za",
+				"zavody\\views.py"
+			],
+			[
+				"zamode",
+				"zavodnici\\models.py"
+			],
+			[
+				"zavie",
+				"zavody\\views.py"
+			],
+			[
+				"se",
+				"hanes\\settings.py"
+			],
+			[
+				"prida",
+				"templates\\zavody\\staff\\zavodnici_pridani.html"
+			],
+			[
+				"formujs",
+				"static\\js\\formular_startera.js"
+			],
+			[
+				"cilo",
+				"templates\\zavody\\staff\\cilovy_formular.html"
+			],
+			[
+				"start",
+				"static\\js\\formular_startera.js"
+			],
+			[
+				"foru",
+				"templates\\zavody\\staff\\formular_startera.html"
+			],
+			[
+				"setti",
+				"hanes\\settings.py"
+			],
+			[
+				"cus",
+				"zavody\\templatetags\\custom_filters.py"
+			],
+			[
+				"zavtabul",
+				"templates\\zavody\\_zavodnici_tabulka.html"
+			],
+			[
+				"cform",
+				"templates\\zavody\\staff\\cilovy_formular.html"
+			],
+			[
+				"for",
+				"templates\\zavody\\staff\\formular_startera.html"
+			],
+			[
+				"kateg",
+				"templates\\zavody\\staff\\_startovka_kategorie.html"
+			],
+			[
+				"bas",
+				"static\\js\\base.js"
+			],
+			[
+				"formerr",
+				"templates\\elements\\_form_error_field.html"
+			],
+			[
+				"staka",
+				"templates\\zavody\\staff\\_startovka_kategorie.html"
+			],
+			[
+				"star",
+				"templates\\zavody\\staff\\startovni_listina.html"
+			],
+			[
+				"vys",
+				"templates\\zavody\\_vysledkova_listina_kategorie.html"
+			],
+			[
+				"formstar",
+				"static\\js\\formular_startera.js"
+			],
+			[
+				"formht",
+				"templates\\zavody\\staff\\formular_startera.html"
+			],
+			[
+				"forstar",
+				"static\\js\\formular_startera.js"
+			],
+			[
+				"formhtml",
+				"templates\\zavody\\staff\\formular_startera.html"
+			],
+			[
+				"forma",
+				"static\\js\\formular_startera.js"
+			],
+			[
+				"basejs",
+				"static\\js\\base.js"
+			],
+			[
+				"zasta",
+				"templates\\zavody\\staff\\startovni_listina.html"
+			],
+			[
+				"zaform",
+				"zavodnici\\forms.py"
+			],
+			[
+				"stjs",
+				"static\\js\\startovka.js"
+			],
+			[
+				"staff",
+				"templates\\zavody\\staff\\_startovka_kategorie.html"
+			],
+			[
+				"pdf",
+				"zavody\\pdf.py"
+			],
+			[
+				"vysle",
+				"templates\\zavody\\vysledkova_listina.html"
+			],
+			[
+				"zavoview",
+				"zavody\\views.py"
+			],
+			[
+				"zavodnimode",
+				"zavodnici\\models.py"
+			],
+			[
+				"zavmode",
+				"zavody\\models.py"
+			],
+			[
+				"vy",
+				"templates\\zavody\\_vysledkova_listina_kategorie.html"
+			],
+			[
+				"set",
+				"hanes\\settings.py"
+			],
+			[
+				"zavodyurl",
+				"zavody\\urls.py"
+			],
+			[
+				"zavodview",
+				"zavody\\views.py"
+			],
+			[
+				"zavoform",
+				"zavodnici\\forms.py"
+			],
+			[
+				"basehtml",
+				"templates\\base.html"
+			],
+			[
+				"rocnide",
+				"templates\\zavody\\rocnik_detail.html"
+			],
+			[
+				"_za",
+				"templates\\zavody\\_zavodnici_tabulka.html"
+			],
+			[
+				"kat",
+				"templates\\zavody\\staff\\_startovka_kategorie.html"
+			],
+			[
+				"zavodmode",
+				"zavodnici\\models.py"
+			],
+			[
+				"zavodymodel",
+				"zavody\\models.py"
+			],
+			[
+				"zavodyform",
+				"zavody\\forms.py"
+			],
+			[
+				"zavovi",
+				"zavody\\views.py"
+			],
+			[
+				"zavoed",
+				"templates\\zavody\\staff\\zavodnik_editace.html"
+			],
+			[
+				"kategorie",
+				"templates\\zavody\\kategorie_detail.html"
+			],
+			[
+				"rocnik",
+				"templates\\zavody\\rocnik_detail.html"
+			],
+			[
+				"pridani",
+				"templates\\zavody\\staff\\zavodnici_pridani.html"
+			],
+			[
+				"lidemod",
+				"lide\\models.py"
+			],
+			[
+				"sta",
+				"templates\\zavody\\staff\\startovni_listina.html"
+			],
+			[
+				"zavomode",
+				"zavody\\models.py"
+			],
+			[
+				"mode",
+				"lide\\models.py"
+			],
+			[
+				"zavoviw",
+				"zavodnici\\views.py"
+			],
+			[
+				"zavod",
+				"templates\\zavody\\staff\\zavodnik_editace.html"
+			],
+			[
+				"rocni",
+				"templates\\zavody\\staff\\rocnik_pridani.html"
+			],
+			[
+				"clove",
+				"templates\\lide\\clovek_list.html"
+			],
+			[
+				"zaview",
+				"zavody\\views.py"
+			],
+			[
+				"katede",
+				"templates\\zavody\\kategorie_detail.html"
+			],
+			[
+				"zavoddet",
+				"templates\\zavody\\zavod_detail.html"
+			],
+			[
+				"rocn",
+				"templates\\zavody\\rocnik_detail.html"
+			],
+			[
+				"zavodde",
+				"templates\\zavody\\zavod_detail.html"
+			],
+			[
+				"detail",
+				"templates\\zavody\\rocnik_detail.html"
+			],
+			[
+				"klubed",
+				"templates\\lide\\staff\\klub_editace.html"
+			],
+			[
+				"urls",
+				"hanes\\urls.py"
+			],
+			[
+				"rocdeta",
+				"templates\\zavody\\rocnik_detail.html"
+			],
+			[
+				"zavmod",
+				"zavodnici\\models.py"
+			],
+			[
+				"zavodniview",
+				"zavodnici\\views.py"
+			],
+			[
+				"import",
+				"templates\\lide\\staff\\lide_import_csv.html"
+			],
+			[
+				"zavorocnik",
+				"templates\\zavody\\staff\\rocnik_pridani.html"
+			],
+			[
+				"starka",
+				"templates\\zavody\\_startovka_kategorie.html"
+			],
+			[
+				"starto",
+				"templates\\zavody\\staff\\_startovka_kategorie.html"
+			],
+			[
+				"vyslkatego",
+				"templates\\zavody\\_vysledkova_listina_kategorie.html"
+			],
+			[
+				"zavocilo",
+				"templates\\zavody\\staff\\cilovy_formular.html"
+			],
+			[
+				"zavedita",
+				"templates\\zavody\\staff\\zavodnik_editace.html"
+			],
+			[
+				"zavodymode",
+				"zavody\\models.py"
+			],
+			[
+				"staffkategorie",
+				"templates\\zavody\\staff\\_startovka_kategorie.html"
+			],
+			[
+				"staffzavodnici",
+				"templates\\zavody\\staff\\zavodnici_pridani.html"
+			],
+			[
+				"zavi",
+				"zavody\\views.py"
+			],
+			[
+				"zavodurl",
+				"zavody\\urls.py"
+			],
+			[
+				"rocnikp",
+				"templates\\zavody\\staff\\rocnik_pridani.html"
+			],
+			[
+				"ba",
+				"static\\js\\base.js"
+			],
+			[
+				"kluform",
+				"kluby\\forms.py"
+			],
+			[
+				"custo",
+				"zavodnici\\custom_fields.py"
+			],
+			[
+				"login",
+				"templates\\registration\\login.html"
+			],
+			[
+				"kadeta",
+				"templates\\zavody\\kategorie_detail.html"
+			],
+			[
+				"zamo",
+				"zavody\\models.py"
+			],
+			[
+				"lidevi",
+				"lide\\views.py"
+			],
+			[
+				"lideve",
+				"lide\\views.py"
+			],
+			[
+				"lidemode",
+				"lide\\models.py"
+			],
+			[
+				"lidemo",
+				"lide\\models.py"
+			],
+			[
+				"liform",
+				"lide\\forms.py"
+			],
+			[
+				"zavform",
+				"zavody\\forms.py"
+			],
+			[
+				"vie",
+				"Hanes\\views.py"
+			],
+			[
+				"form",
+				"zavody/forms.py"
+			],
+			[
+				"kate",
+				"templates/zavody/_kategorie_zavodnici_tabulka.html"
+			],
+			[
+				"prid",
+				"templates/zavody/formular_pridani_zavodniku.html"
+			],
+			[
+				"edi",
+				"templates/zavody/editace/editace_zavodnika.html"
+			],
+			[
+				"ka",
+				"templates/zavody/_kategorie_zavodnici_tabulka.html"
+			],
+			[
+				"zafor",
+				"zavody/forms.py"
+			],
+			[
+				"zavmo",
+				"zavody/models.py"
+			],
+			[
+				"tabu",
+				"templates/zavody/_zavodnici_tabulka.html"
+			],
+			[
+				"erro",
+				"templates/elements/_form_error_field.html"
+			],
+			[
+				"basc",
+				"static/css/base.css"
+			],
+			[
+				"mo",
+				"lide/models.py"
+			],
+			[
+				"pri",
+				"templates/zavody/formular_pridani_zavodniku.html"
+			],
+			[
+				"ed",
+				"templates/zavody/editace/editace_zavodnika.html"
+			],
+			[
+				"edita",
+				"templates/zavody/editace/editace_zavodnika.html"
+			],
+			[
+				"zavofo",
+				"zavody/forms.py"
+			],
+			[
+				"basjs",
+				"static/js/base.js"
+			],
+			[
+				"formu",
+				"templates/zavody/rocnik_zavodnici_formular.html"
+			],
+			[
+				"basecs",
+				"static/css/base.css"
+			],
+			[
+				"errofi",
+				"templates/elements/_form_error_field.html"
+			],
+			[
+				"formul",
+				"templates/zavody/rocnik_zavodnici_formular.html"
+			],
+			[
+				"zaadm",
+				"zavody/admin.py"
+			],
+			[
+				"bascss",
+				"static/css/base.css"
+			],
+			[
+				"func",
+				"lide/functions.py"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "03",
+		"selected_items":
+		[
+			[
+				"03",
+				"D:\\WWW\\PR\\03_DB__root\\03_DB\\PROJECT.sublime-project"
+			],
+			[
+				"ski",
+				"D:\\WWW\\PR\\SKI\\ski-police\\ski-project.sublime-project"
+			],
+			[
+				"fo",
+				"D:\\WWW\\PR\\fotogalerie3_root\\fotogalerie3\\sublimetext_project.sublime-project"
+			],
+			[
+				"",
+				"D:\\WWW\\PR\\fotogalerie3_root\\fotogalerie3\\sublimetext_project.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 1,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 314.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

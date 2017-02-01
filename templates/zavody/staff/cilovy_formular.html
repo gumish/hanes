@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load staticfiles l10n %}
+
+{% block title %}
+     CÍLOVÝ FORMULÁŘ | {{ rocnik }}
+{% endblock title %}
+
+{% block custom_js %}
+    <script type="text/javascript">
+        var cislo_autocomplete_url = "{% url 'zavodnici:cislo_autocomplete' rocnik.pk %}";
+    </script>
+{% endblock custom_js %}
+
+{% block section %}section_zavody{% endblock %}
+
+{% block breadcrumb %}
+    <div class="ui breadcrumb">
+        <a href="{% url 'zavody:zavody_list' %}" class="section">závody</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.zavod.get_absolute_url }}" class="section">detail závodu</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.get_absolute_url }}" class="section">detail ročníku</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">cílový formulář</div>
+    </div>
+{% endblock breadcrumb %}
+
+{% block header %}
+    <h1 class="ui header">
+        <a href="{{ rocnik.get_absolute_url }}" title="zpět na startovní listinu">
+            <i class="ui reply mail link big icon"></i>
+        </a>
+        <div class="content">
+            <i class="checkered flag big icon"></i>
+            {{ rocnik }}
+            <div class="sub header">cílový formulář</div>
+        </div>
+    </h1>
+{% endblock header %}
+
+
+{% block content %}
+    <div class="ui stackable grid">
+        <div class="ten wide computer column">
+
+            {% if formset.non_form_errors %}
+                <div class="ui error message">
+                    {{ formset.non_form_errors }}
+                </div>
+            {% endif %}
+
+            <form action="" method="POST" id="cilovy_formular" class="ui {% if formset.errors %}error{% endif %} form">
+                <table class="ui unstackable celled table">
+                    <thead>
+                        <tr>
+                            <th colspan=3>
+                                <h2>cílový formulář</h2>
+                            </th>
+                            <th colspan=3>
+                                <button type="submit" class="ui primary fluid icon large button">
+                                    <i class="save large icon"></i>
+                                </button>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>#</th>
+                            <th title="povinné pole">startovní číslo*</th>
+                            {# <th title="povinné pole">startovní čas*</th> #}
+                            <th>cílový čas</th>
+                            <th>nedokončil</th>
+                            <th title="přepsat již uložené časy">
+                                <i class="lightning large icon"></i>
+                            </th>
+                            <th>
+                                <i class="ui remove large icon" title="smaže data z řádku"></i>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for form in formset %}
+                            <tr {% if form.non_field_errors %}class="error"{% endif %}>
+                                <td>{{ forloop.counter }}</td>
+                                {% for field in form %}
+                                    <td>
+                                        {{ field }}
+                                        {% include "elements/_error_pointing_ label.html" with error=field.errors.0|safe %}
+                                    </td>
+                                {% endfor %}
+                                <td>
+                                    <i class="ui remove red link large icon smaz_inputy"></i>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% csrf_token %}
+                {{ formset.management_form }}
+
+            </form>
+        </div>
+
+
+        <div class="six wide computer column">
+            {% with rocnik.zavodnici.all as zavodnici %}
+                {% include "zavody/_zavodnici_tabulka.html" with vysledny_cas=True odstartoval=True %}
+            {% endwith %}
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,134 @@
+{% load i18n staticfiles %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <title>
+    {% block title %}{% endblock title %}
+    </title>
+
+    <link href="{% static 'semantic-ui/dist/semantic.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+    <link href="{% static 'css/print.css' %}" rel="stylesheet" media="print">
+    {% block custom_css %}{% endblock custom_css %}
+
+    <script src="{% static 'js/jquery.js' %}" type="text/javascript"></script>
+    <script src="{% static 'semantic-ui/dist/semantic.min.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/jquery.autocomplete.min.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/base.js' %}" type="text/javascript"></script>
+    {% block custom_js %}{% endblock custom_js %}
+</head>
+
+
+<body id="{% block section %}section_uvod{% endblock %}" class="{% block body_class %}{% endblock %}">
+
+    <div class="ui blue inverted menu" id="main_menu">
+        <div class="header item" id="menu_uvod">
+            <a href="{% url 'uvod' %}">
+                <i class="icon sun"></i>HANES 1.0
+            </a>
+        </div>
+        <div class="item" id="menu_zavody">
+            <a href="{% url 'zavody:zavody_list' %}">
+                <i class="checkered flag icon"></i>
+                závody
+            </a>
+        </div>
+        <div class="item" id="menu_lide">
+            <a href="{% url 'lide:lide_list' %}">
+                <i class="ui user icon"></i>
+                lidé
+            </a>
+        </div>
+        <div class="item" id="menu_kluby">
+            <a href="{% url 'kluby:kluby_list' %}">
+                <i class="ui users icon"></i>
+                kluby
+            </a>
+        </div>
+        <div class="item" id="menu_pohary">
+            <a href="{% url 'pohary:pohary_list' %}">
+                <i class="ui trophy icon"></i>
+                poháry
+            </a>
+        </div>
+
+        <div class="right menu">
+            {% if user.is_staff %}
+                <div class="item">
+                    <a href="{% url 'backup_database' %}" id="backup_database" title="zálohovat soubor databáze do adresáře '_BACKUP_'">
+                        <i class="cloud upload link icon"></i>
+                    </a>
+                </div>
+                <div class="item" id="menu_admin">
+                    <a href="{% url 'admin:index' %}" title="do administrace databáze" target="_blank">
+                        <i class="settings link icon"></i> admin
+                    </a>
+                </div>
+            {% endif %}
+            {% if user.is_authenticated %}
+                <div class="item" title="přihlášený uživatel">
+                    <i class="user icon"></i>
+                    {{ user.get_full_name|default:user }}
+                </div>
+                <div class="item" id="menu_login">
+                    <a href="{% url 'logout' %}?next={{request.path}}" title="odhlásit se">
+                        <i class="sign out link  icon"></i>
+                    </a>
+                </div>
+            {% else %}
+                <div class="item" id="menu_login">
+                    <a href="{% url 'login' %}?next={{request.path}}" title="přihlásit registrovaného uživatele">
+                        <i class="user link icon"></i> login
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+
+    {% block breadcrumb %}{% endblock %}
+
+    {% block header %}{% endblock %}
+
+    {% block staff %}{% endblock %}
+
+    {% if messages %}
+        {% regroup messages by level_tag as messages %}
+        <div id="messages">
+        {% for level in messages %}
+            <div class="ui {{level.grouper}} icon message">
+                <i class="close icon"></i>
+                {% if level.grouper == 'success' %}
+                    <i class="thumbs outline up icon"></i>
+                {% else %}
+                    <i class="thumbs outline down icon"></i>
+                {% endif %}
+                <div class="content">
+                    <ul class="list">
+                        {% for message in level.list %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    {% endif %}
+
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <div id="ajax_messages" class="ui compact floating message" style="display:none;"></div>
+
+    <div id="printerDiv" style="display:none"></div>
+
+</body>
+</html>

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load l10n custom_filters %}
+
+{% block title %}
+    {{ block.super }} | přehled lidí
+{% endblock title %}
+
+{% block section %}section_lide{% endblock %}
+
+{% block header %}
+    <h1 class="ui header">
+        <i class="ui user big icon"></i>
+        <div class="content">
+            Lidé
+            <div class="sub header">přehled {{ lide|length }} registrovaných lidí</div>
+        </div>
+    </h1>    
+{% endblock header %}
+
+{% block staff %}
+    {% if user.is_staff %}
+        <div class="ui stacked secondary segment">
+            <a href="{% url 'lide:import_csv' %}" class="ui blue icon button">
+                <i class="plus link icon"></i>
+                import lidí
+            </a>       
+        </div>
+    {% endif %}    
+{% endblock staff %}
+
+{% block content %}
+    {% regroup lide by prijmeni_slug.0 as lide_abc %}
+    <div class="ui divided relaxed horizontal list">
+        {% for pismeno in lide_abc %}
+            <a href=".#{{ pismeno.grouper }}" class="item">
+                {{ pismeno.grouper|upper }}
+            </a>    
+        {% endfor %}
+    </div>
+
+    <table class="ui celled unstackable table">
+        <thead>
+            <tr>
+                <th>příjmení</th>
+                <th>jméno</th>
+                <th>narozen(a)</th>
+                <th>klub(y)</th>
+                <th>startů</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pismeno in lide_abc %}
+                <tr id="{{ pismeno.grouper }}">
+                    <td colspan="5">
+                        <h2>{{ pismeno.grouper|upper }}</h2>
+                    </td>
+                </tr>
+                {% for clovek in pismeno.list %}
+                    <tr>
+                        <td>
+                            <a href="{% detail_url clovek %}" title="detail člověka">
+                                {{ clovek.prijmeni }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ clovek.jmeno }}
+                        </td>
+                        <td>
+                            {{ clovek.narozen|unlocalize }}
+                        </td>
+                        <td>
+                            <div class="ui divided relaxed horizontal list">
+                                {% for klub in clovek.jednotlive_kluby %}
+                                    <div class="item">
+                                        {{ klub }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td class="right aligned">
+                            {{ clovek.pocet_zavodu|default:'' }}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan=4>
+                            žádný člověk
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}

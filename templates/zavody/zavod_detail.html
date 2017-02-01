@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}
+    DETAIL ZÁVODU | {{ zavod.nazev }}
+{% endblock title %}
+
+{% block section %}section_zavody{% endblock %}
+
+{% block breadcrumb %}
+    <div class="ui breadcrumb">
+        <a href="{% url 'zavody:zavody_list' %}" class="section">závody</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">detail závodu</div>
+    </div>      
+{% endblock breadcrumb %}
+
+{% block header %}
+    <h1 class="ui header">
+        <a href="{% url 'zavody:zavody_list' %}" title="na seznam závodů">
+            <i class="ui reply mail link big icon"></i>
+        </a>
+        <div class="content">
+            <i class="checkered flag big icon"></i>
+            {{ zavod.nazev }}
+            <div class="sub header">detail závodu</div>
+        </div>
+    </h1>    
+{% endblock header %}
+
+{% block staff %}
+    <div class="ui stacked secondary segment">
+        {% if user.is_active %}
+            <a href="{% url 'zavody:rocnik_pridani' zavod.slug %}" class="ui blue icon button">
+                <i class="plus icon"></i>
+                nový ročník
+            </a>
+            <a href="{% url 'zavody:zavod_editace' zavod.id %}" class="ui black icon button">
+                <i class="edit icon"></i>
+                editace závodu
+            </a> 
+        {% endif %}
+        {% if user.is_staff %}
+            <a href="{% url 'admin:zavody_zavod_change' zavod.id %}" title="editovat závod v administraci" target="_blank" class="ui icon black button">
+                <i class="settings icon"></i>
+                admin závodu
+            </a>
+        {% endif %}
+    </div>        
+{% endblock staff %}
+
+{% block content %}
+    <p>sport: <b>{{ zavod.sport }}</b></p>
+    <p>místo: <b>{{ zavod.misto|default:'-' }}</b></p>
+    {% if user.is_active %}
+        <p>korekce sezony: <b>{{ zavod.korekce_sezony|yesno }}</b></p>    
+    {% endif %}
+    <p>{{ zavod.info|safe|urlize|linebreaksbr }}</p>
+
+    <h2>Ročníky</h2>
+    <table class="ui celled definition collapsing large table">
+        <thead class="full-width">
+            <tr>
+                <th>ročník</th>
+                <th>datum</th>
+                <th>kategorií</th>
+                <th>počet závodníků</th>
+                <th>jiný název</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rocnik in zavod.rocniky.all %}
+                <tr>
+                    <td>
+                        <a href="{{ rocnik.get_absolute_url }}" class="bolder">
+                            {{ rocnik.datum|date:'Y' }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ rocnik.datum }}
+                    </td>
+                    <td>
+                        {{ rocnik.kategorie.count }}
+                    </td>
+                    <td>
+                        {{ rocnik.zavodnici.all.count }}
+                    </td>
+                    <td>
+                        {{ rocnik.nazev }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% with zavod.posledni_rocnik as rocnik %}
+        {% if rocnik %}
+            <h2>Kategorie posledního ročníku</h2>
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th colspan="6">
+                            <a href="{{ rocnik.get_absolute_url }}" title="na detail ročníku">
+                                {{ rocnik }}
+                            </a>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>značka</th>
+                        <th>název kategorie</th>
+                        <th>pohlaví</th>
+                        <th>věk</th>
+                        <th>
+                            vlastnosti
+                            <i class="help circle icon"
+                                title="požadované vlastnosti na závodníka"></i>
+                        </th>
+                        <th>délka[m]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for kategorie in rocnik.kategorie.all %}
+                        <tr>
+                            <td>
+                                {{ kategorie.znacka }}
+                            </td>
+                            <td>
+                                {{ kategorie.nazev }}
+                            </td>
+                            <td>
+                                {{ kategorie.get_pohlavi_display|default:'unisex' }}
+                            </td>
+                            <td title="narozeni v rozmezí: {{ kategorie.rozsah_narozeni.0|unlocalize }} - {{ kategorie.rozsah_narozeni.1|unlocalize }}">
+                                {{ kategorie.vek_od|default:0 }} - {{ kategorie.vek_do|default:'starší' }}
+                            </td>
+                            <td>
+                                {% if kategorie.atributy.all.exists %}
+                                    <ul>
+                                        {% for attr in kategorie.atributy.all %}
+                                            <li>
+                                                {{ attr.nazev }}    
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}                        
+                            </td>
+                            <td>
+                                {{ kategorie.delka_trate }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>            
+        {% endif %}
+    {% endwith %}
+</div>
+{% endblock content %}

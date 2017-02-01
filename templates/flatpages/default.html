@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ block.super }} | {{ flatpage.title|lower }}
+{% endblock title %}
+
+{% block section %}section_uvod{% endblock section %}
+
+{% block header %}
+    <h1 class="ui header">
+        {{ flatpage.title }}
+        {% if user.is_active %}
+            <a href="{% url 'flatpage_editace' flatpage.pk %}" title="upravit obsah stránky">
+                <i class="edit link icon"></i>
+            </a>    
+        {% endif %}
+        <div class="sub header">vítejte v Hanesově dítěti</div>
+    </h1>    
+{% endblock header %}
+
+{% block content %}
+    {{ flatpage.content|urlize|linebreaks }}
+{% endblock content %}

@@ -1,0 +1,110 @@
+{% load l10n custom_filters %}
+<table class="ui unstackable definition striped table {% if kategorie.pohlavi == 'm' %}blue{% endif %}{% if kategorie.pohlavi == 'z' %}red{% endif %}">
+    <thead class="full-width">
+        <tr class="kategorie_nazev">
+            <th>
+                {{ kategorie.znacka|default:'' }}
+            </th>
+            <th colspan="2">
+                <a href="{{ kategorie.get_absolute_url }}" title="na detail kategorie">
+                    {{ kategorie.nazev }}
+                </a>
+            </th>
+            <th colspan="2">
+                nar. {{ kategorie.rozsah_narozeni.0|unlocalize }} - {{ kategorie.rozsah_narozeni.1|unlocalize }}
+            </th>
+            <th>
+                {# {{ kategorie.get_pohlavi_display|default:'unisex' }} #}
+            </th>
+            <th colspan="{{ colspan }}">
+                {{ kategorie.delka_trate|default:'-' }}
+            </th>
+            <th class="right aligned">
+                <a onclick="printPage('{% url 'zavody:vysledky_kategorie_PDF' kategorie.pk %}')" title="rovnou vytiskne stránku PDF s výsledky kategorie" class="auto-print" data-url="{% url 'zavody:vysledky_kategorie_PDF' kategorie.pk %}">
+                    <i class="print link icon"></i>
+                </a>
+                <a href="{% url 'zavody:vysledky_kategorie_PDF' kategorie.pk %}" target="_blank" title="zobrazit výsledky kategorie na nové kartě prohlížeče ve formátu PDF" class="auto-pdf">
+                    <i class="file pdf outline icon"></i>
+                </a>
+            </th>
+        </tr>
+
+        <tr>
+            <th style="width:3em;">pořadí</th>
+            <th style="width:3em">číslo</th>
+            <th style="width:10em">příjmení</th>
+            <th style="width:9em">jméno</th>
+            <th style="width:3em">nar.</th>
+            <th>klub</th>
+            {% if sloupce_form.startovni_cas.value %}
+                <th style="width:10em">startovní čas</th>
+            {% endif %}
+            {% if sloupce_form.cilovy_cas.value %}
+                <th style="width:10em">cílový čas</th>
+            {% endif %}
+            <th style="width:10em">výsledný čas</th>
+            {% if sloupce_form.poradi_na_trati.value %}
+                <th class="right aligned">na trati</th>
+            {% endif %}
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for zavodnik in zavodnici %}
+                <tr id="zavodnik_{{ zavodnik.id }}" {% if not zavodnik.vysledny_cas and not zavodnik.nedokoncil %}class="bez-casu"{% endif %}>
+
+                    <td class="right aligned">
+                        {{ zavodnik.poradi_v_kategorii|default:'' }}
+                    </td>
+                    <td class="right aligned">
+                        <a href="{% url 'zavodnici:editace_zavodnika' zavodnik.id %}" title="editovat závodníka">
+                            {{ zavodnik.cislo|default:''|unlocalize|default:'-' }}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{% detail_url zavodnik.clovek %}" title="na detail člověka">
+                            {{ zavodnik.clovek.prijmeni }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ zavodnik.clovek.jmeno }}
+                    </td>
+                    <td>
+                        {{ zavodnik.clovek.narozen|unlocalize }}
+                    </td>
+                    <td>
+                        {{ zavodnik.klub.nazev }}
+                    </td>
+                    {% if sloupce_form.startovni_cas.value %}
+                        <td>
+                            {{ zavodnik.startovni_cas|time:'H:i:s' }}
+                        </td>
+                    {% endif %}
+                    {% if sloupce_form.cilovy_cas.value %}
+                        <td>
+                            {{ zavodnik.cilovy_cas|desetiny_sekundy }}
+                        </td>
+                    {% endif %}
+                    <td>
+                        {% if zavodnik.nedokoncil %}
+                            {{ zavodnik.nedokoncil }}
+                        {% else %}
+                            {{ zavodnik.vysledny_cas|desetiny_sekundy|default:'' }}
+                        {% endif %}
+                    </td>
+                    {% if sloupce_form.poradi_na_trati.value %}
+                        <td class="right aligned">
+                            {{ zavodnik.poradi_na_trati|default:'' }}
+                        </td>
+                    {% endif %}
+                </tr>
+        {% empty %}
+            <tr class="disabled">
+                <td colspan=15 class="center aligned" style="font-weight: normal; color: silver;">
+                    žádný závodník
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+
+</table>

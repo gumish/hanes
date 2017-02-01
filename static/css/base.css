@@ -1,0 +1,270 @@
+/* BASE.HMTL */
+body {
+    background-color: hsl(216, 20%, 95%);
+}
+
+body.teal {
+    background-color: hsl(177, 42%, 90%);
+}
+
+#content,
+#messages,
+.ui.breadcrumb,
+.sticky.segment,
+.ui.header {
+    margin: .8em 1em;
+}
+
+#messages {
+    margin-bottom: 1em;
+}
+
+#ajax_messages {
+    position: fixed;
+    right: 5px;
+    bottom: 5px;
+    padding: 2px 20px;
+    font-weight: bold;
+    -webkit-transition: visible 2s; /* Safari */
+    transition: visible 2s;
+    visibility: visible;
+}
+
+.hidden {
+    display: none;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.bolder {
+    font-weight: bolder;
+}
+
+.circle.icon {
+    cursor: help;
+}
+
+.underlined {
+    text-decoration: underline;
+}
+
+.bez-casu {
+    color: silver;
+}
+
+.inverted a {
+    color: white;
+    text-decoration: none;
+}
+
+input.error {
+    background-color: #fff6f6 !important;
+    border-color: #e0b4b4 !important;
+    color: #db2828 !important;
+}
+
+/* MENU */
+#section_uvod #menu_uvod,
+#section_zavody #menu_zavody,
+#section_lide #menu_lide,
+#section_kluby #menu_kluby,
+#section_login #menu_login
+{
+    background-color: #6859AB;
+    font-weight: bold;
+    color: white;
+}
+
+/* AUTOCOMPLETE */
+.autocomplete-suggestions {
+    margin-top: .5em!important;
+    border-radius: .325em;
+    background: #FFF;
+    cursor: default;
+    overflow: auto;
+    font-size: 1em;
+    padding: 5px 10px;
+    color: rgba(0,0,0,.75);
+    -webkit-box-shadow: 0px 2px 2px 2px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 0px 2px 2px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 2px 2px 2px rgba(0, 0, 0, 0.1);
+}
+
+.autocomplete-suggestion {
+    padding: 2px 12px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.autocomplete-selected {
+    background: #F0F0F0;
+}
+
+.autocomplete-group {
+    color: silver;
+}
+
+.autocomplete-group:not(:first-child) {
+    padding-top: 15px;
+}
+
+/* ZAVODY/startovni_listina_admin.html */
+#startovni_listina .icon, #zavodnici_forms .icon {
+    margin: 0;
+}
+
+#startovni_listina input, #startovni_listina span.td select {
+    padding: 0.3em;
+}
+
+#startovni_listina .table.red .thead .th {
+    background-color: #db2828 !important;
+    color: white;
+}
+
+#startovni_listina .red .thead .th a {
+    color: white;
+}
+
+
+#startovni_listina div.table,
+#formular_startera table {
+    display: table;
+    margin-bottom: 5em;
+}
+
+#startovni_listina div.caption,
+#formular_startera caption {
+    display: table-caption;
+    color: black;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+#startovni_listina div.caption a,
+#startovni_listina span.th a {
+    color: black;
+}
+
+#startovni_listina span.td,
+#startovni_listina span.th {
+    display: table-cell;
+    padding: 5px;
+    vertical-align: middle;
+    border-bottom: 1px solid #e8e8e8
+}
+
+#startovni_listina div.thead {
+    display: table-header-group;
+}
+
+#startovni_listina div.tbody {
+    display: table-row-group;
+}
+
+#startovni_listina .tr {
+    display: table-row;
+}
+
+#startovni_listina form.tr {
+    -webkit-transition: display 1s, background 1s; /* Safari */
+    transition: display 1s, background 1s;
+}
+
+#startovni_listina form.tr.success {
+    background-color: #d0e6d0;
+}
+
+#startovni_listina form.tr.removed,
+#startovni_listina form.tr.error,
+#startovni_listina form.tr.removed * {
+    background-color: #ffbcb7;
+    color: #ad8c8c;
+}
+
+#startovni_listina form.tr input.actualized {
+    background-color: #e3f8fb;
+    cursor: help;
+}
+
+/*.error_label {
+    font-size: .9em;
+}*/
+
+#startovni_listina .td.icons {
+    padding: 5px;
+}
+
+#startovni_listina .table .thead .th {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+#startovni_listina .table.red.inverted .thead a {
+    color: white;
+}
+
+dl.vlastnosti dt {
+    font-weight: bold;
+    margin-bottom: .3em;
+}
+
+dl.vlastnosti dd {
+    margin-bottom: 1.5em;
+}
+
+#formular_startera .cislo {
+    font-size: 2em;
+    font-weight: bold;
+    padding: .3em;
+}
+
+#formular_startera .buttons>.active>i.icon {
+    color: white !important;
+    opacity: 1;
+}
+
+#formular_startera .buttons>.green.button {
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+}
+
+#cilovy_formular td select {
+    padding-left: .2em;
+    padding-right: .2em;
+}
+
+#startovni_casy table.sortable tbody tr {
+    cursor: move;
+}
+
+#kategorie_form .ui.table {
+    margin: 4em 0;
+}
+
+#zavodnici_kategorie .rocnik {
+    text-align: center;
+    font-weight: bold;
+    font-size: medium;
+    background-color: hsl(206, 73%, 30%);
+}
+
+#zebricek_kategorie tr.warning {
+    background-color: hsl(40, 70%, 93%)!important;
+}
+
+#zebricek_kategorie tr.error {
+    background-color: hsl(0, 100%, 84%)!important;
+}
+
+#zebricek_kategorie tr.jmeno td {
+    font-weight: bold;
+    background-color: black;
+    color: white;
+}
+
+#zebricek_kategorie tr.warning.pozice:not(.zmena-varovani) td,
+#zebricek_kategorie tr.error.pozice:not(.zmena-varovani) td {
+    border-top-color: hsl(0, 0%, 65%);
+}

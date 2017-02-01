@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load l10n custom_filters %}
+
+{% block title %}
+    {{ block.super }} | přehled klubů
+{% endblock title %}
+
+{% block section %}section_kluby{% endblock %}
+
+{% block header %}
+    <h1 class="ui header">
+        <i class="ui users big icon"></i>
+        <div class="content">
+            Kluby
+            <div class="sub header">přehled {{ kluby|length }} registrovaných klubů</div>
+        </div>
+    </h1>    
+{% endblock header %}
+
+{% block content %}
+    {% regroup kluby by slug.0 as kluby_abc %}
+    <div class="ui divided relaxed horizontal list">
+        {% for pismeno in kluby_abc %}
+            <a href=".#{{ pismeno.grouper }}" class="item">
+                {{ pismeno.grouper|upper }}
+            </a>    
+        {% endfor %}
+    </div>
+
+    <table class="ui celled collapsing table">
+        <thead>
+            <tr>
+                <th>název</th>
+                <th>sport</th>
+                <th>členů</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pismeno in kluby_abc %}
+                <tr id="{{ pismeno.grouper }}">
+                    <td colspan="3">
+                        <h2>{{ pismeno.grouper|upper }}</h2>
+                    </td>
+                </tr>
+                {% for klub in pismeno.list %}
+                    <tr>
+                        <td>
+                            <a href="{% detail_url klub %}" title="na detail klub">
+                                {{ klub.nazev }}
+                            </a>
+                            
+                        </td>
+                        <td>
+                            {{ klub.sport.nazev|default:'' }}
+                        </td>
+                        <td class="right aligned">
+                            {{ klub.pocet_clenstvi }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% empty %}
+                <tr>
+                    <td colspan=4>
+                        žádný klub
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock content %}

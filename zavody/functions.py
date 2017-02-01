@@ -1,0 +1,221 @@
+# coding: utf-8
+import csv
+
+from .models import Zavod, Sport, Kategorie
+from zavodnici.models import Zavodnik
+from .templatetags.custom_filters import desetiny_sekundy
+
+
+def _csv_reader(soubor):
+    csv_reader = csv.reader(soubor, delimiter=';')
+    for row in csv_reader:
+        yield [cell.decode('windows-1250').strip() for cell in row]
+
+
+def kategorie_import(soubor):
+    chyby = []
+    kategorie_list = []
+    for i, radek in enumerate(_csv_reader(soubor), start=1):
+        if i >= 5:
+            try:
+                kategorie = Kategorie(
+                    nazev=radek[0],
+                    znacka=radek[1],
+                    pohlavi=radek[2],
+                    vek_od=int(radek[3]),
+                    vek_do=int(radek[4]),
+                    delka_trate=radek[5],
+                )
+                kategorie_list.append(kategorie)
+            except Exception, e:
+                chyby.append(u'#{0} {1}'.format(i, e))
+    return (kategorie_list, chyby)
+
+
+def zavodnici_import(soubor):
+    chyby = []
+    zavodnici = []
+    for i, radek in enumerate(_csv_reader(soubor), start=1):
+        if i >= 2:
+            try:
+                zavodnik = Zavodnik(
+                    prijmeni=radek[0],
+                    jmeno=radek[1],
+                    pohlavi=radek[2],
+                    vek_od=int(radek[3]),
+                    vek_do=int(radek[4]),
+                    delka_trate=radek[5],
+                )
+                zavodnici.append(zavodnik)
+            except Exception, e:
+                chyby.append(u'#{0} {1}'.format(i, e))
+    return (zavodnici, chyby)
+
+
+def rocnik_import(soubor):
+    zpravy = []
+    for i, radek in enumerate(_csv_reader(soubor), start=1):
+        if i == 1 or radek[0] == '':
+            novy_zavod = True
+            continue
+        if novy_zavod:
+            sport, created = Sport.objects.get_or_create(nazev=radek[1])
+            if created:
+                zpravy.append(u'#{0} uložen nový sport: {1}'.format(i, sport))
+            zavod, created = Zavod.objects.get_or_create(nazev=radek[0], sport=sport)
+            if created:
+                zpravy.append(u'#{0} uložen nový závod: {1}'.format(i, zavod))
+            novy_zavod = False
+        else:
+            try:
+                kategorie, created = Kategorie.objects.get_or_create(
+                    nazev=radek[0],
+                    znacka=radek[1],
+                    pohlavi=radek[2],
+                    vek_od=int(radek[3]),
+                    vek_do=int(radek[4]),
+                    delka_trate=radek[5],
+                    zavod=zavod
+                )
+                if created:
+                    zpravy.append(u'#{0} uložena nová kategorie: {1}'.format(i, kategorie))
+            except Exception, e:
+                zpravy.append(u'#{0} {1}'.format(i, e))
+    return zpravy
+
+
+def exportuj_startovku(response, rocnik, ordering_str):
+    def _zavodnici_write(zavodnici):
+        for zavodnik in zavodnici:
+            writer.writerow([
+                zavodnik.cislo,
+                zavodnik.clovek.prijmeni.encode(enctype, 'ignore'),
+                zavodnik.clovek.jmeno.encode(enctype, 'ignore'),
+                zavodnik.clovek.narozen,
+                zavodnik.klub.nazev.encode(enctype, 'ignore') if zavodnik.klub else '',
+                desetiny_sekundy(zavodnik.startovni_cas),
+                desetiny_sekundy(zavodnik.cilovy_cas),
+                desetiny_sekundy(zavodnik.vysledny_cas),
+                zavodnik.nedokoncil,
+                zavodnik.odstartoval
+            ])
+
+    enctype = 'cp1250'
+    writer = csv.writer(response,  delimiter=';')
+    kategorie_list = rocnik.kategorie_list(ordering_str)
+    nezarazeni = rocnik.nezarazeni(ordering_str)
+
+    writer.writerow([rocnik.__unicode__().encode(enctype, 'ignore')])
+    writer.writerow([])
+    writer.writerow([])
+
+    for kategorie, zavodnici in kategorie_list:
+        writer.writerow([
+            kategorie.znacka,
+            kategorie.nazev.encode(enctype, 'ignore'),
+            '{0[0]} - {0[1]}'.format(kategorie.rozsah_narozeni()),
+            kategorie.get_pohlavi_display().encode(enctype, 'ignore'),
+            kategorie.delka_trate
+        ])
+        _zavodnici_write(zavodnici)
+        writer.writerow([])
+        writer.writerow([])
+
+    if nezarazeni:
+        writer.writerow([
+            '',
+            u'nezařazení'.encode(enctype, 'ignore')
+        ])
+        _zavodnici_write(nezarazeni)
+
+    return response
+
+
+def exportuj_vysledky(response, rocnik):
+    def _zavodnici_write(zavodnici):
+        for zavodnik in zavodnici:
+            writer.writerow([
+                zavodnik.poradi_v_kategorii(),
+                zavodnik.cislo,
+                zavodnik.clovek.prijmeni.encode(enctype, 'ignore'),
+                zavodnik.clovek.jmeno.encode(enctype, 'ignore'),
+                zavodnik.clovek.narozen,
+                zavodnik.klub.nazev.encode(enctype, 'ignore') if zavodnik.klub else '',
+                desetiny_sekundy(zavodnik.startovni_cas),
+                desetiny_sekundy(zavodnik.cilovy_cas),
+                desetiny_sekundy(zavodnik.vysledny_cas),
+                zavodnik.nedokoncil,
+                zavodnik.odstartoval,
+                zavodnik.poradi_na_trati()
+            ])
+
+    enctype = 'cp1250'
+    writer = csv.writer(response,  delimiter=';')
+    kategorie_list = rocnik.kategorie_list()
+
+    writer.writerow([
+        rocnik.__unicode__().encode(enctype, 'ignore'),
+        rocnik.zavod.sport.__unicode__().encode(enctype, 'ignore')
+    ])
+    writer.writerow([])
+    writer.writerow([])
+
+    for kategorie, zavodnici in kategorie_list:
+        writer.writerow([
+            kategorie.znacka.encode(enctype, 'ignore'),
+            kategorie.nazev.encode(enctype, 'ignore'),
+            '{0[0]} - {0[1]}'.format(kategorie.rozsah_narozeni()),
+            kategorie.get_pohlavi_display().encode(enctype, 'ignore'),
+            kategorie.delka_trate.encode(enctype, 'ignore')
+        ])
+        writer.writerow([
+            u'pořadí'.encode(enctype, 'ignore'),
+            u'číslo'.encode(enctype, 'ignore'),
+            u'příjmení'.encode(enctype, 'ignore'),
+            u'jméno'.encode(enctype, 'ignore'),
+            u'nar.',
+            u'klub',
+            u'startovní čas'.encode(enctype, 'ignore'),
+            u'cílový čas'.encode(enctype, 'ignore'),
+            u'výsledný čas'.encode(enctype, 'ignore'),
+            u'na trati',
+        ])
+        _zavodnici_write(zavodnici)
+        writer.writerow([])
+        writer.writerow([])
+
+    return response
+
+
+def exportuj_kategorie(response, rocnik):
+    enctype = 'cp1250'
+    writer = csv.writer(response,  delimiter=';')
+
+    writer.writerow([
+        u'Název závodu'.encode(enctype, 'ignore'),
+        u'Sport'
+    ])
+    writer.writerow([
+        rocnik.__unicode__().encode(enctype, 'ignore'),
+        rocnik.zavod.sport.__unicode__().encode(enctype, 'ignore')
+    ])
+    writer.writerow([])
+    writer.writerow([
+        u'Název'.encode(enctype, 'ignore'),
+        u'Značka'.encode(enctype, 'ignore'),
+        u'Pohlaví'.encode(enctype, 'ignore'),
+        u'Věk od včetně'.encode(enctype, 'ignore'),
+        u'Věk do včetně'.encode(enctype, 'ignore'),
+        u'Délka tratě'.encode(enctype, 'ignore')
+    ])
+    for kategorie in rocnik.kategorie.all():
+        writer.writerow([
+            kategorie.nazev.encode(enctype, 'ignore'),
+            kategorie.znacka.encode(enctype, 'ignore'),
+            kategorie.pohlavi,
+            kategorie.vek_od,
+            kategorie.vek_do,
+            kategorie.delka_trate.encode(enctype, 'ignore')
+        ])
+
+    return response

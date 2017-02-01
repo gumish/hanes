@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    SMAZAT? | {{ object }}
+{% endblock title %}
+
+{% block header %}
+    <h1 class="ui header">
+        <i class="ui trash red big icon"></i>
+        <div class="content">
+            {{ object }}
+            <div class="sub header">
+                smazání objektu
+            </div>            
+        </div>
+    </h1>    
+{% endblock header %}
+
+{% block content %}
+    <div class="ui container">
+        <form action="" method="POST" class="ui form">
+            {% csrf_token %}
+            <button type="submit" class="ui red icon button">
+                <i class="trash icon"></i>
+                smazat
+            </button>
+            <a href="{{ object.get_absolute_url }}" title="nemazat a zpět na detail objektu" class="ui icon button">
+                <i class="cancel icon"></i>
+                zrušit
+            </a>
+        </form>        
+    </div>
+{% endblock content %}

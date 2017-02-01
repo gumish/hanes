@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}
+    PŘIDÁNÍ POHÁRŮ
+{% endblock title %}
+
+{% block section %}section_pohary{% endblock %}
+
+{% block custom_js %}
+    {% comment %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#id_sport").devbridgeAutocomplete({
+                serviceUrl: "{% url 'pohary:sport_autocomplete' %}",
+                minChars: 1,
+                deferRequestBy: 0,
+                maxHeight: 600,
+                preventBadQueries: false,
+                triggerSelectOnValidInput: false,
+                noCache: false,
+                width: 300,
+            });
+        });
+    </script>
+    {% endcomment %}
+{% endblock %}
+
+{% block header %}
+    <h1 class="ui header">
+        <div class="content">
+            <i class="trophy big icon"></i>
+            Přidání poháru
+        </div>
+    </h1>    
+{% endblock header %}
+
+{% block staff %}
+{% endblock staff %}
+
+{% block content %}
+    <div class="ui grid">
+        <div class="ui ten wide column">
+            <h3>Přidání nového poháru</h3>
+            <form action="" method="POST" class="ui form">
+                {% csrf_token %}
+                {% for field in form %}
+                    {% include "elements/_form_error_field.html" with label=True required=True %}
+                {% endfor %}
+                <button type="submit" class="ui primary icon button">
+                    <i class="save icon"></i>
+                    odeslat
+                </button>        
+                <a href="{% url 'pohary:pohary_list' %}" title="neuložit a zpět na seznam pohárů" class="ui icon button">
+                    <i class="ui reply mail icon"></i>
+                    zrušit
+                </a>
+            </form>            
+        </div>
+        <div class="ui six wide column">
+            <h3>Seznam již registrovných pohárů</h3>
+            <table class="ui celled unstackable collapsing table">
+                <thead>
+                    <tr>
+                        <th>název</th>
+                        <th>datum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pohar in pohary %}
+                        <tr>
+                            <td>
+                                <a href="{{ pohar.get_absolute_url }}">
+                                    {{ pohar.nazev }}
+                                </a>
+                            </td>
+                            <td>
+                                {{ pohar.datum }}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan=2>
+                                žádný pohár
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock content %}

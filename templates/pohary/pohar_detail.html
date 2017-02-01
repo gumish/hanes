@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}
+    DETAIL POHÁRU | {{ pohar.nazev }}
+{% endblock title %}
+
+{% block section %}section_pohary{% endblock %}
+
+{% block breadcrumb %}
+    <div class="ui breadcrumb">
+        <a href="{% url 'pohary:pohary_list' %}" class="section">poháry</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">detail poháru</div>
+    </div>
+{% endblock breadcrumb %}
+
+{% block header %}
+    <h1 class="ui header">
+        <a href="{% url 'pohary:pohary_list' %}" title="na seznam pohárů">
+            <i class="ui reply mail link big icon"></i>
+        </a>
+        <div class="content">
+            <i class="ui trophy big icon"></i>
+            {{ pohar }}
+            <div class="sub header">detail poháru</div>
+        </div>
+    </h1>
+{% endblock header %}
+
+{% block staff %}
+    <div class="ui stacked secondary segment">
+    {% comment %}
+        {% if user.is_active %}
+            <a href="{% url 'pohary:rocnik_pridani' pohar.slug %}" class="ui blue icon button">
+                <i class="plus icon"></i>
+                nový ročník
+            </a>
+            <a href="{% url 'pohary:pohar_editace' pohar.id %}" class="ui black icon button">
+                <i class="edit icon"></i>
+                editace poháru
+            </a>
+        {% endif %}
+    {% endcomment %}
+        {% if user.is_staff %}
+            <a href="{% url 'admin:pohary_pohar_change' pohar.id %}" title="editovat pohár v administraci" target="_blank" class="ui icon black button">
+                <i class="settings icon"></i>
+                admin poháru
+            </a>
+        {% endif %}
+    </div>
+{% endblock staff %}
+
+{% block content %}
+    <h3>Závody</h3>
+    <table class="ui celled definition collapsing large table">
+        <thead class="full-width">
+            <tr>
+                <th>ročník</th>
+                <th>počet závodníků</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rocnik in pohar.rocniky.all %}
+                <tr>
+                    <td>
+                        <a href="{{ rocnik.get_absolute_url }}">
+                            {{ rocnik }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ rocnik.zavodnici.all.count }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Kategorie poháru</h3>
+    <table class="ui celled table">
+        <thead>
+            <tr>
+                <th>značka</th>
+                <th>název kategorie</th>
+                <th>pohlaví</th>
+                <th>věk</th>
+                <th>
+                    vlastnosti
+                    <i class="help circle icon"
+                        title="požadované vlastnosti na závodníka"></i>
+                </th>
+                <th>závodníků</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for kategorie in pohar.kategorie_poharu.all %}
+                <tr>
+                    <td>
+                        {{ kategorie.znacka }}
+                    </td>
+                    <td>
+                        <a href="{{ kategorie.get_absolute_url }}">
+                            {{ kategorie.nazev }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ kategorie.get_pohlavi_display|default:'unisex' }}
+                    </td>
+                    <td title="narozeni v rozmezí: {{ kategorie.rozsah_narozeni.0|unlocalize }} - {{ kategorie.rozsah_narozeni.1|unlocalize }}">
+                        {{ kategorie.vek_od|default:0 }} - {{ kategorie.vek_do|default:'starší' }}
+                    </td>
+                    <td>
+                        {% if kategorie.atributy.all.exists %}
+                            <ul>
+                                {% for attr in kategorie.atributy.all %}
+                                    <li>
+                                        {{ attr.nazev }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ kategorie.zavodnici|length }}
+                    </td>
+                </tr>
+            {% endfor %}
+            {% with pohar.zavodnici_bez_kategorie as bez_kategorie %}
+                {% if bez_kategorie %}
+                    <tr class="red">
+                        <td>-</td>
+                        <td colspan="4">nezařazení do žádné z kategorií</td>
+                        <td title="{{ bez_kategorie|join:'/n' }}" style="cursor: help;">
+                            {{ bez_kategorie|length }}
+                            <i class="ui users icon"></i>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endwith %}
+        </tbody>
+    </table>
+{% endblock content %}

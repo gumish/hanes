@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}
+    DETAIL ROČNÍKU | {{ rocnik }}
+{% endblock title %}
+
+{% block section %}section_zavody{% endblock %}
+
+{% block breadcrumb %}
+    <div class="ui breadcrumb">
+        <a href="{% url 'zavody:zavody_list' %}" class="section">závody</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.zavod.get_absolute_url }}" class="section">detail závodu</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">detail ročníku</div>
+    </div>
+{% endblock breadcrumb %}
+
+{% block header %}
+    <h1 class="ui header">
+        <a href="{{ rocnik.zavod.get_absolute_url }}" title="na detail závodu">
+            <i class="ui reply mail link big icon"></i>
+        </a>
+        <div class="content">
+            <i class="checkered flag big icon"></i>
+            {{ rocnik }}
+            <div class="sub header">{{ rocnik.zavod.sport }}</div>
+        </div>
+    </h1>
+{% endblock header %}
+
+
+{% block content %}
+
+    <div class="ui stackable grid">
+        {# MENU #}
+        <div class="four wide column">
+
+            {# STARTOVKA #}
+            <div class="ui vertical inverted large blue fluid menu">
+                <a href="{% url 'zavody:startovni_listina' rocnik.id %}" class="header item">
+                    <i class="flag outline icon"></i>
+                    startovní listina
+                </a>
+                {% if user.is_active %}
+                    <a href="{% url 'zavody:pridani_zavodniku' rocnik.id %}" class="item">
+                        přidat závodníky
+                    </a>
+                    <a href="{% url 'zavody:import_zavodniku' rocnik.id %}" class="item">
+                        import závodníků
+                    </a>
+                {% endif %}
+            </div>
+
+            {% if user.is_active %}
+                {# FORMULÁŘ STARTÉRA #}
+                <div class="ui vertical inverted large teal fluid menu">
+                    <a href="{% url 'zavody:startovni_casy' rocnik.id %}" class="item">
+                        <i class="wait icon"></i>
+                        startovní časy
+                    </a>
+                    <a href="{% url 'zavody:formular_startera' rocnik.id %}" class="item">
+                        <i class="checkmark box icon"></i>
+                        formulář startéra
+                    </a>
+                </div>
+            {% endif %}
+
+            {# VÝSLEDKY #}
+            <div class="ui vertical inverted large violet fluid menu">
+                <a href="{% url 'zavody:vysledkova_listina' rocnik.id %}" title="výsledková listina - dle kategorií" class="header item">
+                    <i class="checkered flag icon"></i>
+                    výsledková listina
+                </a>
+                {% if user.is_active %}
+                    <a href="{% url 'zavody:cilovy_formular' rocnik.id %}" title="cílový formulář" class="item">
+                        cílový formulář
+                    </a>
+                {% endif %}
+            </div>
+
+            {# EXPORTY #}
+            <div class="ui vertical inverted grey fluid small menu">
+                <a href="{% url 'zavody:startovka_export' rocnik.id %}" title="vyexportovat data do CSV:excel" class="item">
+                    <i class="download icon"></i>
+                    export startovní listiny
+                </a>
+                <a href="{% url 'zavody:vysledky_export' rocnik.id %}" title="vyexportovat data do CSV:excel" class="item">
+                    export výsledkové listiny
+                </a>
+                {% if user.is_active %}
+                    <a href="{% url 'zavody:kategorie_export' rocnik.id %}" class="item">
+                        export kategorií
+                    </a>
+                {% endif %}
+            </div>
+
+            {# ADMIN #}
+
+
+            {% if user.is_active %}
+                <div class="ui vertical inverted fluid small menu">
+                    <a href="{% url 'zavody:rocnik_editace' rocnik.id %}" title="editovat ročník" class="item" target="_blank">
+                        <i class="edit link icon"></i>
+                        editace ročníku
+                    </a>
+                    {% if user.is_staff %}
+                        <a href="{% url 'admin:zavody_rocnik_change' rocnik.id %}" title="editovat ročník v administraci" class="item" target="_blank">
+                            <i class="settings link icon"></i>
+                            admin ročníku
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {# POPIS #}
+            <div class="ui segment">
+                {% if rocnik.nazev %}
+                    <p>původní název závodu: <b>{{ rocnik.zavod }}</b></p>
+                {% endif %}
+                <p>datum: <b>{{ rocnik.datum }}</b></p>
+                <p>čas: <b>{{ rocnik.cas|default:'' }}</b> </p>
+                <p>místo: <b>{{ rocnik.get_misto|default:'' }}</b></p>
+                <p>
+                    {{ rocnik.info|safe|urlize|linebreaksbr  }}
+                </p>
+            </div>
+
+        </div>
+
+        <div class="twelve wide column">
+            {# KATEGORIE ROCNIKU #}
+            <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>značka</th>
+                        <th>název kategorie</th>
+                        <th>pohlaví</th>
+                        <th>věk</th>
+                        <th>ročník</th>
+                        <th>
+                            vlastnosti
+                            <i class="help circle icon"
+                                title="požadované vlastnosti na závodníka"></i>
+                        </th>
+                        <th>délka[m]</th>
+                        <th>závodníků</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for kategorie in kategorie_all %}
+                        <tr>
+                            <td>
+                                {{ kategorie.znacka }}
+                            </td>
+                            <td>
+                                <a href="{{ kategorie.get_absolute_url }}" title="na detail kategorie">
+                                    {{ kategorie.nazev }}
+                                </a>
+                            </td>
+                            <td>
+                                {{ kategorie.get_pohlavi_display|default:'unisex' }}
+                            </td>
+                            <td>
+                                {{ kategorie.vek_od|default:0 }} - {{ kategorie.vek_do|default:'starší' }}
+                            </td>
+                            <td>{{ kategorie.rozsah_narozeni.0|unlocalize }} - {{ kategorie.rozsah_narozeni.1|unlocalize }}</td>
+                            <td>
+                                {% if kategorie.atributy.all.exists %}
+                                    <ul>
+                                        {% for attr in kategorie.atributy.all %}
+                                            <li>
+                                                {{ attr.nazev }}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ kategorie.delka_trate }}
+                            </td>
+                            <td>{{ kategorie.zavodniku }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+
+</div>
+{% endblock content %}

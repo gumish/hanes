@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load l10n custom_filters %}
+
+{% block title %}
+    DETAIL KATEGORIE | {{ kategorie.nazev }}
+{% endblock title %}
+
+{% block section %}section_zavody{% endblock %}
+
+{% block breadcrumb %}
+    <div class="ui breadcrumb">
+        <a href="{{ kategorie.rocnik.get_absolute_url }}" class="section">detail ročníku</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">detail kategorie</div>
+    </div>
+{% endblock breadcrumb %}
+
+{% block header %}
+    <h1 class="ui header">
+        <a href="{{ kategorie.rocnik.get_absolute_url }}" title="zpět na předchozí stránku">
+            <i class="ui reply mail link big icon"></i>
+        </a>
+        <div class="content">
+            <i class="checkered flag big icon"></i>
+            {{ kategorie.znacka }} - {{ kategorie.nazev }}
+
+            <div class="sub header">
+                narození {{ kategorie.rozsah_narozeni.0|unlocalize }} -
+                {{ kategorie.rozsah_narozeni.1|unlocalize }} |
+                délka tratě: {{ kategorie.delka_trate|default:'-' }} |
+                počet závodníků v kategorii: {{ kategorie.zavodnici_temp.count }}   
+            </div>
+        </div>
+    </h1>    
+{% endblock header %}
+
+{% block staff %}
+    {% if user.is_active %}
+        <div class="ui stacked secondary sticky segment">
+            <a href="{% url 'zavody:kategorie_editace' kategorie.id %}" class="ui black button" title="upravit kategorii">
+                <i class="edit link icon"></i>
+                editace kategorie
+            </a>                
+            
+            {% if user.is_staff %}
+                <a href="{% url 'admin:zavody_kategorie_change' kategorie.id %}" class="ui black button" title="upravit kategorii v administraci">
+                    <i class="settings link icon"></i>
+                    admin kategorie
+                </a>                
+            {% endif %}
+        </div>
+    {% endif %}    
+{% endblock staff %}
+
+{% block content %}
+    {% with kategorie.zavodnici_temp.all as zavodnici %}
+        <div class="ui grid">
+            <div class="four wide column computer only">
+                <dl class="vlastnosti ui segment">
+                    <dt>závod</dt>
+                    <dd>{{ kategorie.rocnik }}</dd>
+                    <dt>věk závodníků</dt>
+                    <dd>
+                        {{ kategorie.vek_od|default:'0' }} - {{ kategorie.vek_do|default:'100' }}
+                    </dd>
+                    <dt>narozeni</dt>
+                    <dd>
+                        {{ kategorie.rozsah_narozeni.0|unlocalize }} -
+                        {{ kategorie.rozsah_narozeni.1|unlocalize }}
+                    </dd>
+                    <dt>pohlaví závodníků</dt>
+                    <dd>{{ kategorie.get_pohlavi_display|default:'unisex' }}</dd>
+                    <dt>požadované vlastnosti závodníků</dt>
+                    <dd>
+                        {% if kategorie.atributy.all.exists %}
+                            {% for attr in kategorie.atributy.all %}
+                                {{ attr.nazev }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </dd>
+                    <dt>délka tratě</dt>
+                    <dd>{{ kategorie.delka_trate|default:'-' }}</dd>
+                    <dt>počet závodníků:</dt>
+                    <dd>{{ zavodnici|length }}</dd>
+                </dl>                
+            </div>
+
+            <div class="sixteen wide tablet twelve wide computer column">
+                <table class="ui unstackable definition striped table">
+                    <thead class="full-width">
+                        <tr>
+                            <th style="width:3em">číslo</th>
+                            <th style="width:10em">příjmení</th>
+                            <th style="width:9em">jméno</th>
+                            <th style="width:3em">nar.</th>
+                            <th>klub</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for zavodnik in zavodnici %}
+                                <tr id="zavodnik_{{ zavodnik.id }}">
+
+                                    <td class="right aligned">
+                                        {{ zavodnik.cislo|default:''|unlocalize }}
+                                    </td>
+                                    <td>
+                                        
+                                            {{ zavodnik.clovek.prijmeni }}
+                                        
+                                    </td>
+                                    <td>
+                                        {{ zavodnik.clovek.jmeno }}
+                                    </td>
+                                    <td>
+                                        {{ zavodnik.clovek.narozen|unlocalize }}
+                                    </td>
+                                    <td>
+                                        {{ zavodnik.klub.nazev }}
+                                    </td>
+                                </tr>
+                        {% empty %}
+                            <tr class="disabled">
+                                <td colspan=8 class="center aligned" style="font-weight: normal; color: silver;">
+                                    žádný závodník
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>                
+            </div>
+        </div>
+    {% endwith %}
+{% endblock content %}

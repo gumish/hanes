@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}
+    VÝSLEDKOVÁ LISTINA | {{ rocnik }}
+{% endblock title %}
+
+{% block custom_js %}
+    
+{% endblock custom_js %}
+
+{% block section %}section_zavody{% endblock %}
+
+{% block breadcrumb %}
+    <div class="ui breadcrumb">
+        <a href="{% url 'zavody:zavody_list' %}" class="section">závody</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.zavod.get_absolute_url }}" class="section">detail závodu</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.get_absolute_url }}" class="section">detail ročníku</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">výsledková listina</div>
+    </div>    
+{% endblock breadcrumb %}
+
+{% block header %}
+    <h1 class="ui header">
+        <a href="{{ rocnik.get_absolute_url }}" title="na detail závodu">
+            <i class="ui reply mail link big icon"></i>
+        </a>
+        <div class="content">
+            <i class="checkered flag big icon"></i>
+            {{ rocnik }}
+            <div class="sub header">výsledková listina ročníku</div>
+        </div>
+    </h1>    
+{% endblock header %}
+
+{% block staff %}
+    <div class="ui stacked secondary clearing {% if user.is_active %}sticky{% endif %} segment">
+        {% if user.is_active %}
+            <a href="{% url 'zavody:cilovy_formular' rocnik.id %}" title="cílový formulář" class="ui icon violet button">
+                <i class="wait icon"></i>
+                cílový formulář
+            </a>
+        {% endif %}
+
+        <a href="{% url 'zavody:vysledky_export' rocnik.id %}" title="vyexportovat data do CSV:excel" class="ui icon grey button">
+            <i class="download icon"></i>
+            export výsledkové listiny
+        </a>
+
+        <a href="{% url 'zavody:vysledky_rocnik_PDF' rocnik.pk %}" target="_blank" class="ui icon grey button" title="převod výsledkové listiny všech kategorií do PDF v novém okně prohlížeče">
+            <i class="file pdf outline icon"></i>
+            výsledky v PDF
+        </a>
+
+        <form action="" method="POST" class="ui form" style="float:right;">
+            {% csrf_token %}
+            <div class="inline fields">
+            {% for field in sloupce_form %}
+                <div class="field">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                </div>
+            {% endfor %}
+                <button type="submit" class="ui icon blue button">
+                    <i class="hide icon"></i>
+                </button>
+            </div>
+        </form>
+     </div>    
+{% endblock staff %}
+
+{% block content %}
+    <div id="kategorie_form">
+        {% for kategorie, zavodnici in kategorie_list %}
+            {% include "zavody/_vysledkova_listina_kategorie.html" %}
+        {% endfor %}
+    </div>
+{% endblock content %}

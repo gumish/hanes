@@ -1,0 +1,26 @@
+{% if not field.is_hidden %}
+    <div class="
+        field
+        {% if field.errors %}error{% endif %}
+        {% if inline %}inline{% endif %}"
+        {% if field.help_text %}
+            title="{{ field.help_text }}"    
+        {% endif %}
+    >
+        {% if label %}
+            <label {% if field.field.required and required %} title="pole nutno vyplnit"{% endif %}>
+                {{ field.label }}
+                {% if field.field.required and required %}
+                    <span class="bold">*</span>
+                {% endif %}
+                {% if help and field.help_text %}
+                    <i class="circle help icon" title="{{ field.help_text }}"></i>
+                {% endif %}
+            </label>
+        {% endif %}
+        {{ field }}
+        {% include "elements/_error_pointing_ label.html" with error=field.errors.0|safe %}
+    </div>
+{% else %}
+    {{ field }}
+{% endif %}

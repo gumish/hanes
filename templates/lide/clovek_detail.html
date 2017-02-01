@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load l10n custom_filters %}
+
+{% block title %}
+    {{ block.super }} | {{ clovek }}
+{% endblock title %}
+
+{% block section %}section_lide{% endblock %}
+
+{% block breadcrumb %}
+    <div class="ui breadcrumb">
+        <a href="{% url 'lide:lide_list' %}#{{ clovek.prijmeni.0 }}" class="section">lidé</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">detail člověka</div>
+    </div>    
+{% endblock breadcrumb %}
+
+{% block header %}
+    <h1 class="ui header">
+        {% if referer %}
+            <a href="{{ referer }}" title="zpět na předchozí stránku">
+                <i class="ui reply mail link big icon"></i>
+            </a>
+        {% else %}
+            <a href="{% url 'lide:lide_list' %}#{{ clovek.prijmeni.0 }}" title="zpět na seznam lidí">
+                <i class="ui reply mail link big icon"></i>
+            </a>        
+        {% endif %}
+        <div class="content">
+            <i class="ui user big icon"></i>
+            {{ clovek.cele_jmeno }}
+            {% if user.is_staff %}
+                <a href="{% url 'admin:lide_clovek_change' clovek.id %}" title="editovat člověka" target="_blank" class="ui icon button">
+                    <i class="settings link icon"></i>
+                </a>
+            {% endif %}
+            <div class="sub header">detail človeka</div>
+        </div>
+    </h1>    
+{% endblock header %}
+
+{% block content %}
+    <div class="ui stackable grid">
+
+        <div class="sixteen wide tablet five wide computer column">
+            <dl class="vlastnosti">
+                <dt>Příjmení</dt>
+                <dd>{{ clovek.prijmeni }}</dd>
+                <dt>Jméno</dt>
+                <dd>{{ clovek.jmeno }}</dd>
+                <dt>Pohlaví</dt>
+                <dd>{{ clovek.get_pohlavi_display }}</dd>
+                <dt>Narozen{% if clovek.pohlavi == 'z' %}a{% endif %}</dt>
+                <dd>{{ clovek.narozen|unlocalize }}</dd>
+                <dt>Vlastnosti</dt>
+                <dd>
+                    {% if clovek.atributy.all %}
+                        <ul>
+                            {% for atr in clovek.atributy.all %}
+                                <li>{{ atr }}</li>    
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        -                        
+                    {% endif %}
+                </dd>
+                <dt>Kluby</dt>
+                <dd>
+                    {% with clovek.jednotlive_kluby as kluby %}
+                        {% if kluby %}
+                            <ul>
+                                {% for klub in kluby %}
+                                    <li>
+                                        <a href="{% url 'kluby:klub_detail' klub.slug %}" title="na detail klubu">
+                                            {{ klub }}
+                                        </a>
+                                    </li>    
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            -
+                        {% endif %}
+                    {% endwith %}                    
+                </dd>
+                {% if jmenovci %}
+                    <dt>
+                        Jmenovci
+                    </dt>
+                    <dd>
+                        <ul>
+                            {% for jmenovec in jmenovci %}
+                                <li>
+                                    <a href="{{ jmenovec.get_absolute_url }}">
+                                        {{ jmenovec }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>                    
+                    </dd>                    
+                {% endif %}
+            </dl>
+        </div>
+
+        <div class="sixteen wide tablet eleven wide computer column">
+            <table class="ui unstackable celled structured table">
+                <thead>
+                    <tr>
+                        <th colspan="5">zúčastněné závody</th>
+                        <th colspan="4" class="center aligned">umístění v závodu</th>
+                    </tr>
+                    <tr>
+                        <th rowspan="2" class="center aligned">ročník</th>
+                        <th rowspan="2" class="center aligned">závod</th>
+                        <th rowspan="2" class="center aligned">kategorie</th>
+                        <th rowspan="2" class="center aligned">trať</th>
+                        <th rowspan="2" class="center aligned">výsledný čas</th>
+                        <th colspan="2" class="center aligned">v kategorii</th>
+                        <th colspan="2" class="center aligned">na trati</th>
+                    </tr>
+                    <tr>
+                        <th class="right aligned">umístění</th>
+                        <th class="right aligned" title="celkem závodníků v kategorii">Σ</th>
+                        <th class="right aligned">umístění</th>
+                        <th class="right aligned" title="celkem závodníků na trati">Σ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% regroup zavodnici|dictsortreversed:'rocnik.datum' by rocnik.datum|date:'Y' as roky_list %}
+                    {% for rok in roky_list %}
+                        {% for zavodnik in rok.list %}
+                            <tr>
+                                {% if forloop.first %}
+                                    <td rowspan="{{ rok.list|length }}" class="center aligned">
+                                        {{ rok.grouper }}
+                                    </td>
+                                {% endif %}
+                                <td>
+                                    <a href="{% url 'zavody:vysledkova_listina' zavodnik.rocnik.id %}#zavodnik_{{ zavodnik.id }}" title="{{ zavodnik.rocnik.datum }} - na výsledkovou listinu závodu">
+                                        {{ zavodnik.rocnik.zavod.nazev }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {{ zavodnik.kategorie_temp.nazev }}
+                                </td>
+                                <td>
+                                    {{ zavodnik.kategorie_temp.delka_trate }}
+                                </td>
+                                <td>
+                                    {{ zavodnik.vysledny_cas|desetiny_sekundy|default:'' }}
+                                </td>
+                                <td class="right aligned">
+                                    {{ zavodnik.poradi_v_kategorii|default:'' }}
+                                </td>
+                                <td class="right aligned">
+                                    {{ zavodnik.kategorie_temp.zavodnici_temp.count }}
+                                </td>
+                                <td class="right aligned">
+                                    {{ zavodnik.poradi_na_trati|default:''}}
+                                </td>
+                                <td class="right aligned">
+                                    {% if zavodnik.zavodniku_na_trati %}
+                                        {{ zavodnik.zavodniku_na_trati|default:''}}    
+                                    {% endif %}
+                                </td>
+                            </tr>                            
+                        {% endfor %}
+
+                    {% empty %}
+                        <tr>
+                            <td colspan="9" class="center aligned">
+                                žádný závod
+                            </td>
+                        </tr>    
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock content %}

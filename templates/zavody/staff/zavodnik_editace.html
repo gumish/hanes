@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load staticfiles l10n custom_filters %}
+
+{% block title %}
+    EDITACE ZÁVODNÍKA | {{ rocnik }}
+{% endblock title %}
+
+{% block section %}section_zavody{% endblock %}
+
+{% block custom_js %}
+<script type="text/javascript">
+    var clovek_autocomplete_url = "{% url 'lide:clovek_autocomplete' zavodnik.rocnik.pk %}";
+    var klub_autocomplete_url = "{% url 'kluby:klub_autocomplete' %}";
+</script>
+{% endblock %}
+
+{% block breadcrumb %}
+    <div class="ui breadcrumb">
+        <a href="{% url 'zavody:zavody_list' %}" class="section">závody</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.zavod.get_absolute_url }}" class="section">detail závodu</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.get_absolute_url }}" class="section">detail ročníku</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">editace závodníka</div>
+    </div>
+{% endblock breadcrumb %}
+
+{% block header %}
+    <h1 class="ui header">
+        <a href="{% url 'zavody:startovni_listina' rocnik.id %}" title="neuložit změny a zpět na startovní listinu ročníku">
+            <i class="ui reply mail link big icon"></i>
+        </a>
+        <div class="content">
+            <i class="ui html5 big icon"></i>
+            {{ rocnik }}
+            <div class="sub header">
+                {{ zavodnik.kategorie_temp|default:'v žádné kategorii' }}<br />
+                startovní číslo: {{ zavodnik.cislo|default:'bez čísla' }}
+            </div>
+        </div>
+    </h1>
+{% endblock header %}
+
+{% block staff %}
+    <div class="ui stacked secondary sticky segment right aligned">
+        <button type="submit" class="ui primary icon button" form="zavodnici_forms">
+            <i class="save icon"></i>
+            odeslat
+        </button>
+        <a href="{{ rocnik.get_absolute_url }}" title="neuložit změny a zpět na detail ročníku" class="ui icon button">
+            <i class="ui reply mail icon"></i>
+            zrušit
+        </a>
+    </div>
+{% endblock staff %}
+
+{% block content %}
+<form action="" method="POST" enctype="multipart/form-data" class="ui form" id="zavodnici_forms">
+    <div class="ui stackable grid">
+        <div class="six wide column">
+            <h4 class="ui dividing header">
+                {% if zavodnik.clovek and user.is_staff %}
+                    <a href="{% url 'admin:lide_clovek_change' zavodnik.clovek.pk %}" title="administace člověka" target="_blank">
+                        <i class="edit icon"></i>
+                    </a>
+                {% endif %}
+                Člověk
+            </h4>
+            <div class="ui info message">
+                <i class="ui info icon"></i>
+                vyplněním kolonek člověka změníte člověka přiřazeného jako závodníka, případně pokud neexistuje registrovaný člověkv ytvoříte nového registrovaného člověka
+            </div>
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% include "elements/_form_error_field.html" with field=form.prijmeni label=True %}
+            {% include "elements/_form_error_field.html" with field=form.jmeno label=True %}
+            {% include "elements/_form_error_field.html" with field=form.pohlavi label=True %}
+            {% include "elements/_form_error_field.html" with field=form.narozen label=True %}
+        </div>
+        <div class="six wide column">
+            <h4 class="ui dividing header">
+                {% if user.is_staff %}
+                    <a href="{% url 'admin:zavodnici_zavodnik_change' zavodnik.pk %}" title="administace závodníka" target="_blank">
+                        <i class="edit icon"></i>
+                    </a>
+                {% endif %}
+                Závodník
+            </h4>
+            {% include "elements/_form_error_field.html" with field=form.cislo label=True %}
+            {% include "elements/_form_error_field.html" with field=form.klub_nazev label=True %}
+            {% include "elements/_form_error_field.html" with field=form.kategorie label=True %}
+        </div>
+        <div class="four wide column">
+            <h4 class="ui dividing header">
+                {% if user.is_staff %}
+                    <a href="{% url 'admin:zavodnici_zavodnik_change' zavodnik.pk %}" title="administace závodníka" target="_blank">
+                        <i class="edit icon"></i>
+                    </a>
+                {% endif %}
+                Časy
+            </h4>
+            {% if zavodnik.kategorie.spusteni_stopek %}
+                <div class="field">
+                    <label>Čas spuštění stopek kategorie</label>
+                    <input type="text" value="{{ zavodnik.kategorie.spusteni_stopek|time:'H:i:s' }}" disabled="disabled">
+                </div>
+            {% endif %}
+            {% include "elements/_form_error_field.html" with field=form.startovni_cas label=True %}
+            {% include "elements/_form_error_field.html" with field=form.cilovy_cas label=True %}
+            {% include "elements/_form_error_field.html" with field=form.odstartoval label=True %}
+            {% include "elements/_form_error_field.html" with field=form.nedokoncil label=True %}
+            {% if zavodnik.vysledny_cas %}
+                <div class="field">
+                    <label>Výsledný čas</label>
+                    <input type="text" value="{{ zavodnik.vysledny_cas|desetiny_sekundy }}" disabled="disabled">
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</form>
+{% endblock content %}

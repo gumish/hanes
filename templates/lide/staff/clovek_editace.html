@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load l10n custom_filters %}
+
+{% block title %}
+    {{ block.super }} | {{ clovek }}
+{% endblock title %}
+
+{% block custom_js %}
+    <script type="text/javascript">
+        var clovek_autocomplete_url = "{% url 'lide:clovek_autocomplete' %}";
+    </script>
+{% endblock %}
+
+{% block section %}section_lide{% endblock %}
+
+{% block breadcrumb %}
+    <div class="ui breadcrumb">
+        <a href="{% url 'lide:lide_list' %}#{{ clovek.prijmeni.0 }}" class="section">lidé</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">editace člověka</div>
+    </div>    
+{% endblock breadcrumb %}
+
+{% block header %}
+    <h1 class="ui header">
+        {% if referer %}
+            <a href="{{ referer }}" title="zpět na předchozí stránku">
+                <i class="ui reply mail link big icon"></i>
+            </a>
+        {% else %}
+            <a href="{% url 'lide:lide_list' %}#{{ clovek.prijmeni.0 }}" title="zpět na seznam lidí">
+                <i class="ui reply mail link big icon"></i>
+            </a>        
+        {% endif %}
+        <div class="content">
+            <i class="ui user big icon"></i>
+            {{ clovek.cele_jmeno }}
+            {% if user.is_staff %}
+                <a href="{% url 'admin:lide_clovek_change' clovek.id %}" title="editovat člověka" target="_blank" class="ui icon black button">
+                    <i class="settings link icon"></i>
+                </a>
+            {% endif %}
+            <div class="sub header">editace človeka</div>
+        </div>
+    </h1>    
+{% endblock header %}
+
+{% block staff %}
+    <div class="ui stacked secondary sticky segment right aligned">
+        <button type="submit" class="ui primary icon button" form="clovek_form">
+            <i class="save icon"></i>
+            odeslat
+        </button>
+        {% if referer %}
+            <a href="{{ referer }}" title="neuložit změny a zpět na předchozí stránku lidí" class="ui icon button">
+                <i class="ui reply mail icon"></i>
+                zrušit
+            </a>
+        {% else %}
+            <a href="{% url 'lide:lide_list' %}#{{ clovek.prijmeni.0 }}" title="neuložit změny a zpět na seznam lidí" class="ui icon button">
+                <i class="ui reply mail icon"></i>
+                zrušit
+            </a>        
+        {% endif %}
+    </div>    
+{% endblock staff %}
+
+{% block content %}
+    <form action="" method="POST" class="ui {% if form.errors %}error{% endif %} form" id="clovek_form">
+
+        <div class="ui stackable grid">
+
+            {# PRVNI SLOUPEC #}
+            <div class="sixteen wide tablet six wide computer column">
+                <h3 class="ui dividing header">
+                    Člověk
+                </h3>
+
+                <div class="ui error message">
+                    {{ form.non_field_errors.0|safe }}    
+                </div>
+
+                {% csrf_token %}
+                {% for field in form %}
+                    {% include "elements/_form_error_field.html" with label=True help=True %}
+                {% endfor %}
+            </div>
+
+
+            {# DRUHY SLOUPEC #}
+            <div class="sixteen wide tablet six wide computer column">
+                <h3 class="ui dividing header">
+                    Členství v klubech
+                </h3>
+
+                <div class="ui error message">
+                    {{ clenstvi_formset.non_form_errors }}
+                </div>                
+
+                <div class="ui info small message">
+                    <i class="info icon"></i>
+                    Členství je u člověka použito pro nabízení vhodných klubů.
+                    Jeho odstraněním se kluby ani jejich přiřazení k závodu nesmažou.
+                </div>
+                {{ clenstvi_formset.management_form }}
+                {% for clenstvi_form in clenstvi_formset %}
+                    <div class="ui secondary segment">
+                        {% for field in clenstvi_form %}
+                            {% include "elements/_form_error_field.html" with label=True help=True %}
+                        {% endfor %}
+                    </div>                   
+                {% endfor %}
+            </div>
+
+
+            {# TRETI SLOUPEC #}
+            <div class="sixteen wide tablet four wide computer column">
+                    <h3 class="ui dividing header">Jmenovci</h3>
+                    {% if jmenovci %}
+                        <ul>
+                            {% for jmenovec in jmenovci %}
+                                <li>
+                                    <a href="{% detail_url jmenovec %}">
+                                        {{ jmenovec }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>                    
+                    {% endif %}
+            </div>
+        </div>
+    </form>
+
+    <table class="ui unstackable celled structured table">
+        <thead>
+            <tr>
+                <th colspan="5">zúčastněné závody</th>
+                <th colspan="4" class="center aligned">umístění v závodu</th>
+            </tr>
+            <tr>
+                <th rowspan="2" class="center aligned">ročník</th>
+                <th rowspan="2" class="center aligned">závod</th>
+                <th rowspan="2" class="center aligned">kategorie</th>
+                <th rowspan="2" class="center aligned">trať</th>
+                <th rowspan="2" class="center aligned">výsledný čas</th>
+                <th colspan="2" class="center aligned">v kategorii</th>
+                <th colspan="2" class="center aligned">na trati</th>
+            </tr>
+            <tr>
+                <th class="right aligned">umístění</th>
+                <th class="right aligned" title="celkem závodníků v kategorii">Σ</th>
+                <th class="right aligned">umístění</th>
+                <th class="right aligned" title="celkem závodníků na trati">Σ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% regroup zavodnici|dictsortreversed:'rocnik.datum' by rocnik.datum|date:'Y' as roky_list %}
+            {% for rok in roky_list %}
+                {% for zavodnik in rok.list %}
+                    <tr>
+                        {% if forloop.first %}
+                            <td rowspan="{{ rok.list|length }}" class="center aligned">
+                                {{ rok.grouper }}
+                            </td>
+                        {% endif %}
+                        <td>
+                            <a href="{% url 'zavody:vysledkova_listina' zavodnik.rocnik.id %}#zavodnik_{{ zavodnik.id }}" title="{{ zavodnik.rocnik.datum }} - na výsledkovou listinu závodu">
+                                {{ zavodnik.rocnik.zavod.nazev }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ zavodnik.kategorie_temp.nazev }}
+                        </td>
+                        <td>
+                            {{ zavodnik.kategorie_temp.delka_trate }}
+                        </td>
+                        <td>
+                            {{ zavodnik.vysledny_cas|desetiny_sekundy|default:'' }}
+                        </td>
+                        <td class="right aligned">
+                            {{ zavodnik.poradi_v_kategorii|default:'' }}
+                        </td>
+                        <td class="right aligned">
+                            {{ zavodnik.kategorie_temp.zavodnici_temp.count }}
+                        </td>
+                        <td class="right aligned">
+                            {{ zavodnik.poradi_na_trati|default:''}}
+                        </td>
+                        <td class="right aligned">
+                            {% if zavodnik.zavodniku_na_trati %}
+                                {{ zavodnik.zavodniku_na_trati|default:''}}    
+                            {% endif %}
+                        </td>
+                    </tr>                            
+                {% endfor %}
+
+            {% empty %}
+                <tr>
+                    <td colspan="9" class="center aligned">
+                        žádný závod
+                    </td>
+                </tr>    
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}
