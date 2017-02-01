@@ -29,7 +29,7 @@
 {% endblock header %}
 
 {% block staff %}
-    <div class="ui stacked secondary segment">
+    <div class="ui stacked secondary segment noprint">
         {% if user.is_active %}
             <a href="{% url 'zavody:rocnik_pridani' zavod.slug %}" class="ui blue icon button">
                 <i class="plus icon"></i>

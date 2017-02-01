@@ -76,7 +76,9 @@ class KategoriePoharu(models.Model):
     nazev = models.CharField(u'Název', max_length=50)
     znacka = models.CharField(
         u'Značka', max_length=10,
-        null=True, blank=True)
+        null=True, blank=True,
+        help_text=u'značka kategorie se použije při\
+        porovnávání s <b>vnucenými kategoriemi</b> závodníků')
     pohlavi = models.CharField(
         u'Pohlaví', max_length=1, choices=POHLAVI,
         null=True, blank=True)
@@ -147,7 +149,13 @@ class KategoriePoharu(models.Model):
 
         zarazeni = []
         for zavodnik in self.pohar.zavodnici_vsichni():
-            if kategorie_test_cloveka(self, zavodnik, _rozsah_narozeni(zavodnik.rocnik)):
+            vhodny = False
+            if zavodnik.kategorie:  # podminka pridana pro pripad dvojich kategorii pro cloveka
+                vhodny = zavodnik.kategorie.znacka == self.znacka
+                print zavodnik, vhodny
+            else:
+                vhodny = kategorie_test_cloveka(self, zavodnik, _rozsah_narozeni(zavodnik.rocnik))
+            if vhodny:
                 zarazeni.append(zavodnik)
                 self.pohar.zavodnici_s_kategorii.append(zavodnik)
         return zarazeni

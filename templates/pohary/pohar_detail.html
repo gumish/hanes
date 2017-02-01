@@ -29,7 +29,7 @@
 {% endblock header %}
 
 {% block staff %}
-    <div class="ui stacked secondary segment">
+    <div class="ui stacked secondary segment noprint">
     {% comment %}
         {% if user.is_active %}
             <a href="{% url 'pohary:rocnik_pridani' pohar.slug %}" class="ui blue icon button">

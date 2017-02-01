@@ -1,4 +1,4 @@
-.ui.menu, .ui.breadcrumb, .ui.header a, .ui.sticky.segment,  tr.kategorie th.right.aligned{
+.noprint, .ui.menu, .ui.breadcrumb, .ui.header a, .ui.sticky.segment,  tr.kategorie th.right.aligned{
 	display: none;
 }
 

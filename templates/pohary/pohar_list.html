@@ -19,7 +19,7 @@
 
 {% block staff %}
     {% if user.is_staff %}
-        <div class="ui stacked secondary segment">
+        <div class="ui stacked secondary segment noprint">
             <a href="{% url 'pohary:pohar_create' %}" class="ui blue icon button">
                 <i class="plus icon"></i>
                 přidat pohár

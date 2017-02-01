@@ -24,14 +24,14 @@
         </a>
         <div class="content">
             <i class="ui trophy big icon"></i>
-            {{ kategorie }}
+            {{ pohar }}
             <div class="sub header">detail kategorie poháru</div>
         </div>
     </h1>
 {% endblock header %}
 
 {% block staff %}
-    <div class="ui stacked secondary segment">
+    <div class="ui stacked secondary segment noprint">
     {% comment %}
         {% if user.is_active %}
             <a href="{% url 'pohary:rocnik_pridani' pohar.slug %}" class="ui blue icon button">
@@ -59,7 +59,7 @@
             th.rocnik {width: calc(70% / {{ rocniky.count }})}
         </style>
 
-        <h2>žebříček lidí v kategorii</h2>
+        <h2>{{ kategorie }}</h2>
         <table class="ui compact small celled definition blue table" id="zebricek_kategorie">
             <thead class="full-width">
                 <tr>
@@ -92,6 +92,9 @@
                                 <td class="{% if zavodnik.zapocitane %}active bold{% endif %} center aligned"
                                     title="pořadí: {{ zavodnik.poradi }}   čas: {{ zavodnik.vysledny_cas }}  kategorie: {{ zavodnik.kategorie_temp.znacka }}">
                                     {{ zavodnik.body }}
+                                    {% if zavodnik.kategorie %}
+                                        <i class="warning circle icon" title="kategorie '{{zavodnik.kategorie.nazev}}' je vynucena - není automaticky přiřazena"></i>
+                                    {% endif %}
                                     {% comment %}{% if user.is_staff %}
                                         <a href="{{ zavodnik.get_absolute_url }}">
                                             <i class="wrench icon"></i>

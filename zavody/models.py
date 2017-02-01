@@ -171,7 +171,9 @@ class Kategorie(models.Model):
     nazev = models.CharField(u'Název', max_length=50)
     znacka = models.CharField(
         u'Značka', max_length=10,
-        null=True, blank=True)
+        null=True, blank=True,
+        help_text=u'značka kategorie se použije při\
+        porovnávání s vnucenými kategoriemi závodníků <b>u kategorií pohárů</b>')
     pohlavi = models.CharField(
         u'Pohlaví', max_length=1, choices=POHLAVI,
         null=True, blank=True)

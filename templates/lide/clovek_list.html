@@ -19,7 +19,7 @@
 
 {% block staff %}
     {% if user.is_staff %}
-        <div class="ui stacked secondary segment">
+        <div class="ui stacked secondary segment noprint">
             <a href="{% url 'lide:import_csv' %}" class="ui blue icon button">
                 <i class="plus link icon"></i>
                 import lidí
