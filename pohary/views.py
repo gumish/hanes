@@ -1,10 +1,13 @@
 # coding: utf-8
 from django.core.urlresolvers import reverse_lazy
-from django.views.generic import CreateView, DetailView, ListView
 from django.http import HttpResponseRedirect
+from django.views.generic import CreateView, DetailView, ListView
+from io import BytesIO
 
-from .models import KategoriePoharu, Pohar
+from zavody.pdf import PdfPrint
+
 from .forms import PoharCreateForm
+from .models import KategoriePoharu, Pohar
 
 
 class PoharyListView(ListView):
@@ -52,3 +55,28 @@ class PoharCreateView(CreateView):
                 KategoriePoharu.objects.create(**values)
         return HttpResponseRedirect(
             pohar.get_absolute_url())
+
+
+def vysledky_kategorie_pdf(request, kategorie_pk):
+    kategorie = KategoriePoharu.objects.get(pk=kategorie_pk)
+    rows = []
+    widths = [1.5, 1.5, 3, 2.7, 1.5, 6, 2.3, 1.5]
+    for zavodnik in kategorie.serazeni_zavodnici(razeni=None):
+        rows.append([
+                zavodnik.poradi_v_kategorii() or '',
+                zavodnik.cislo or '',
+                zavodnik.clovek.prijmeni,
+                zavodnik.clovek.jmeno,
+                zavodnik.clovek.narozen,
+                zavodnik.klub.nazev if zavodnik.klub else '',
+                zavodnik.nedokoncil or desetiny_sekundy(zavodnik.vysledny_cas),
+                zavodnik.poradi_na_trati() or ''
+            ])
+    pdf_print = PdfPrint(BytesIO())
+    pdf = pdf_print.sheet(
+        [{
+            'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),
+            'headers': ([u'pořadí', u'číslo', u'příjmení', u'jméno', u'nar.', u'klub', u'výsledný čas', u'na trati'],),
+            'rows': rows}],
+        widths)
+    return HttpResponse(pdf, content_type='application/pdf')

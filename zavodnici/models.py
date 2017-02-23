@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 
 
 class Zavodnik(models.Model):
+    casova_ztrata = None
 
     NEDOKONCIL = (
         ('DNS', u'DNS'),

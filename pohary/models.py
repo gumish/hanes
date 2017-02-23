@@ -152,7 +152,6 @@ class KategoriePoharu(models.Model):
             vhodny = False
             if zavodnik.kategorie:  # podminka pridana pro pripad dvojich kategorii pro cloveka
                 vhodny = zavodnik.kategorie.znacka == self.znacka
-                print zavodnik, vhodny
             else:
                 vhodny = kategorie_test_cloveka(self, zavodnik, _rozsah_narozeni(zavodnik.rocnik))
             if vhodny:

@@ -136,6 +136,7 @@ class ImportZavodnikuCSVForm(LideImportCSVForm):
 class SloupceVysledkoveListinyForm(forms.Form):
     startovni_cas = forms.BooleanField(required=False, label=u'startovní čas', initial=False)
     cilovy_cas = forms.BooleanField(required=False, label=u'cílový čas', initial=False)
+    casova_ztrata = forms.BooleanField(required=False, label=u'časová ztráta', initial=False)
     poradi_na_trati = forms.BooleanField(required=False, label=u'pořadí na trati', initial=True)
 
 

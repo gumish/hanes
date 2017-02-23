@@ -265,6 +265,7 @@ class Kategorie(models.Model):
         return (nezarazeni, duplikati, zpravy)
 
     def serazeni_zavodnici(self, razeni):
+        "vrati serazene zavodniky kategorie a doplni do nich casove ztraty na prvniho"
         # pomoci annotate Count, se radi prazdna pole na konec (null_value = 1 / 0)
         annotate_kwargs = {}
         ordering_kwargs = _string_to_ordering_kwargs(razeni)
@@ -274,11 +275,18 @@ class Kategorie(models.Model):
             annotate_kwargs[actual.strip('-')] = Count(i.strip('-'))
             ordering_list.append(actual)
         ordering_list += ordering_kwargs['razeni']
-        return (
-            self.zavodnici_temp.all()\
-                .annotate(
-                    **annotate_kwargs
-                ).order_by(
-                    *ordering_list
-                )
-            )
+
+        zavodnici = self.zavodnici_temp.all()\
+                .annotate(**annotate_kwargs)\
+                .order_by(*ordering_list)
+
+        # vypocet casove ztraty na prvniho
+        if zavodnici:
+            nejlepsi_cas = zavodnici[0].vysledny_cas
+            if nejlepsi_cas:
+                for i, zavodnik in enumerate(zavodnici[1:], 1):
+                    cas = zavodnik.vysledny_cas
+                    if cas:
+                        zavodnici[i].casova_ztrata = cas - nejlepsi_cas
+
+        return zavodnici

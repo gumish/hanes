@@ -43,6 +43,9 @@
                 <th style="width:10em">cílový čas</th>
             {% endif %}
             <th style="width:10em">výsledný čas</th>
+            {% if sloupce_form.casova_ztrata.value %}
+                <th>časová ztráta</th>
+            {% endif %}
             {% if sloupce_form.poradi_na_trati.value %}
                 <th class="right aligned">na trati</th>
             {% endif %}
@@ -92,6 +95,9 @@
                             {{ zavodnik.vysledny_cas|desetiny_sekundy|default:'' }}
                         {% endif %}
                     </td>
+                    {% if sloupce_form.casova_ztrata.value %}
+                        <td>{{ zavodnik.casova_ztrata|desetiny_sekundy|default:'' }}</td>
+                    {% endif %}
                     {% if sloupce_form.poradi_na_trati.value %}
                         <td class="right aligned">
                             {{ zavodnik.poradi_na_trati|default:'' }}

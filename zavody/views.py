@@ -267,7 +267,9 @@ def startovni_listina(request, rocnik_pk, ordering_str='vysledny_cas--startovni_
 
 
 def pridani_zavodniku(request, pk):
-    "zpracovani formulare `PridaniZavodnikuForm`, rozrazeni cloveku do kategorii daneho rocniku zavodu"
+    """zpracovani formulare `PridaniZavodnikuForm`,
+    rozrazeni cloveku do kategorii daneho rocniku zavodu"""
+
     rocnik = Rocnik.objects.get(pk=pk)
     ZavodnikPridaniFormSet = formset_factory(
         ZavodnikPridaniForm,
@@ -297,18 +299,17 @@ def pridani_zavodniku(request, pk):
     )
 
 
-def startovni_casy(request, rocnik_pk):
-    "stranka s formsetem zavodniku, jejiz casy budou ovladany javascriptem"
-    rocnik = Rocnik.objects.get(pk=rocnik_pk)
-
-    return render_to_response(
-        'zavody/staff/startovni_casy.html', {
-            'rocnik': rocnik,
-            'kategorie_list': kategorie_list,
-            'formset': formset
-        },
-        context_instance=RequestContext(request)
-    )
+# def startovni_casy(request, rocnik_pk):
+#     "stranka s formsetem zavodniku, jejiz casy budou ovladany javascriptem"
+#     rocnik = Rocnik.objects.get(pk=rocnik_pk)
+#     return render_to_response(
+#         'zavody/staff/startovni_casy.html', {
+#             'rocnik': rocnik,
+#             'kategorie_list': kategorie_list,
+#             'formset': formset
+#         },
+#         context_instance=RequestContext(request)
+#     )
 
 
 class EditZavodniciView(UpdateView):
@@ -469,23 +470,26 @@ TITLE_TEMPLATE = u'{0.znacka} - {0.nazev} &nbsp;&nbsp; nar. {1[0]}-{1[1]} &nbsp;
 def vysledky_kategorie_PDF(request, kategorie_pk):
     kategorie = Kategorie.objects.get(pk=kategorie_pk)
     rows = []
-    widths = [1.5, 1.5, 3, 2.7, 1.5, 6, 2.3, 1.5]
+    widths = [1.2, 1.2, 3, 2.5, 1.5, 5, 2.3, 2.3, 1.5]
     for zavodnik in kategorie.serazeni_zavodnici(razeni=None):
         rows.append([
-                zavodnik.poradi_v_kategorii() or '',
-                zavodnik.cislo or '',
-                zavodnik.clovek.prijmeni,
-                zavodnik.clovek.jmeno,
-                zavodnik.clovek.narozen,
-                zavodnik.klub.nazev if zavodnik.klub else '',
-                zavodnik.nedokoncil or desetiny_sekundy(zavodnik.vysledny_cas),
-                zavodnik.poradi_na_trati() or ''
-            ])
+            zavodnik.poradi_v_kategorii() or '',
+            zavodnik.cislo or '',
+            zavodnik.clovek.prijmeni,
+            zavodnik.clovek.jmeno,
+            zavodnik.clovek.narozen,
+            zavodnik.klub.nazev if zavodnik.klub else '',
+            zavodnik.nedokoncil or desetiny_sekundy(zavodnik.vysledny_cas),
+            desetiny_sekundy(zavodnik.casova_ztrata) or '',
+            zavodnik.poradi_na_trati() or ''
+        ])
     pdf_print = PdfPrint(BytesIO())
     pdf = pdf_print.sheet(
         [{
             'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),
-            'headers': ([u'pořadí', u'číslo', u'příjmení', u'jméno', u'nar.', u'klub', u'výsledný čas', u'na trati'],),
+            'headers': ([
+                u'pořadí', u'číslo', u'příjmení', u'jméno', u'nar.', u'klub',
+                u'výsledný čas', u'časová ztráta', u'na trati'],),
             'rows': rows}],
         widths)
     return HttpResponse(pdf, content_type='application/pdf')
@@ -497,21 +501,24 @@ def vysledky_rocnik_PDF(request, rocnik_pk):
     tables = []
     for kategorie in rocnik.kategorie.all():
         rows = []
-        widths = [1.5, 1.5, 3, 2.7, 1.5, 6, 2.3, 1.5]
+        widths = [1.2, 1.2, 3, 2.5, 1.5, 5, 2.3, 2.3, 1.5]
         for zavodnik in kategorie.serazeni_zavodnici(razeni=None):
             rows.append([
-                    zavodnik.poradi_v_kategorii() or '',
-                    zavodnik.cislo or '',
-                    zavodnik.clovek.prijmeni,
-                    zavodnik.clovek.jmeno,
-                    zavodnik.clovek.narozen,
-                    zavodnik.klub.nazev if zavodnik.klub else '',
-                    zavodnik.nedokoncil or desetiny_sekundy(zavodnik.vysledny_cas),
-                    zavodnik.poradi_na_trati() or ''
+                zavodnik.poradi_v_kategorii() or '',
+                zavodnik.cislo or '',
+                zavodnik.clovek.prijmeni,
+                zavodnik.clovek.jmeno,
+                zavodnik.clovek.narozen,
+                zavodnik.klub.nazev if zavodnik.klub else '',
+                zavodnik.nedokoncil or desetiny_sekundy(zavodnik.vysledny_cas),
+                desetiny_sekundy(zavodnik.casova_ztrata) or '',
+                zavodnik.poradi_na_trati() or ''
                 ])
         tables.append({
             'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),
-            'headers': ([u'pořadí', u'číslo', u'příjmení', u'jméno', u'nar.', u'klub', u'výsledný čas', u'na trati'],),
+            'headers': ([
+                u'pořadí', u'číslo', u'příjmení', u'jméno', u'nar.', u'klub',
+                u'výsledný čas', u'časová ztráta', u'na trati'],),
             'rows': rows})
 
     pdf = pdf_print.sheet(tables, widths)
