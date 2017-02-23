@@ -484,14 +484,15 @@ def vysledky_kategorie_PDF(request, kategorie_pk):
             zavodnik.poradi_na_trati() or ''
         ])
     pdf_print = PdfPrint(BytesIO())
+    right_aligned = [0, 1, 8]
     pdf = pdf_print.sheet(
         [{
             'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),
             'headers': ([
-                u'pořadí', u'číslo', u'příjmení', u'jméno', u'nar.', u'klub',
+                u'poř.', u'číslo', u'příjmení', u'jméno', u'nar.', u'klub',
                 u'výsledný čas', u'časová ztráta', u'na trati'],),
             'rows': rows}],
-        widths)
+        widths, right_aligned)
     return HttpResponse(pdf, content_type='application/pdf')
 
 
@@ -501,7 +502,6 @@ def vysledky_rocnik_PDF(request, rocnik_pk):
     tables = []
     for kategorie in rocnik.kategorie.all():
         rows = []
-        widths = [1.2, 1.2, 3, 2.5, 1.5, 5, 2.3, 2.3, 1.5]
         for zavodnik in kategorie.serazeni_zavodnici(razeni=None):
             rows.append([
                 zavodnik.poradi_v_kategorii() or '',
@@ -517,11 +517,13 @@ def vysledky_rocnik_PDF(request, rocnik_pk):
         tables.append({
             'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),
             'headers': ([
-                u'pořadí', u'číslo', u'příjmení', u'jméno', u'nar.', u'klub',
+                u'poř.', u'číslo', u'příjmení', u'jméno', u'nar.', u'klub',
                 u'výsledný čas', u'časová ztráta', u'na trati'],),
             'rows': rows})
 
-    pdf = pdf_print.sheet(tables, widths)
+    widths = [1.2, 1.2, 3, 2.5, 1.5, 5, 2.3, 2.3, 1.5]
+    right_aligned = [0, 1, 8]
+    pdf = pdf_print.sheet(tables, widths, right_aligned)
     return HttpResponse(pdf, content_type='application/pdf')
 
 def startovka_kategorie_PDF(request, kategorie_pk):

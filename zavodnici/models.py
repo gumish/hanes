@@ -183,7 +183,7 @@ class Zavodnik(models.Model):
                 kategorie_temp=self.kategorie_temp,
                 vysledny_cas__lt=self.vysledny_cas,
                 ).aggregate(pocet=Count('vysledny_cas'))
-            return lepsich['pocet'] + 1
+            return str(lepsich['pocet'] + 1) + '.'
         else:
             return None
 

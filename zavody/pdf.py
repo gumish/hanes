@@ -2,7 +2,7 @@
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, PageBreak, Table, TableStyle, Paragraph, Spacer
-from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.units import cm
@@ -31,7 +31,7 @@ class PdfPrint:
         canvas.drawRightString(20.8*cm, .2*cm, text)
 
 # ---------------------------------------------------
-    def sheet(self, tables, widths=None):
+    def sheet(self, tables, widths=None, right_aligned=[]):
         # set some characteristics for pdf document
         doc = SimpleDocTemplate(
             self.buffer,
@@ -49,6 +49,8 @@ class PdfPrint:
             alignment=TA_CENTER, fontName='Arial'))
         styles.add(ParagraphStyle(
             name='Arial', fontName='Arial', fontSize=10))
+        styles.add(ParagraphStyle(
+            name='Right', fontName='Arial', fontSize=10, alignment=TA_RIGHT))
 
         V_LIST = 277
         v_akt = 0.0
@@ -73,13 +75,15 @@ class PdfPrint:
             data.append(Spacer(1, 5))
 
             # TABULKA
-            headers = [[
-                Paragraph(unicode(value), styles['TableHeader'])
-                for value in row] for row in table['headers']]
+            headers = [
+                [Paragraph(unicode(value), styles['TableHeader']) for value in row]
+                for row in table['headers']
+            ]
 
-            rows = [[
-                Paragraph(unicode(value), styles['Arial'])
-                for value in row] for row in table['rows']]
+            rows = [
+                [Paragraph(unicode(value), styles['Right' if i in right_aligned else 'Arial']) for i, value in enumerate(row)]
+                for row in table['rows']
+            ]
 
             if widths:
                 wh_table = Table(headers + rows, colWidths=[val * cm for val in widths])
