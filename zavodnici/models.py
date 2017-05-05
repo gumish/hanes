@@ -61,7 +61,7 @@ class Zavodnik(models.Model):
         help_text=u'pokud není zadán `startovní čas`, pak se jedná o výsledný čas závodu')
     vysledny_cas = models.DurationField(
         u'Výsledný čas',
-        null=True, blank=True)
+        null=True, blank=True, editable=False)
     nedokoncil = models.CharField(
         u'Nedokončil', null=True, blank=True,
         choices=NEDOKONCIL, max_length=10)

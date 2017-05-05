@@ -19,13 +19,17 @@ RUNSERVER = (len(sys.argv) > 1 and sys.argv[1] == 'runserver')
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE_ID = 1  # kvuli flatpages
 
+TEMPLATE_DEBUG = True
+
 if RUNSERVER:
     DEBUG = True
     STATIC_URL = '/static/'
+    INTERNAL_IPS = '127.0.0.1'
 else:
     DEBUG = False
     STATIC_URL = '/static/'  # 'http://localhost:8001/static/'
     FORCE_SCRIPT_NAME = ''  # zruseni pridavani predpony v url 'mysite.fcgi'
+    TEMPLATE_DEBUG = False
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -41,7 +45,7 @@ ALLOWED_HOSTS = ['localhost']
 
 # Application definition
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,7 +53,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # 'debug_toolbar',
     'django.contrib.sites',  # kvuli flatpages
     'django.contrib.flatpages',
     'plugins.django_wysiwyg',
@@ -60,9 +63,9 @@ INSTALLED_APPS = (
     'zavody',
     'zavodnici',
     'pohary'
-)
+]
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -73,7 +76,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     'hanes.middleware.ExceptionLoggingMiddleware'
-)
+]
 
 ROOT_URLCONF = 'hanes.urls'
 
@@ -143,3 +146,7 @@ USE_TZ = True
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
+if TEMPLATE_DEBUG:
+    INSTALLED_APPS.append('debug_toolbar')
+    MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')

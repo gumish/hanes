@@ -64,7 +64,7 @@ class Clovek(models.Model):
         self.prijmeni_slug_sorting = self.prijmeni_slug
         self.prijmeni_slug_sorting = _vytvor_sorting_slug(self.prijmeni)
         self.jmeno_slug = slugify(self.jmeno)
-        self.slug = '-'.join([self.prijmeni_slug, self.jmeno_slug, str(self.narozen)])
+        self.slug = '-'.join([self.prijmeni_slug, self.jmeno_slug, str(self.narozen), str(self.id)])
         return super(Clovek, self).save(*args, **kwargs)
 
     def cele_jmeno(self):

@@ -3,8 +3,9 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib import admin
 # from django.contrib.flatpages import views
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
-from .views import *
+from .views import backup_database, uvod, FlatPageUpdate
 
 admin.autodiscover()
 
@@ -32,3 +33,9 @@ urlpatterns = patterns(
 urlpatterns += staticfiles_urlpatterns()
 
 # urlpatterns += url(r'^(?P<url>.*/)$', views.flatpage),
+
+if settings.TEMPLATE_DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns

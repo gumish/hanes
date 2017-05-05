@@ -100,22 +100,20 @@
                 {% endif %}
                 Časy
             </h4>
-            {% if zavodnik.kategorie.spusteni_stopek %}
+            {% if zavodnik.kategorie_temp.spusteni_stopek %}
                 <div class="field">
                     <label>Čas spuštění stopek kategorie</label>
-                    <input type="text" value="{{ zavodnik.kategorie.spusteni_stopek|time:'H:i:s' }}" disabled="disabled">
+                    <input type="text" value="{{ zavodnik.kategorie_temp.spusteni_stopek|time:'H:i:s' }}" disabled="disabled">
                 </div>
             {% endif %}
             {% include "elements/_form_error_field.html" with field=form.startovni_cas label=True %}
             {% include "elements/_form_error_field.html" with field=form.cilovy_cas label=True %}
+            <div class="field">
+                <label>Výsledný čas</label>
+                <input type="text" value="{{ zavodnik.vysledny_cas|desetiny_sekundy }}" disabled="disabled">
+            </div>
             {% include "elements/_form_error_field.html" with field=form.odstartoval label=True %}
             {% include "elements/_form_error_field.html" with field=form.nedokoncil label=True %}
-            {% if zavodnik.vysledny_cas %}
-                <div class="field">
-                    <label>Výsledný čas</label>
-                    <input type="text" value="{{ zavodnik.vysledny_cas|desetiny_sekundy }}" disabled="disabled">
-                </div>
-            {% endif %}
         </div>
     </div>
 
