@@ -8,7 +8,7 @@ urlpatterns = patterns(
     '',
     # LISTs
     url(r'^$',
-        zavody_list_import,
+        ZavodyListView.as_view(),
         name='zavody_list'),
 
     # DETAILs

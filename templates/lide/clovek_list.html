@@ -2,7 +2,7 @@
 {% load l10n custom_filters %}
 
 {% block title %}
-    {{ block.super }} | přehled lidí
+    LIDÉ | přehled
 {% endblock title %}
 
 {% block section %}section_lide{% endblock %}
@@ -50,7 +50,7 @@
         </thead>
         <tbody>
             {% for pismeno in lide_abc %}
-                <tr id="{{ pismeno.grouper }}">
+                <tr id="{{ pismeno.grouper|default:'bez příjmení' }}">
                     <td colspan="5">
                         <h2>{{ pismeno.grouper|upper }}</h2>
                     </td>
@@ -63,6 +63,11 @@
                             </a>
                         </td>
                         <td>
+                            {% if user.is_staff %}
+                                <a href="{% url 'admin:lide_clovek_change' clovek.id %}" title="editovat člověka v adminitraci" target="_blank">
+                                    <i class="settings link icon"></i>
+                                </a>
+                            {% endif %}
                             {{ clovek.jmeno }}
                         </td>
                         <td>

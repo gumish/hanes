@@ -52,6 +52,7 @@ class Zavod(models.Model):
     class Meta:
         verbose_name = u'Závod'
         verbose_name_plural = u'Závody'
+        ordering = ('-rocniky__datum', 'sport', 'nazev')  #zavody serazeny od nejaktualnejsiho
 
     def __unicode__(self):
         return self.nazev

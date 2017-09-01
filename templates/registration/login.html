@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-    {{ block.super }} | úvod
+    LOGIN | přihlášení
 {% endblock title %}
 
 {% block section %}section_login{% endblock section %}
@@ -42,16 +42,18 @@
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{{ next }}">
                 <div class="ui stacked segment">
-                    {% for f in form %}
-                        <div class="field">
-                            <div class="ui left icon input">
-                                <input type="text" name="{{ f.html_name }}" placeholder="{{ f.label|lower }}"
-                                    {% if forloop.first %}autofocus{% endif %}>
-                                <i class="{% cycle 'user' 'lock' %} icon"></i>
-                            </div>
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <input type="text" name="username" placeholder="uživatelské jméno" autofocus>
+                            <i class="user icon"></i>
                         </div>
-                    {% endfor %}
-
+                    </div>
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <input type="password" name="password" placeholder="heslo" autofocus>
+                            <i class="lock icon"></i>
+                        </div>
+                    </div>
                     {% if form.errors %}
                         <div class="ui error message">
                             <p>

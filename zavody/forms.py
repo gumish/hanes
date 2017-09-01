@@ -1,7 +1,7 @@
 # coding: utf-8
 from django import forms
 from django.forms.formsets import BaseFormSet
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, MultipleObjectsReturned
 from django.db import transaction
 
 from lide.forms import LideImportCSVForm
@@ -120,16 +120,20 @@ class ImportZavodnikuCSVForm(LideImportCSVForm):
         zavodnici = []
         for radek in lide:
             clovek, klub, novy_clovek, novy_klub, radek = radek
-            zavodnik, zavodnik_novy = Zavodnik.objects.get_or_create(
-                clovek=clovek,
-                rocnik=rocnik,
-                defaults={
-                    'klub': klub,
-                    'cislo': radek[1]['cislo'],
-                    'startovni_cas': radek[1]['cislo'],
-                })
-            zavodnici.append(
-                (zavodnik, zavodnik_novy, radek[2]))
+            try:
+                zavodnik, zavodnik_novy = Zavodnik.objects.get_or_create(
+                    clovek=clovek,
+                    rocnik=rocnik,
+                    defaults={
+                        'klub': klub,
+                        'cislo': radek['cislo']
+                        # 'startovni_cas': radek['startovni_cas'],
+                        # 'cilovy_cas': radek['cilovy_cas']
+                    })
+                zavodnici.append(
+                    (zavodnik, zavodnik_novy, radek['defaults']))
+            except MultipleObjectsReturned, e:
+                print clovek, e
         return zavodnici
 
 

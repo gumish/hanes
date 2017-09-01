@@ -69,6 +69,7 @@ class LideImportCSV(FormView):
 
 
 def clovek_update(request, slug):
+    'editace cloveka'
     clovek = Clovek.objects.get(slug=slug)
     zavodnici = clovek.zavodnici.filter(kategorie_temp__isnull=False).order_by('-rocnik__datum')
     jmenovci = Clovek.objects.filter(
@@ -82,7 +83,8 @@ def clovek_update(request, slug):
         form = ClovekUpdateForm(request.POST, instance=clovek)
         clenstvi_formset = ClenstviFormSet(request.POST, instance=clovek)
         if form.is_valid() and clenstvi_formset.is_valid():
-            clovek, zpravy = form.save()  # clovek se zde muze zmenit
+            clovek, zpravy, smazan = form.save()  # clovek se zde muze zmenit
+            request.session['smazano'] = smazan
             for zprava in zpravy:
                 messages.success(request, zprava)
             if clovek:
@@ -93,7 +95,11 @@ def clovek_update(request, slug):
                 # pokud byl klub smazan a nebyl urcen novy klub clenum, pak presmeruj na seznam klubu
                 return HttpResponseRedirect(reverse('lide:lide_list'))
     else:
-        _referer_do_session(request)
+        if not request.session['smazano']:
+            _referer_do_session(request)
+        else:
+            request.session['smazano'] = False
+            request.session['referer'] = None
         form = ClovekUpdateForm(instance=clovek)
         clenstvi_formset = ClenstviFormSet(instance=clovek)
     return render_to_response(

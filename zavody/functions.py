@@ -1,18 +1,33 @@
 # coding: utf-8
 import csv
+from datetime import datetime
+from django.utils.text import slugify
 
-from .models import Zavod, Sport, Kategorie
-from zavodnici.models import Zavodnik
+from .models import Zavod, Sport, Kategorie, Rocnik
 from .templatetags.custom_filters import desetiny_sekundy
 
+from zavodnici.models import Zavodnik
+from kluby.models import Klub
+from lide.models import Clovek, Clenstvi
 
 def _csv_reader(soubor):
     csv_reader = csv.reader(soubor, delimiter=';')
     for row in csv_reader:
         yield [cell.decode('windows-1250').strip() for cell in row]
 
+def _pohlavi(slovo):
+    "preklada muzi/zeny"
+    if slovo:
+        return slugify(slovo[0])
+    else:
+        return ''
+
+# -------
+# IMPORTY
+# -------
 
 def kategorie_import(soubor):
+    "pouziti pri zakladani noveho rocniku"
     chyby = []
     kategorie_list = []
     for i, radek in enumerate(_csv_reader(soubor), start=1):
@@ -31,58 +46,96 @@ def kategorie_import(soubor):
                 chyby.append(u'#{0} {1}'.format(i, e))
     return (kategorie_list, chyby)
 
-
-def zavodnici_import(soubor):
-    chyby = []
-    zavodnici = []
-    for i, radek in enumerate(_csv_reader(soubor), start=1):
-        if i >= 2:
-            try:
-                zavodnik = Zavodnik(
-                    prijmeni=radek[0],
-                    jmeno=radek[1],
-                    pohlavi=radek[2],
-                    vek_od=int(radek[3]),
-                    vek_do=int(radek[4]),
-                    delka_trate=radek[5],
-                )
-                zavodnici.append(zavodnik)
-            except Exception, e:
-                chyby.append(u'#{0} {1}'.format(i, e))
-    return (zavodnici, chyby)
-
-
 def rocnik_import(soubor):
-    zpravy = []
-    for i, radek in enumerate(_csv_reader(soubor), start=1):
-        if i == 1 or radek[0] == '':
-            novy_zavod = True
-            continue
-        if novy_zavod:
-            sport, created = Sport.objects.get_or_create(nazev=radek[1])
-            if created:
-                zpravy.append(u'#{0} uložen nový sport: {1}'.format(i, sport))
-            zavod, created = Zavod.objects.get_or_create(nazev=radek[0], sport=sport)
-            if created:
-                zpravy.append(u'#{0} uložen nový závod: {1}'.format(i, zavod))
-            novy_zavod = False
+    "import vysledku EXPORT VYSLEDKOVE LISTINY (fce exportuj_vysledky)"
+
+    def _text_na_cas(text, i=None):
+        if text:
+            format_casu = '%H:%M:%S,%f' if ',' in text else '%H:%M:%S'
+            return datetime.strptime(text, format_casu).time()
         else:
-            try:
-                kategorie, created = Kategorie.objects.get_or_create(
-                    nazev=radek[0],
-                    znacka=radek[1],
-                    pohlavi=radek[2],
-                    vek_od=int(radek[3]),
-                    vek_do=int(radek[4]),
-                    delka_trate=radek[5],
-                    zavod=zavod
+            return None
+
+    zpravy = []
+    predchozi_radek = None
+    for i, radek in enumerate(_csv_reader(open(soubor)), start=1):
+        if not radek:
+            # prazdny radek
+            predchozi_radek = 'prazdny'
+        else:
+            print '*'*10
+            if i == 1:
+                # hlavicka
+                sport, created = Sport.objects.get_or_create(nazev=radek[2])
+                if created:
+                    zpravy.append(u'#{0} uložen nový sport: {1}'.format(i, sport))
+                zavod, created = Zavod.objects.get_or_create(nazev=radek[0], sport=sport)
+                if created:
+                    zpravy.append(u'#{0} uložen nový závod: {1}'.format(i, zavod))
+                rocnik, created = Rocnik.objects.get_or_create(
+                    zavod=zavod,
+                    datum=datetime.strptime(radek[1], '%Y-%m-%d').date()
                 )
+            elif radek[0] == u'pořadí':
+                # hlavicka zavodniku
+                print i, 'hlavicka zavodniku'
+                predchozi_radek = 'hlavicka zavodniku'
+            elif predchozi_radek == 'prazdny' and radek[0]:
+                # kategorie_import
+                print i, 'kategorie'
+                od_do = map(int, radek[2].split(' - '))
+                od_do = [rocnik.datum.year - x for x in od_do]
+                kategorie, created = Kategorie.objects.get_or_create(
+                    znacka=radek[0],
+                    nazev=radek[1],
+                    pohlavi=_pohlavi(radek[3]),
+                    vek_od=od_do[1],
+                    vek_do=od_do[0],
+                    delka_trate=radek[4],
+                    spusteni_stopek=_text_na_cas(radek[5], i),
+                    rocnik=rocnik
+                )
+                predchozi_radek = 'kategorie'
                 if created:
                     zpravy.append(u'#{0} uložena nová kategorie: {1}'.format(i, kategorie))
-            except Exception, e:
-                zpravy.append(u'#{0} {1}'.format(i, e))
+            elif predchozi_radek in ('hlavicka zavodniku', 'zavodnik'):
+                # Zavodnik
+                print i, 'zavodnik'
+                klub, created = Klub.objects.get_or_create(nazev=radek[5])
+                if created:
+                    zpravy.append(u'#{0} uložen nový klub: {1}'.format(i, klub))
+                clovek, created = Clovek.objects.get_or_create(
+                    jmeno=radek[3],
+                    prijmeni=radek[2],
+                    narozen=int(radek[4])
+                )
+                if created:
+                    zpravy.append(u'#{0} uložen nový člověk: {1}'.format(i, clovek))
+                try:
+                    clenstvi, created = Clenstvi.objects.get_or_create(
+                        clovek=clovek,
+                        klub=klub
+                    )
+                except:
+                    pass
+                zavodnik, created = Zavodnik.objects.get_or_create(
+                    rocnik=rocnik,
+                    clovek=clovek,
+                    klub=klub,
+                    kategorie_temp=kategorie,
+                    cislo=radek[1],
+                    startovni_cas=_text_na_cas(radek[6], i),
+                    cilovy_cas=_text_na_cas(radek[7], i),
+                    nedokoncil=radek[9],
+                    odstartoval=radek[10]
+                )
+                predchozi_radek = 'zavodnik'
     return zpravy
 
+
+# -------
+# EXPORTY
+# -------
 
 def exportuj_startovku(response, rocnik, ordering_str):
     def _zavodnici_write(zavodnici):
@@ -154,7 +207,8 @@ def exportuj_vysledky(response, rocnik):
     kategorie_list = rocnik.kategorie_list()
 
     writer.writerow([
-        rocnik.__unicode__().encode(enctype, 'ignore'),
+        rocnik.zavod.nazev.encode(enctype, 'ignore'),
+        rocnik.datum,
         rocnik.zavod.sport.__unicode__().encode(enctype, 'ignore')
     ])
     writer.writerow([])
@@ -166,7 +220,8 @@ def exportuj_vysledky(response, rocnik):
             kategorie.nazev.encode(enctype, 'ignore'),
             '{0[0]} - {0[1]}'.format(kategorie.rozsah_narozeni()),
             kategorie.get_pohlavi_display().encode(enctype, 'ignore'),
-            kategorie.delka_trate.encode(enctype, 'ignore')
+            kategorie.delka_trate.encode(enctype, 'ignore'),
+            kategorie.spusteni_stopek
         ])
         writer.writerow([
             u'pořadí'.encode(enctype, 'ignore'),
@@ -178,6 +233,8 @@ def exportuj_vysledky(response, rocnik):
             u'startovní čas'.encode(enctype, 'ignore'),
             u'cílový čas'.encode(enctype, 'ignore'),
             u'výsledný čas'.encode(enctype, 'ignore'),
+            u'nedokončil'.encode(enctype, 'ignore'),
+            u'odstartoval'.encode(enctype, 'ignore'),
             u'na trati',
         ])
         _zavodnici_write(zavodnici)

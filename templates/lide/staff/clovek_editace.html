@@ -2,7 +2,7 @@
 {% load l10n custom_filters %}
 
 {% block title %}
-    {{ block.super }} | {{ clovek }}
+    EDITACE | {{ clovek }}
 {% endblock title %}
 
 {% block custom_js %}
@@ -134,12 +134,13 @@
     <table class="ui unstackable celled structured table">
         <thead>
             <tr>
-                <th colspan="5">zúčastněné závody</th>
+                <th colspan="6">zúčastněné závody</th>
                 <th colspan="4" class="center aligned">umístění v závodu</th>
             </tr>
             <tr>
                 <th rowspan="2" class="center aligned">ročník</th>
                 <th rowspan="2" class="center aligned">závod</th>
+                <th rowspan="2" class="center aligned">za klub</th>
                 <th rowspan="2" class="center aligned">kategorie</th>
                 <th rowspan="2" class="center aligned">trať</th>
                 <th rowspan="2" class="center aligned">výsledný čas</th>
@@ -166,6 +167,11 @@
                         <td>
                             <a href="{% url 'zavody:vysledkova_listina' zavodnik.rocnik.id %}#zavodnik_{{ zavodnik.id }}" title="{{ zavodnik.rocnik.datum }} - na výsledkovou listinu závodu">
                                 {{ zavodnik.rocnik.zavod.nazev }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{% detail_url zavodnik.klub %}">
+                                {{ zavodnik.klub }}
                             </a>
                         </td>
                         <td>

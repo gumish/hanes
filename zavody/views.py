@@ -12,7 +12,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.text import slugify
-from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
+from django.views.generic import ListView, CreateView, DeleteView, DetailView, UpdateView
 from django.views.generic.edit import FormView
 
 from hanes.nested_formsets import nestedformset_factory
@@ -21,30 +21,19 @@ from zavodnici.forms import (StarterZavodnikForm, ZavodnikForm,
                              ZavodnikPridaniForm)
 
 from .forms import *
-from .functions import (exportuj_kategorie, exportuj_startovku,
-                        exportuj_vysledky, rocnik_import)
+from .functions import exportuj_kategorie, exportuj_startovku, exportuj_vysledky
 from .models import Kategorie, Rocnik, Sport, Zavod
 from .pdf import PdfPrint
 from .templatetags.custom_filters import desetiny_sekundy
+from lide.views import _referer_do_session
 
 
 # LISTs
-def zavody_list_import(request):
-    if request.method == 'POST' and request.user.is_staff:
-        form = CSVsouborFormular(request.POST, request.FILES)
-        if form.is_valid():
-            zpravy = rocnik_import(request.FILES['soubor'])
-            for zprava in zpravy:
-                messages.success(request, zprava)
-            return HttpResponseRedirect(reverse('zavody:zavody_list'))
-    else:
-        form = CSVsouborFormular()
-
-    zavody = Zavod.objects.all()
-    return render_to_response(
-        'zavody/zavod_list.html',
-        {'form': form, 'zavody': zavody},
-        context_instance=RequestContext(request))
+class ZavodyListView(ListView):
+    "prehled zavodu"
+    context_object_name = 'zavody'
+    queryset = Zavod.objects.all()
+    template_name = 'zavody/zavod_list.html'
 
 
 # DETAILs
@@ -117,6 +106,7 @@ class ZavodDeleteView(DeleteView):
 def vysledkova_listina(request, rocnik_pk):
     rocnik = Rocnik.objects.get(pk=rocnik_pk)
     kategorie_list = rocnik.kategorie_list()
+    _referer_do_session(request)
     # for kat, zavs in kategorie_list:
     #     if kat.id == 57:
     #         for z in zavs:

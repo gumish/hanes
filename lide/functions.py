@@ -21,6 +21,9 @@ def _clean_radek(i, radek):
                     'pohlavi': radek[2],
                     },
                 'klub': radek[4] or None,
+                'cislo': radek[5] or None
+                # 'startovni_cas': radek[6] or None,
+                # 'cilovy_cas': radek[7] or None
             }
         except:
             return ValidationError(

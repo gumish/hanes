@@ -22,10 +22,6 @@ def _vytvor_sorting_slug(slovo):
 class Clovek(models.Model):
     jmeno = models.CharField(u'Křestní jméno', max_length=20)
     prijmeni = models.CharField(u'Příjmení', max_length=30)
-    jmeno_slug = models.SlugField(editable=False, unique=False)
-    prijmeni_slug = models.SlugField(editable=False, unique=False)
-    slug = models.SlugField(editable=False)
-    prijmeni_slug_sorting = models.SlugField(editable=False, unique=False)
     pohlavi = models.CharField(
         u'Pohlaví', max_length=1,
         choices=POHLAVI,
@@ -37,6 +33,10 @@ class Clovek(models.Model):
         # null=True,
         blank=True
         )
+    jmeno_slug = models.SlugField(editable=False, unique=False, blank=True)
+    prijmeni_slug = models.SlugField(editable=False, unique=False, blank=True)
+    slug = models.SlugField(db_index=True, unique=True, blank=True)
+    prijmeni_slug_sorting = models.SlugField(editable=False, unique=False)
     varovani = None
 
     class Meta:
@@ -64,8 +64,10 @@ class Clovek(models.Model):
         self.prijmeni_slug_sorting = self.prijmeni_slug
         self.prijmeni_slug_sorting = _vytvor_sorting_slug(self.prijmeni)
         self.jmeno_slug = slugify(self.jmeno)
-        self.slug = '-'.join([self.prijmeni_slug, self.jmeno_slug, str(self.narozen), str(self.id)])
-        return super(Clovek, self).save(*args, **kwargs)
+        super(Clovek, self).save(*args, **kwargs)  #nejprve ulozi pro zjisteni ID
+        self.slug = '{}-{}-{}_{}'.format(
+            self.prijmeni_slug, self.jmeno_slug, str(self.narozen), str(self.id))
+        return super(Clovek, self).save(update_fields=['slug']) #updatuje SLUG
 
     def cele_jmeno(self):
         return u'{0} {1}'.format(self.prijmeni, self.jmeno)

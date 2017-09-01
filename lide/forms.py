@@ -47,11 +47,13 @@ class ClovekUpdateForm(forms.ModelForm):
         if data['smazat']:
             zpravy.append(u"Člověk '{0}' smazán".format(self.instance))
             self.instance.delete()
+            smazan = True
         else:
             clovek = super(ClovekUpdateForm, self).save(*args, **kwargs)
             zpravy.append(u'změny v člověku uloženy')
+            smazan = False
 
-        return (clovek, zpravy)
+        return (clovek, zpravy, smazan)
 
 
 class CSVsouborFormular(forms.Form):

@@ -19,7 +19,7 @@ RUNSERVER = (len(sys.argv) > 1 and sys.argv[1] == 'runserver')
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE_ID = 1  # kvuli flatpages
 
-TEMPLATE_DEBUG = True
+TEMPLATE_DEBUG = False
 
 if RUNSERVER:
     DEBUG = True
@@ -40,7 +40,7 @@ SECRET_KEY = '*y9vh2hg9-t((rq+nt1w+fv-x#qa=(ni1r!4=4@849m2'
 # SECURITY WARNING: don't run with debug turned on in production!
 print 'runserver:', RUNSERVER, '| debug:', DEBUG
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['localhost', '*']
 
 
 # Application definition
