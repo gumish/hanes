@@ -1,19 +1,23 @@
 {
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "Python",
             "type": "python",
             "request": "launch",
             "stopOnEntry": true,
-            "pythonPath": "${config.python.pythonPath}",
+            "pythonPath": "${config:python.pythonPath}",
             "program": "${file}",
             "cwd": "${workspaceRoot}",
             "debugOptions": [
                 "WaitOnAbnormalExit",
                 "WaitOnNormalExit",
                 "RedirectOutput"
-            ]
+            ],
+            "args": [
+                "load_shotgun"
+            ],
         },
         {
             "name": "PySpark",
@@ -42,7 +46,7 @@
             "type": "python",
             "request": "launch",
             "stopOnEntry": true,
-            "pythonPath": "${config.python.pythonPath}",
+            "pythonPath": "${config:python.pythonPath}",
             "module": "module.name",
             "cwd": "${workspaceRoot}",
             "debugOptions": [
@@ -56,7 +60,7 @@
             "type": "python",
             "request": "launch",
             "stopOnEntry": true,
-            "pythonPath": "${config.python.pythonPath}",
+            "pythonPath": "${config:python.pythonPath}",
             "program": "${file}",
             "cwd": "null",
             "console": "integratedTerminal",
@@ -70,7 +74,7 @@
             "type": "python",
             "request": "launch",
             "stopOnEntry": true,
-            "pythonPath": "${config.python.pythonPath}",
+            "pythonPath": "${config:python.pythonPath}",
             "program": "${file}",
             "cwd": "null",
             "console": "externalTerminal",
@@ -83,14 +87,19 @@
             "name": "Django",
             "type": "python",
             "request": "launch",
-            "stopOnEntry": true,
-            "pythonPath": "${config.python.pythonPath}",
+            "stopOnEntry": false,    // true
+            "pythonPath": "${config:python.pythonPath}",
             "program": "${workspaceRoot}/manage.py",
-            "cwd": "${workspaceRoot}",
+            // "cwd": "${workspaceRoot}",
             "args": [
                 "runserver",
-                "--noreload"
+                "127.0.0.1:8080",
+                "--no-color", // dodano
+                "--noreload",
+                "--nothreading" // dodano
             ],
+            "env": {},
+            "envFile": "${workspaceRoot}/../virtualenv",  //virtualenv pat
             "debugOptions": [
                 "WaitOnAbnormalExit",
                 "WaitOnNormalExit",
@@ -103,7 +112,7 @@
             "type": "python",
             "request": "launch",
             "stopOnEntry": false,
-            "pythonPath": "${config.python.pythonPath}",
+            "pythonPath": "${config:python.pythonPath}",
             "program": "fully qualified path fo 'flask' executable. Generally located along with python interpreter",
             "cwd": "${workspaceRoot}",
             "env": {
@@ -125,7 +134,7 @@
             "type": "python",
             "request": "launch",
             "stopOnEntry": false,
-            "pythonPath": "${config.python.pythonPath}",
+            "pythonPath": "${config:python.pythonPath}",
             "program": "${workspaceRoot}/run.py",
             "cwd": "${workspaceRoot}",
             "args": [],
@@ -140,7 +149,7 @@
             "type": "python",
             "request": "launch",
             "stopOnEntry": true,
-            "pythonPath": "${config.python.pythonPath}",
+            "pythonPath": "${config:python.pythonPath}",
             "program": "${workspaceRoot}/console.py",
             "cwd": "${workspaceRoot}",
             "args": [

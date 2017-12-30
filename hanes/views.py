@@ -50,7 +50,10 @@ def backup_database(request):
     files = os.listdir(dest_folder)
     if files:
         last_file = os.path.splitext(files[-1])[0]
-        new_number = int(last_file.split(delimiter)[1]) + 1
+        try:
+            new_number = int(last_file.split(delimiter)[1]) + 1
+        except:
+            new_number = 0
     else:
         new_number = 0
     new_index = str(new_number).zfill(3)

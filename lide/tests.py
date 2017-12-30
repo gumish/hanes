@@ -1,16 +1,29 @@
+# coding: utf-8
 """
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
+TEST LIDE
 """
 
-from django.test import TestCase
+# from django.test import TestCase
+from test_plus.test import TestCase
 
+from .models import Clovek, _vytvor_sorting_slug
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)
+# def create_clovek(jmeno, prijmeni, narozen, pohlavi=None):
+#     Clovek.objects.create(
+#         jmeno=jmeno,
+#         prijmeni=prijmeni,
+#         narozen=narozen)
+
+class ClovekModelTest(TestCase):
+    fixtures = ['fixtures.json']
+    # def setUp(self):
+    #     create_clovek(u'Martin Hruška 1981')
+
+    def test_vytvor_sorting_slug(self):
+        slovo = u'Martin Hruška'
+        self.assertEqual(_vytvor_sorting_slug(slovo), U'martin-hruszka')
+
+    def test_testplus_get(self):
+        url = self.reverse('lide:clovek_detail', slug='adamek-petr-1993_2')
+        self.get(url)
+        self.response_200()

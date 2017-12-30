@@ -5,3 +5,4 @@ syntax: glob
 *.csv
 _BACKUP_
 _DBs
+.vscode

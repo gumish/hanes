@@ -12,17 +12,14 @@ from django.db.models import Count
 from django.forms.models import inlineformset_factory
 from django.utils.text import slugify
 
-
 from .models import Clovek, Clenstvi
 from .forms import ClovekUpdateForm, LideImportCSVForm
 from zavody.models import Rocnik
-
 
 def _referer_do_session(request):
     referer = request.META.get('HTTP_REFERER', '')
     if not referer.endswith(request.path):
         request.session['referer'] = referer
-
 
 # DETAILs
 class ClovekDetailView(DetailView):
@@ -83,7 +80,7 @@ def clovek_update(request, slug):
         form = ClovekUpdateForm(request.POST, instance=clovek)
         clenstvi_formset = ClenstviFormSet(request.POST, instance=clovek)
         if form.is_valid() and clenstvi_formset.is_valid():
-            clovek, zpravy, smazan = form.save()  # clovek se zde muze zmenit
+            clovek, zpravy, smazan = form.save()  # clovek se zde muze zmenit.
             request.session['smazano'] = smazan
             for zprava in zpravy:
                 messages.success(request, zprava)
@@ -95,7 +92,8 @@ def clovek_update(request, slug):
                 # pokud byl klub smazan a nebyl urcen novy klub clenum, pak presmeruj na seznam klubu
                 return HttpResponseRedirect(reverse('lide:lide_list'))
     else:
-        if not request.session['smazano']:
+        if not request.session.get('smazano', None):
+        # if 'smazano' not in request.session or not request.session['smazano']:
             _referer_do_session(request)
         else:
             request.session['smazano'] = False
@@ -129,7 +127,7 @@ def clovek_autocomplete(request, rocnik_pk=None):
     if rocnik_pk:
         rocnik = Rocnik.objects.get(pk=rocnik_pk)
     if 'query' in request.GET:
-        # query rozdeli na dle mezery na prijmeni a jmeno
+        # query rozdeli na dle mezery na prijmeni a jmeno 
         query = slugify(request.GET['query'].encode('utf8')).split('-')
         lide = Clovek.objects.filter(prijmeni_slug__startswith=query[0])
         if len(query) > 1:

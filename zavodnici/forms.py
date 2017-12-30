@@ -7,6 +7,7 @@ from zavody.models import Kategorie
 from kluby.models import Klub
 from lide.models import POHLAVI, Clovek
 from .custom_fields import CustomTimeField
+from django.utils.text import slugify
 
 
 # FORMS
@@ -76,8 +77,11 @@ class ZavodnikPridaniForm(forms.ModelForm):
         if data:
             if data['klub_nazev']:
                 klub, created = Klub.objects.get_or_create(
-                    nazev=data['klub_nazev'],
-                    defaults={'sport': self.instance.rocnik.zavod.sport})
+                    slug=slugify(data['klub_nazev']),
+                    defaults={
+                        'sport': self.instance.rocnik.zavod.sport,
+                        'nazev': data['klub_nazev']
+                    })
                 self.instance.klub = klub
 
             self.instance.kategorie_temp = self.instance.kategorie

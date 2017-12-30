@@ -4,6 +4,7 @@ from django import forms
 from .models import Klub
 from lide.models import Clenstvi
 from zavody.models import Zavodnik
+from django.utils.text import slugify
 
 
 class KlubUpdateForm(forms.ModelForm):
@@ -27,7 +28,10 @@ class KlubUpdateForm(forms.ModelForm):
         klub = None
         zpravy = []
         if data['presunout_do']:
-            klub = Klub.objects.get_or_create(nazev=data['presunout_do'])[0]
+            klub = Klub.objects.get_or_create(
+                slug=slugify(data['presunout_do']),
+                defaults={'nazev': data['presunout_do']}
+            )[0]
             Clenstvi.objects.filter(klub=self.instance).update(klub=klub)
             Zavodnik.objects.filter(klub=self.instance).update(klub=klub)
             zpravy.append(

@@ -84,7 +84,7 @@ class LideImportCSVForm(forms.Form):
         radky = self.cleaned_data['soubor']
         for radek in radky:
             clovek, novy_clovek = Clovek.objects.get_or_create(
-                slug=radek['slug'],
+                slug__startswith=radek['slug'],
                 defaults=radek['defaults'])
 
             if radek['klub']:

@@ -101,7 +101,9 @@ def rocnik_import(soubor):
             elif predchozi_radek in ('hlavicka zavodniku', 'zavodnik'):
                 # Zavodnik
                 print i, 'zavodnik'
-                klub, created = Klub.objects.get_or_create(nazev=radek[5])
+                klub, created = Klub.objects.get_or_create(
+                    slug=slugify(radek[5]),
+                    defaults={'nazev': radek[5]})
                 if created:
                     zpravy.append(u'#{0} uložen nový klub: {1}'.format(i, klub))
                 clovek, created = Clovek.objects.get_or_create(

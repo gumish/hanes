@@ -38,7 +38,7 @@ else:
 SECRET_KEY = '*y9vh2hg9-t((rq+nt1w+fv-x#qa=(ni1r!4=4@849m2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-print 'runserver:', RUNSERVER, '| debug:', DEBUG
+# print 'runserver:', RUNSERVER, '| debug:', DEBUG
 
 ALLOWED_HOSTS = ['localhost', '*']
 
