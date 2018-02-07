@@ -18,7 +18,7 @@
         <a href="{% url 'lide:lide_list' %}#{{ clovek.prijmeni.0 }}" class="section">lidé</a>
         <i class="right chevron icon divider"></i>
         <div class="active section">editace člověka</div>
-    </div>    
+    </div>
 {% endblock breadcrumb %}
 
 {% block header %}
@@ -30,7 +30,7 @@
         {% else %}
             <a href="{% url 'lide:lide_list' %}#{{ clovek.prijmeni.0 }}" title="zpět na seznam lidí">
                 <i class="ui reply mail link big icon"></i>
-            </a>        
+            </a>
         {% endif %}
         <div class="content">
             <i class="ui user big icon"></i>
@@ -42,7 +42,7 @@
             {% endif %}
             <div class="sub header">editace človeka</div>
         </div>
-    </h1>    
+    </h1>
 {% endblock header %}
 
 {% block staff %}
@@ -60,9 +60,9 @@
             <a href="{% url 'lide:lide_list' %}#{{ clovek.prijmeni.0 }}" title="neuložit změny a zpět na seznam lidí" class="ui icon button">
                 <i class="ui reply mail icon"></i>
                 zrušit
-            </a>        
+            </a>
         {% endif %}
-    </div>    
+    </div>
 {% endblock staff %}
 
 {% block content %}
@@ -77,7 +77,7 @@
                 </h3>
 
                 <div class="ui error message">
-                    {{ form.non_field_errors.0|safe }}    
+                    {{ form.non_field_errors.0|safe }}
                 </div>
 
                 {% csrf_token %}
@@ -95,7 +95,7 @@
 
                 <div class="ui error message">
                     {{ clenstvi_formset.non_form_errors }}
-                </div>                
+                </div>
 
                 <div class="ui info small message">
                     <i class="info icon"></i>
@@ -108,7 +108,7 @@
                         {% for field in clenstvi_form %}
                             {% include "elements/_form_error_field.html" with label=True help=True %}
                         {% endfor %}
-                    </div>                   
+                    </div>
                 {% endfor %}
             </div>
 
@@ -125,7 +125,7 @@
                                     </a>
                                 </li>
                             {% endfor %}
-                        </ul>                    
+                        </ul>
                     {% endif %}
             </div>
         </div>
@@ -165,7 +165,7 @@
                             </td>
                         {% endif %}
                         <td>
-                            <a href="{% url 'zavody:vysledkova_listina' zavodnik.rocnik.id %}#zavodnik_{{ zavodnik.id }}" title="{{ zavodnik.rocnik.datum }} - na výsledkovou listinu závodu">
+                            <a href="{% url 'zavody:vysledkova_listina' zavodnik.rocnik.id %}#zavodnik_{{ zavodnik.id|safe }}" title="{{ zavodnik.rocnik.datum }} - na výsledkovou listinu závodu">
                                 {{ zavodnik.rocnik.zavod.nazev }}
                             </a>
                         </td>
@@ -194,10 +194,10 @@
                         </td>
                         <td class="right aligned">
                             {% if zavodnik.zavodniku_na_trati %}
-                                {{ zavodnik.zavodniku_na_trati|default:''}}    
+                                {{ zavodnik.zavodniku_na_trati|default:''}}
                             {% endif %}
                         </td>
-                    </tr>                            
+                    </tr>
                 {% endfor %}
 
             {% empty %}
@@ -205,7 +205,7 @@
                     <td colspan="9" class="center aligned">
                         žádný závod
                     </td>
-                </tr>    
+                </tr>
             {% endfor %}
         </tbody>
     </table>

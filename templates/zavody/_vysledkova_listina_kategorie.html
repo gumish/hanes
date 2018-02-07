@@ -54,7 +54,7 @@
 
     <tbody>
         {% for zavodnik in zavodnici %}
-                <tr id="zavodnik_{{ zavodnik.id }}" {% if not zavodnik.vysledny_cas and not zavodnik.nedokoncil %}class="bez-casu"{% endif %}>
+                <tr id="zavodnik_{{ zavodnik.id|safe }}" {% if not zavodnik.vysledny_cas and not zavodnik.nedokoncil %}class="bez-casu"{% endif %}>
 
                     <td class="right aligned">
                         {{ zavodnik.poradi_v_kategorii|default:'' }}

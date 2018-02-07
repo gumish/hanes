@@ -115,6 +115,11 @@ input.error {
     margin: 0;
 }
 
+#startovni_listina .ui.labeled.input .ui.label {
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
 #startovni_listina input, #startovni_listina span.td select {
     padding: 0.3em;
 }
@@ -128,6 +133,9 @@ input.error {
     color: white;
 }
 
+#startovni_listina span.users-count {
+    margin-right: 1em;
+}
 
 #startovni_listina div.table,
 #formular_startera table {
@@ -151,9 +159,15 @@ input.error {
 #startovni_listina span.td,
 #startovni_listina span.th {
     display: table-cell;
-    padding: 5px;
+    padding: 2px;
     vertical-align: middle;
     border-bottom: 1px solid #e8e8e8
+}
+
+#startovni_listina span.td.nowrap {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
 }
 
 #startovni_listina div.thead {

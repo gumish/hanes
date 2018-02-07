@@ -12,7 +12,7 @@
         <a href="{% url 'lide:lide_list' %}#{{ clovek.prijmeni.0 }}" class="section">lidé</a>
         <i class="right chevron icon divider"></i>
         <div class="active section">detail člověka</div>
-    </div>    
+    </div>
 {% endblock breadcrumb %}
 
 {% block header %}
@@ -24,7 +24,7 @@
         {% else %}
             <a href="{% url 'lide:lide_list' %}#{{ clovek.prijmeni.0 }}" title="zpět na seznam lidí">
                 <i class="ui reply mail link big icon"></i>
-            </a>        
+            </a>
         {% endif %}
         <div class="content">
             <i class="ui user big icon"></i>
@@ -36,7 +36,7 @@
             {% endif %}
             <div class="sub header">detail človeka</div>
         </div>
-    </h1>    
+    </h1>
 {% endblock header %}
 
 {% block content %}
@@ -57,11 +57,11 @@
                     {% if clovek.atributy.all %}
                         <ul>
                             {% for atr in clovek.atributy.all %}
-                                <li>{{ atr }}</li>    
+                                <li>{{ atr }}</li>
                             {% endfor %}
                         </ul>
                     {% else %}
-                        -                        
+                        -
                     {% endif %}
                 </dd>
                 <dt>Kluby</dt>
@@ -74,13 +74,13 @@
                                         <a href="{% url 'kluby:klub_detail' klub.slug %}" title="na detail klubu">
                                             {{ klub }}
                                         </a>
-                                    </li>    
+                                    </li>
                                 {% endfor %}
                             </ul>
                         {% else %}
                             -
                         {% endif %}
-                    {% endwith %}                    
+                    {% endwith %}
                 </dd>
                 {% if jmenovci %}
                     <dt>
@@ -95,8 +95,8 @@
                                     </a>
                                 </li>
                             {% endfor %}
-                        </ul>                    
-                    </dd>                    
+                        </ul>
+                    </dd>
                 {% endif %}
             </dl>
         </div>
@@ -135,7 +135,7 @@
                                     </td>
                                 {% endif %}
                                 <td>
-                                    <a href="{% url 'zavody:vysledkova_listina' zavodnik.rocnik.id %}#zavodnik_{{ zavodnik.id }}" title="{{ zavodnik.rocnik.datum }} - na výsledkovou listinu závodu">
+                                    <a href="{% url 'zavody:vysledkova_listina' zavodnik.rocnik.id %}#zavodnik_{{ zavodnik.id|safe }}" title="{{ zavodnik.rocnik.datum }} - na výsledkovou listinu závodu">
                                         {{ zavodnik.rocnik.zavod.nazev }}
                                     </a>
                                 </td>
@@ -159,10 +159,10 @@
                                 </td>
                                 <td class="right aligned">
                                     {% if zavodnik.zavodniku_na_trati %}
-                                        {{ zavodnik.zavodniku_na_trati|default:''}}    
+                                        {{ zavodnik.zavodniku_na_trati|default:''}}
                                     {% endif %}
                                 </td>
-                            </tr>                            
+                            </tr>
                         {% endfor %}
 
                     {% empty %}
@@ -170,7 +170,7 @@
                             <td colspan="9" class="center aligned">
                                 žádný závod
                             </td>
-                        </tr>    
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>

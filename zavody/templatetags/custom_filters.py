@@ -26,7 +26,7 @@ def th_sortable(context, verbose, order, width=None, kat=0):
     aktualni_order = context['ordering_str']
     url = reverse('zavody:startovni_listina', args=[context['rocnik'].id])
     # asc_desc + url_smer
-    if order == aktualni_order.lstrip('-'):
+    if order in aktualni_order.lstrip('-'):
         # jedna se aktualne razeny sloupec
         if aktualni_order[0] == '-':
             # aktualne je razen sestupne

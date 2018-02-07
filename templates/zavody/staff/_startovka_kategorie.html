@@ -1,5 +1,5 @@
 {% load l10n custom_filters %}
-<div id="kat_{{kategorie.id}}" class="ui sortable unstackable large table" style="border-top: 1px solid {% if kategorie.pohlavi == 'm' %}blue{% endif %}{% if kategorie.pohlavi == 'z' %}red{% endif %}">
+<div id="kat_{{kategorie.id|safe}}" class="ui sortable unstackable large table" style="border-top: 1px solid {% if kategorie.pohlavi == 'm' %}blue{% endif %}{% if kategorie.pohlavi == 'z' %}red{% endif %}">
     <div class="caption">
         {% if kategorie %}
             <div class="ui grid">
@@ -14,23 +14,23 @@
                     </a>
                 </div>
                 <div class="three wide column">
-                    nar. {{ kategorie.rozsah_narozeni.0|unlocalize }} - {{ kategorie.rozsah_narozeni.1|unlocalize }}
+                    {{ kategorie.rozsah_narozeni.0|unlocalize }} - {{ kategorie.rozsah_narozeni.1|unlocalize }}
                 </div>
                 <div class="column">
                     {{ kategorie.delka_trate|default:'-' }}
                 </div>
-                <div class="four wide column" title="požadované vlastnosti závodníka">
+                <div class="three wide column" title="požadované vlastnosti závodníka">
                     {% if kategorie.atributy.all.exists %}
                         {% for attr in kategorie.atributy.all %}
                             {{ attr.nazev }}{% if not forloop.last %}, {% endif %}
                         {% endfor %}
                     {% endif %}
                 </div>
-                <div class="column" title="počet závodníků v kategorii">
-                    {{ zavodnici|length }}
-                    <i class="user icon"></i>
-                </div>
-                <div class="column">
+                <div class="three wide column right aligned">
+                    <span class="users-count" title="počet závodníků v kategorii">
+                        {{ zavodnici|length }}
+                        <i class="user icon"></i>
+                    </span>
                     <a onclick="printPage('{% url 'zavody:startovka_kategorie_PDF' kategorie.pk %}')" title="rovnou vytiskne stránku PDF se startovkou kategorie" class="auto-print" data-url="{% url 'zavody:vysledky_kategorie_PDF' kategorie.pk %}">
                         <i class="print link icon"></i>
                     </a>
@@ -46,16 +46,16 @@
     <div class="thead">
         <div class="tr">
             <span class="th" style="width:1em;"></span>
-            {% th_sortable 'číslo' 'cislo' 9 kategorie.id %}
-            {% th_sortable 'příjmení' 'clovek__prijmeni' 10 kategorie.id %}
-            {% th_sortable 'jméno' 'clovek__jmeno' 9 kategorie.id %}
-            {% th_sortable 'nar.' 'clovek__narozen' 3 kategorie.id %}
-            {% th_sortable 'klub' 'klub' kategorie.id %}
-            {% th_sortable 'startovní čas' 'startovni_cas' 8 kategorie.id %}
-            {% th_sortable 'cílový čas' 'cilovy_cas' 8kategorie.id %}
-            {% th_sortable 'nedokončil' 'nedokoncil' 4 kategorie.id %}
+            {% th_sortable 'číslo' 'cislo' 4 kategorie.id %}
+            {% th_sortable 'příjmení' 'clovek__prijmeni' '' kategorie.id %}
+            {% th_sortable 'jméno' 'clovek__jmeno' '' kategorie.id %}
+            {% th_sortable 'nar.' 'clovek__narozen' 4 kategorie.id %}
+            {% th_sortable 'klub' 'klub' '' kategorie.id %}
+            {% th_sortable 'start. čas' 'startovni_cas' 6 kategorie.id %}
+            {% th_sortable 'cíl. čas' 'cilovy_cas' 6 kategorie.id %}
+            {% th_sortable 'nedokončil' 'nedokoncil' 7 kategorie.id %}
             <span class="th"></span>
-            {% th_sortable 'výsledný čas' 'vysledny_cas' 8 kategorie.id %}
+            {% th_sortable 'výsl. čas' 'vysledny_cas' 6 kategorie.id %}
             <span class="th" style="width:1em;"></span>
         </div>
     </div>
@@ -65,7 +65,7 @@
             <form
                 action="{% url 'zavodnici:uprav_zavodnika_ze_startovky' zavodnik.id %}"
                 method="POST"
-                class="tr ui small {% if formset.errors %}error{% endif %} form" id="zavodnik_{{ zavodnik.id }}"
+                class="tr ui small {% if formset.errors %}error{% endif %} form" id="zavodnik_{{ zavodnik.id|safe }}"
             >
                 <span class="td">
                     <i class="ui blue refresh link icon" title="aktualizovat řádek dle uložených dat" data-url="{% url 'zavodnici:aktualizuj_data_startovky' zavodnik.id %}"></i>
@@ -106,7 +106,7 @@
                     <span class="td"></span>
                     <span class="td"></span>
                 {% endif %}
-                <span class="td">
+                <span class="td nowrap">
                     {% if zavodnik.klub %}
                         <a href="{% url 'kluby:klub_update' zavodnik.klub.slug %}" title="editovat klub">
                             {{ zavodnik.klub.nazev }}

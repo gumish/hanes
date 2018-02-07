@@ -1,5 +1,5 @@
 {% load l10n custom_filters %}
-<div id="kat_{{kategorie.id}}" class="ui sortable unstackable large table" style="border-top: 1px solid {% if kategorie.pohlavi == 'm' %}blue{% endif %}{% if kategorie.pohlavi == 'z' %}red{% endif %}">
+<div id="kat_{{kategorie.id|safe }}" class="ui sortable unstackable large table" style="border-top: 1px solid {% if kategorie.pohlavi == 'm' %}blue{% endif %}{% if kategorie.pohlavi == 'z' %}red{% endif %}">
     <div class="caption">
         {% if kategorie %}
             <div class="ui grid">
@@ -46,16 +46,16 @@
             {% th_sortable 'příjmení' 'clovek__prijmeni_slug_sorting' 10 kategorie.id %}
             {% th_sortable 'jméno' 'clovek__jmeno_slug' 9 kategorie.id %}
             {% th_sortable 'nar.' 'clovek__narozen' 3 kategorie.id %}
-            {% th_sortable 'klub' 'klub' kategorie.id %}
-            {% th_sortable 'startovní čas' 'startovni_cas' 10 kategorie.id %}
-            {% th_sortable 'cílový čas' 'cilovy_cas' 10 kategorie.id %}
+            {% th_sortable 'klub' 'klub' '' kategorie.id %}
+            {% th_sortable 'start. čas' 'startovni_cas' 6 kategorie.id %}
+            {% th_sortable 'cíl. čas' 'cilovy_cas' 6 kategorie.id %}
             {% th_sortable 'výsledný čas' 'vysledny_cas' 10 kategorie.id %}
         </div>
     </div>
 
     <div class="tbody">
         {% for zavodnik in zavodnici %}
-            <div class="tr" id="zavodnik_{{ zavodnik.id }}" zavodnik="{{ zavodnik.id }}">
+            <div class="tr" id="zavodnik_{{ zavodnik.id|safe }}" zavodnik="{{ zavodnik.id|safe }}">
 
                 <span class="td right aligned">
                     {{ zavodnik.cislo|default:''|unlocalize }}

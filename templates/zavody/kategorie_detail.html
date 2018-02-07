@@ -28,10 +28,10 @@
                 narození {{ kategorie.rozsah_narozeni.0|unlocalize }} -
                 {{ kategorie.rozsah_narozeni.1|unlocalize }} |
                 délka tratě: {{ kategorie.delka_trate|default:'-' }} |
-                počet závodníků v kategorii: {{ kategorie.zavodnici_temp.count }}   
+                počet závodníků v kategorii: {{ kategorie.zavodnici_temp.count }}
             </div>
         </div>
-    </h1>    
+    </h1>
 {% endblock header %}
 
 {% block staff %}
@@ -40,16 +40,16 @@
             <a href="{% url 'zavody:kategorie_editace' kategorie.id %}" class="ui black button" title="upravit kategorii">
                 <i class="edit link icon"></i>
                 editace kategorie
-            </a>                
-            
+            </a>
+
             {% if user.is_staff %}
                 <a href="{% url 'admin:zavody_kategorie_change' kategorie.id %}" class="ui black button" title="upravit kategorii v administraci">
                     <i class="settings link icon"></i>
                     admin kategorie
-                </a>                
+                </a>
             {% endif %}
         </div>
-    {% endif %}    
+    {% endif %}
 {% endblock staff %}
 
 {% block content %}
@@ -84,7 +84,7 @@
                     <dd>{{ kategorie.delka_trate|default:'-' }}</dd>
                     <dt>počet závodníků:</dt>
                     <dd>{{ zavodnici|length }}</dd>
-                </dl>                
+                </dl>
             </div>
 
             <div class="sixteen wide tablet twelve wide computer column">
@@ -101,15 +101,15 @@
 
                     <tbody>
                         {% for zavodnik in zavodnici %}
-                                <tr id="zavodnik_{{ zavodnik.id }}">
+                                <tr id="zavodnik_{{ zavodnik.id|safe }}">
 
                                     <td class="right aligned">
                                         {{ zavodnik.cislo|default:''|unlocalize }}
                                     </td>
                                     <td>
-                                        
+
                                             {{ zavodnik.clovek.prijmeni }}
-                                        
+
                                     </td>
                                     <td>
                                         {{ zavodnik.clovek.jmeno }}
@@ -129,7 +129,7 @@
                             </tr>
                         {% endfor %}
                     </tbody>
-                </table>                
+                </table>
             </div>
         </div>
     {% endwith %}

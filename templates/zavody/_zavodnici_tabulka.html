@@ -26,7 +26,7 @@
     </thead>
     <tbody>
         {% for zavodnik in zavodnici %}
-            <tr zavodnik="{{ zavodnik.id }}">
+            <tr zavodnik="{{ zavodnik.id|safe }}">
                 <td>
                     {% if user.is_active %}
                         <a href="{% url 'zavodnici:editace_zavodnika' zavodnik.id %}" title="editovat závodníka">

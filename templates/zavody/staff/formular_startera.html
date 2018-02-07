@@ -98,7 +98,7 @@
                     {% for zavodnik, formular in zavodnici %}
                         <tr>
                             <td class="cislo">
-                                {{ formular.id }}
+                                {{ formular.id|safe }}
                                 <a href="{% url 'zavodnici:editace_zavodnika' zavodnik.id %}" title="editovat závodníka">
                                     {{ zavodnik.cislo|unlocalize|default:'?' }}
                                 </a>
