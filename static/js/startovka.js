@@ -1,30 +1,38 @@
+// funkce pro zabliknuti pozadi
+var blink = function (element, color) {
+    var original_color = element.css('background');
+    element.css("background", color);
+    setTimeout(function () {
+        element.css("background", original_color);
+    }, 900);
+}
+
 $(document)
   .ready(function() {
     var message = $('#ajax_messages');
 
-    $('#startovni_listina i.save.icon').click(function() {
+    $('#startovni_listina').on('click', 'i.save.icon', function(){
         $(this).submit();
     });
 
     // odeslani zavodnika ajaxem
-    $('#startovni_listina form.tr').submit(function() { // catch the form's submit event
+    $('#startovni_listina').on('submit', 'form.tr', function(){ // catch the form's submit event
         var form = $(this);
         form.find('.red.label').remove(); // odmazani starych chybovych hlasek
         $.ajax({ // create an AJAX call...
             data: $(this).serialize(), // get the form data
             type: $(this).attr('method'), // GET or POST
             url: $(this).attr('action'), // the file to call
-            success: function (data) {
-                form.removeClass('error').addClass('success');
-                $.each(data, function(name, val){
-                    form.find('input[name$="'+name+'"]').val(val);
-                });
+            success: function (html) {
+                var new_form = $(html);
+                form.replaceWith(new_form);
                 message
                     .show()
                     .removeClass('error')
                     .addClass('success')
                     .text("řádek uložen v pořádku")
                     .fadeOut(3000);
+                blink(new_form, '#65ff00');
             },
             error: function(data, status) {
                 form.removeClass('success').addClass('error');
@@ -43,35 +51,8 @@ $(document)
         return false;
     });
 
-    // aktualizace dat dle databaze
-    $('#startovni_listina form.tr i.refresh.icon').click(function(){
-        var el = $(this);
-        var tr = $(this).closest('form.tr');
-        $.ajax({
-            url: el.attr('data-url'),
-            success: function(data){
-                $.each(data, function(name, value){
-                    var input = tr.find('input[name$="'+name+'"]');
-                    value = value ? value : "";
-                    if (input.val() != value) {
-                        input
-                            .prop('title', 'hodnota byla zaktualizována dle databáze (původní hodnota pole: '+input.val()+')')
-                            .addClass('actualized')
-                            .val(value);
-                    }
-                });
-                message
-                    .show()
-                    .removeClass('error')
-                    .addClass('success')
-                    .text("řádek aktualizován")
-                    .fadeOut(3000);
-            }
-        });
-    });
-
     // smazani zavodnika
-    $('#startovni_listina i.trash.icon').click(function(){
+    $('#startovni_listina').on('click', 'i.trash.icon', function(){
         var el = $(this);
         $.ajax({
             url: el.attr('data-url'),
@@ -87,5 +68,25 @@ $(document)
                     .fadeOut(3000);
             }
         });
+    });
+
+    // aktualizace dat dle databaze
+    $('#startovni_listina').on('click', 'i.refresh.icon', function(){
+        var form = $(this).closest('form.tr');
+        $.get(
+            $(this).attr('data-url'),
+            {},
+            function (html) {
+                var new_form = $(html);
+                form.replaceWith(new_form);
+                message
+                    .show()
+                    .removeClass('error')
+                    .addClass('success')
+                    .text("řádek aktualizován")
+                    .fadeOut(3000);
+                blink(new_form, '#8ebbdc');
+            },
+        );
     });
 });

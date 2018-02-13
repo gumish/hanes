@@ -2,10 +2,10 @@
 import json
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.core.urlresolvers import reverse
-from django.http import JsonResponse
 from django.views.generic.edit import UpdateView
+from django.template.loader import render_to_string
 
 from .models import Zavodnik
 from .forms import *
@@ -83,11 +83,18 @@ class ZavodnikUpdateView(UpdateView):
             return response
 
     def form_valid(self, form):
-        response = super(ZavodnikUpdateView, self).form_valid(form)
         if self.request.is_ajax():
-            return JsonResponse(_desetiny_sekundy(form.cleaned_data))
+            zavodnik = form.save()
+            html = render_to_string(
+                'zavody/staff/_startovka_zavodnik_form.html',
+                {
+                    'zavodnik': zavodnik,
+                    'formular': ZavodnikForm(instance=zavodnik, prefix=zavodnik.id)},
+                request=self.request
+            )
+            return HttpResponse(html)
         else:
-            return response
+            return super(ZavodnikUpdateView, self).form_valid(form)
 
 
 def smaz_zavodnika_ze_startovky(request, pk):
@@ -103,9 +110,11 @@ def smaz_zavodnika_ze_startovky(request, pk):
 def aktualizuj_data_startovky(request, pk):
     "startovni listina: aktualizace zavodnika pomoci ajaxu"
     zavodnik = Zavodnik.objects.get(pk=pk)
-    result = {
-        'cislo': zavodnik.cislo,
-        'startovni_cas': zavodnik.startovni_cas,
-        'cilovy_cas': zavodnik.cilovy_cas
-    }
-    return JsonResponse(_desetiny_sekundy(result))
+    html = render_to_string(
+        'zavody/staff/_startovka_zavodnik_form.html',
+        {
+            'zavodnik': zavodnik,
+            'formular': ZavodnikForm(instance=zavodnik, prefix=zavodnik.id)},
+        request=request
+    )
+    return HttpResponse(html)

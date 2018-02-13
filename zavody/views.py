@@ -221,11 +221,11 @@ def rozkategorizovat_zavodniky(request, rocnik_pk):
         reverse('zavody:startovni_listina', args=[rocnik.id]))
 
 
-def startovni_listina(request, rocnik_pk, ordering_str='vysledny_cas--startovni_cas--cislo'):
+def startovni_listina(request, rocnik_pk, ordering_str='startovni_cas--cislo--vysledny_cas'):
     # TODO: vyresit razeni
     rocnik = Rocnik.objects.get(pk=rocnik_pk)
     kategorie_list = []
-    kategorie_list_temp = rocnik.kategorie_list(ordering_str)
+    kategorie_list_temp = rocnik.kategorie_list(razeni=ordering_str, ignoruj_nedokoncil=True)
     nezarazeni_temp = rocnik.nezarazeni(ordering_str)
 
     if request.user.is_active:
@@ -520,15 +520,26 @@ def startovka_kategorie_PDF(request, kategorie_pk):
     kategorie = Kategorie.objects.get(pk=kategorie_pk)
     rows = []
     widths = [1.5, 3, 2.7, 1.5, 6, 3]
-    for zavodnik in kategorie.serazeni_zavodnici(razeni=None):
-        rows.append([
-                zavodnik.cislo or '',
-                zavodnik.clovek.prijmeni,
-                zavodnik.clovek.jmeno,
-                zavodnik.clovek.narozen,
-                zavodnik.klub.nazev if zavodnik.klub else '',
-                zavodnik.nedokoncil or desetiny_sekundy(zavodnik.startovni_cas),
-            ])
+    for zavodnik in kategorie.serazeni_zavodnici(razeni=None, ignoruj_nedokoncil=True):
+        startovni_cas = str(zavodnik.startovni_cas)
+        if not zavodnik.nedokoncil:
+            rows.append([
+                    zavodnik.cislo or '',
+                    zavodnik.clovek.prijmeni,
+                    zavodnik.clovek.jmeno,
+                    zavodnik.clovek.narozen,
+                    zavodnik.klub.nazev if zavodnik.klub else '',
+                    startovni_cas,
+                ])
+        else:
+            rows.append([
+                    zavodnik.cislo or '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    startovni_cas + ' | ' + zavodnik.nedokoncil,
+                ])
     pdf_print = PdfPrint(BytesIO())
     pdf = pdf_print.sheet(
         [{
@@ -546,15 +557,26 @@ def startovka_rocnik_PDF(request, rocnik_pk):
     for kategorie in rocnik.kategorie.all():
         rows = []
         widths = [1.5, 3, 2.7, 1.5, 6, 3]
-        for zavodnik in kategorie.serazeni_zavodnici(razeni='startovni_cas--cislo'):
-            rows.append([
-                    zavodnik.cislo or '',
-                    zavodnik.clovek.prijmeni,
-                    zavodnik.clovek.jmeno,
-                    zavodnik.clovek.narozen,
-                    zavodnik.klub.nazev if zavodnik.klub else '',
-                    zavodnik.nedokoncil or desetiny_sekundy(zavodnik.startovni_cas),
-                ])
+        for zavodnik in kategorie.serazeni_zavodnici(razeni='startovni_cas--cislo', ignoruj_nedokoncil=True):
+            startovni_cas = str(zavodnik.startovni_cas)
+            if not zavodnik.nedokoncil:
+                rows.append([
+                        zavodnik.cislo or '',
+                        zavodnik.clovek.prijmeni,
+                        zavodnik.clovek.jmeno,
+                        zavodnik.clovek.narozen,
+                        zavodnik.klub.nazev if zavodnik.klub else '',
+                        startovni_cas,
+                    ])
+            else:
+                rows.append([
+                        zavodnik.cislo or '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        startovni_cas + ' | ' + zavodnik.nedokoncil,
+                    ])
         tables.append({
             'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),
             'headers': ([u'číslo', u'příjmení', u'jméno', u'nar.', u'klub', u'startovní čas'],),

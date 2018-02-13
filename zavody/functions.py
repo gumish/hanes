@@ -1,14 +1,16 @@
 # coding: utf-8
 import csv
 from datetime import datetime
+
 from django.utils.text import slugify
 
-from .models import Zavod, Sport, Kategorie, Rocnik
+from kluby.models import Klub
+from lide.models import Clenstvi, Clovek
+from zavodnici.models import Zavodnik
+
+from .models import Kategorie, Rocnik, Sport, Zavod
 from .templatetags.custom_filters import desetiny_sekundy
 
-from zavodnici.models import Zavodnik
-from kluby.models import Klub
-from lide.models import Clovek, Clenstvi
 
 def _csv_reader(soubor):
     csv_reader = csv.reader(soubor, delimiter=';')
@@ -42,8 +44,8 @@ def kategorie_import(soubor):
                     delka_trate=radek[5],
                 )
                 kategorie_list.append(kategorie)
-            except Exception, e:
-                chyby.append(u'#{0} {1}'.format(i, e))
+            except Exception as error:
+                chyby.append(u'#{0} {1}'.format(i, error))
     return (kategorie_list, chyby)
 
 def rocnik_import(soubor):
@@ -150,13 +152,12 @@ def exportuj_startovku(response, rocnik, ordering_str):
                 zavodnik.klub.nazev.encode(enctype, 'ignore') if zavodnik.klub else '',
                 desetiny_sekundy(zavodnik.startovni_cas),
                 desetiny_sekundy(zavodnik.cilovy_cas),
-                desetiny_sekundy(zavodnik.vysledny_cas),
-                zavodnik.nedokoncil,
+                zavodnik.nedokoncil or desetiny_sekundy(zavodnik.vysledny_cas),
                 zavodnik.odstartoval
             ])
 
     enctype = 'cp1250'
-    writer = csv.writer(response,  delimiter=';')
+    writer = csv.writer(response, delimiter=';')
     kategorie_list = rocnik.kategorie_list(ordering_str)
     nezarazeni = rocnik.nezarazeni(ordering_str)
 
@@ -205,7 +206,7 @@ def exportuj_vysledky(response, rocnik):
             ])
 
     enctype = 'cp1250'
-    writer = csv.writer(response,  delimiter=';')
+    writer = csv.writer(response, delimiter=';')
     kategorie_list = rocnik.kategorie_list()
 
     writer.writerow([
@@ -248,7 +249,7 @@ def exportuj_vysledky(response, rocnik):
 
 def exportuj_kategorie(response, rocnik):
     enctype = 'cp1250'
-    writer = csv.writer(response,  delimiter=';')
+    writer = csv.writer(response, delimiter=';')
 
     writer.writerow([
         u'Název závodu'.encode(enctype, 'ignore'),

@@ -7,12 +7,20 @@ from django.utils.text import slugify
 
 from zavodnici.models import Zavodnik
 
-def _string_to_ordering_kwargs(razeni='vysledny_cas--startovni_cas--cislo'):
-    ordering_kwargs = {
-        'prvni': ['nedokoncil'],
-        'count': ['-vysledny_cas'],
-        'razeni': ['vysledny_cas', 'startovni_cas', 'cislo']
-    }
+def _string_to_ordering_kwargs(razeni='vysledny_cas--startovni_cas--cislo', ignoruj_nedokoncil=False):
+    " ignoruj_nedokoncil: promena pro zruseni zarazovani DNS na konec "
+    if ignoruj_nedokoncil:
+        ordering_kwargs = {
+            'prvni': [],
+            'count': [],
+            'razeni': ['vysledny_cas', 'startovni_cas', 'cislo']
+        }
+    else:
+        ordering_kwargs = {
+            'prvni': ['nedokoncil'],
+            'count': ['-vysledny_cas'],
+            'razeni': ['vysledny_cas', 'startovni_cas', 'cislo']
+        }
     if razeni:
         ordering_kwargs['razeni'] = razeni.split('--')
     return ordering_kwargs
@@ -133,10 +141,10 @@ class Rocnik(models.Model):
         Zavodnik.objects.filter(id__in=[z.id for z in nezarazeni]).update(kategorie_temp=None)
         return zpravy
 
-    def kategorie_list(self, razeni=None):
+    def kategorie_list(self, razeni=None, ignoruj_nedokoncil=False):
         kategorie_list = []
         for kategorie in self.kategorie.all():
-            kategorie_list.append([kategorie, kategorie.serazeni_zavodnici(razeni)])
+            kategorie_list.append([kategorie, kategorie.serazeni_zavodnici(razeni, ignoruj_nedokoncil)])
         return kategorie_list
 
     def nezarazeni(self, razeni=''):
@@ -265,11 +273,11 @@ class Kategorie(models.Model):
         Zavodnik.objects.filter(id__in=[i.id for i in zarazeni]).update(kategorie_temp=self)
         return (nezarazeni, duplikati, zpravy)
 
-    def serazeni_zavodnici(self, razeni):
+    def serazeni_zavodnici(self, razeni, ignoruj_nedokoncil=False):
         "vrati serazene zavodniky kategorie a doplni do nich casove ztraty na prvniho"
         # pomoci annotate Count, se radi prazdna pole na konec (null_value = 1 / 0)
         annotate_kwargs = {}
-        ordering_kwargs = _string_to_ordering_kwargs(razeni)
+        ordering_kwargs = _string_to_ordering_kwargs(razeni, ignoruj_nedokoncil)
         ordering_list = ordering_kwargs['prvni']
         for i in ordering_kwargs['count']:
             actual = i + '_value'

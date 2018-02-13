@@ -182,6 +182,11 @@ input.error {
     display: table-row;
 }
 
+#startovni_listina .tr.dns span.dns-hide,
+#startovni_listina .tr.dns span.dns-hide * {
+    color: rgb(212, 212, 212);
+}
+
 #startovni_listina form.tr {
     -webkit-transition: display 1s, background 1s; /* Safari */
     transition: display 1s, background 1s;
