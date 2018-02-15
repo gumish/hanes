@@ -259,10 +259,19 @@ class KategoriePoharu(models.Model):
 
             zebricek = sorted(zebricek, key=lambda x: x[2], reverse=True)
 
+            # prirazeni finalnich pozic dle bodu
             pozice = 1
+            skok_pozic = 1
             for index, radek in enumerate(zebricek, 0):
-                if index != 0 and radek[2] < zebricek[index-1][2]:
-                    pozice += 1
+                # u prvniho zavodnika se nic nepocita
+                if index != 0:
+                    # pokud ma zavodnik vice bodu nez ten predesli zvys pozici o skok ..
+                    if radek[2] < zebricek[index-1][2]:
+                        pozice += skok_pozic
+                        skok_pozic = 1
+                    # .. pokud maji stejne, pak navysej pouze skok, o ktery se zvysi pozice pri nasledne zmene bodu
+                    else:
+                        skok_pozic += 1
                 zebricek[index].append(pozice)
 
             for indexy_zebricku in _stejne_soucty(zebricek).values():

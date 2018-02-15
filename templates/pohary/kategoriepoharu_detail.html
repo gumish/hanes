@@ -2,7 +2,7 @@
 {% load l10n custom_filters %}
 
 {% block title %}
-    KATEGORIE POHÁRU | {{ kategorie.nazev }} 
+    KATEGORIE POHÁRU | {{ kategorie.nazev }}
 {% endblock title %}
 
 {% block section %}section_pohary{% endblock %}
@@ -31,26 +31,14 @@
 {% endblock header %}
 
 {% block staff %}
-    <div class="ui stacked secondary segment noprint">
-    {% comment %}
-        {% if user.is_active %}
-            <a href="{% url 'pohary:rocnik_pridani' pohar.slug %}" class="ui blue icon button">
-                <i class="plus icon"></i>
-                nový ročník
-            </a>
-            <a href="{% url 'pohary:pohar_editace' pohar.id %}" class="ui black icon button">
-                <i class="edit icon"></i>
-                editace poháru
-            </a>
-        {% endif %}
-    {% endcomment %}
-        {% if user.is_staff %}
+    {% if user.is_staff %}
+        <div class="ui stacked secondary segment noprint">
             <a href="{% url 'admin:pohary_kategoriepoharu_change' kategorie.id %}" title="editovat kategorii poháru v administraci" target="_blank" class="ui icon black button">
                 <i class="settings icon"></i>
                 admin kategorie
             </a>
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
 {% endblock staff %}
 
 {% block content %}
