@@ -1,8 +1,10 @@
 # coding: utf-8
+import csv
 from django import forms
 from django.forms.formsets import BaseFormSet
 from django.core.exceptions import ValidationError, MultipleObjectsReturned
 from django.db import transaction
+from django.forms.formsets import formset_factory
 
 from lide.forms import LideImportCSVForm
 from .models import Zavodnik, Zavod, Sport, Rocnik
@@ -12,6 +14,69 @@ from zavodnici.custom_fields import CustomTimeField
 
 # FORMS
 # -----
+
+class PouzeTxtSouborCasuFormular(forms.Form):
+    soubor = forms.FileField(
+        label=u'soubor *.txt',
+        help_text=u'soubor s výslednými časy z mobilní aplikace',
+        required=True,
+        widget=forms.FileInput(attrs={'accept': '.txt'}))
+
+    def clean(self):
+        result = []
+        soubor = self.cleaned_data['soubor']
+        csvreader = csv.reader(soubor, delimiter='\t')
+        next(csvreader)  # preskoceni prvniho radku
+        for radek in csvreader:
+            result.append({
+                'cilovy_cas': radek[1],
+                'cislo': radek[2]
+            })
+        return result
+
+
+class ImportCilovehoCasuFormular(forms.Form):
+    cislo = forms.IntegerField(label=u'Startovní číslo', min_value=0)
+    cilovy_cas = CustomTimeField(label=u'Cílový čas', required=True)
+    prepsat = forms.BooleanField(required=False, help_text=u'povolit přepsání již zapsaných časů')
+
+    def clean_cislo(self):
+        """
+        existuje startovni cislo?
+        - ANO: priradi se existujici zavodnik
+        - NE: vytvori se docasny zavodnik bez cloveka
+        drive se to hodila jako chyba (kod nize)
+        """
+        cislo = self.cleaned_data['cislo']
+
+        self.zavodnik, created = Zavodnik.objects.get_or_create(
+            cislo=cislo, rocnik=self.rocnik)
+
+        return cislo
+
+    def clean(self):
+        data = self.cleaned_data
+        if self.zavodnik and not self.cleaned_data['prepsat']:
+            if self.zavodnik.cilovy_cas:
+                raise forms.ValidationError(
+                    {'cilovy_cas': u'''<u>Závodník má již zadaný čas.</u><br>
+                    Pokud ho chceš přepsat, zatrhni políčko vpravo.'''})
+            elif self.zavodnik.nedokoncil:
+                raise forms.ValidationError(
+                    {'cilovy_cas': u'''<u>Závodník závod nedokončil!</u><br>
+                    Pokud i tak chceš cílový čas zapsat,<br>
+                    zatrhni políčko vpravo.'''})
+        return self.cleaned_data
+
+    def save(self):
+        data = self.cleaned_data
+        if data:
+            zavodnik = self.zavodnik
+            if data['cilovy_cas']:
+                zavodnik.cilovy_cas = data['cilovy_cas']
+            zavodnik.save()
+
+
 class CilovyFormular(forms.Form):
     cislo = forms.IntegerField(label=u'Startovní číslo', min_value=0)
     cilovy_cas = CustomTimeField(label=u'Cílový čas', required=False)
@@ -33,22 +98,19 @@ class CilovyFormular(forms.Form):
             cislo=cislo, rocnik=self.rocnik)
 
         return cislo
-        # if Zavodnik.objects.filter(cislo=cislo, rocnik=self.rocnik).exists():
-        #     self.zavodnik = Zavodnik.objects.get(cislo=cislo, rocnik=self.rocnik)
-        #     return cislo
-        # else:
-        #     self.zavodnik = None
-        #     raise forms.ValidationError(u'Číslo {0} neexistuje'.format(cislo))
 
     def clean_nedokoncil(self):
         nedokoncil = self.cleaned_data['nedokoncil']
         return None if not nedokoncil else nedokoncil
 
     def clean(self):
+
+        " vzajemna validace mezi policky formulare "
+
         data = self.cleaned_data
         if not ('cilovy_cas' in data or data['nedokoncil']):
             raise ValidationError({'cilovy_cas': u'Musí být vyplněn buď `cílový čas` nebo `nedokončil`'})
-        if self.zavodnik and not self.cleaned_data['prepsat']:
+        if hasattr(self, 'zavodnik') and not self.cleaned_data['prepsat']:
             if self.zavodnik.cilovy_cas:
                 raise forms.ValidationError(
                     {'cilovy_cas': u'''<u>Závodník má již zadaný čas.</u><br>
@@ -68,6 +130,9 @@ class CilovyFormular(forms.Form):
                 zavodnik.cilovy_cas = data['cilovy_cas']
             zavodnik.nedokoncil = data['nedokoncil']
             zavodnik.save()
+            return zavodnik
+        else:
+            return None
 
 
 class ZavodCreateForm(forms.ModelForm):
@@ -184,3 +249,9 @@ class KontrolaLidiFormSet(KontrolaKolonekFormSet):
 
 class PridaniZavodnikuFormSet(KontrolaLidiFormSet):
     pass
+
+
+ImportyCilovehoCasuFormSet = formset_factory(
+    ImportCilovehoCasuFormular,
+    formset=KontrolaCiselFormSet,
+    extra=3)

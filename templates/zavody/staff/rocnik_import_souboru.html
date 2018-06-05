@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load staticfiles l10n %}
+
+{% block title %}
+     IMPORT SOUBORU | {{ rocnik }}
+{% endblock title %}
+
+{% block section %}section_zavody{% endblock %}
+
+{% block breadcrumb %}
+    <div class="ui breadcrumb">
+        <a href="{% url 'zavody:zavody_list' %}" class="section">závody</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.zavod.get_absolute_url }}" class="section">detail závodu</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.get_absolute_url }}" class="section">detail ročníku</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">import souboru</div>
+    </div>
+{% endblock breadcrumb %}
+
+{% block header %}
+    <h1 class="ui header">
+        <a href="{{ rocnik.get_absolute_url }}" title="zpět na startovní listinu">
+            <i class="ui reply mail link big icon"></i>
+        </a>
+        <div class="content">
+            <i class="cloud upload big icon"></i>
+            {{ rocnik }}
+            <div class="sub header">{{ subheader }}</div>
+        </div>
+    </h1>
+{% endblock header %}
+
+
+{% block content %}
+    <form method="POST" action="." enctype="multipart/form-data" class="ui form">
+        {% csrf_token %}
+
+        <div class="field {% if form.soubor.errors %}error{% endif %}">
+            <label class="underlined">
+                {{ form.soubor.label }}
+                <i class="circle help icon" title="{{ form.soubor.help_text }}"></i>
+            </label>
+
+            {{ form.soubor }}
+
+            {% if form.soubor.errors %}
+                <div class="ui red inverted segment">
+                    {{ form.soubor.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+        <button type="submit" class="ui primary icon button">
+            <i class="save icon"></i>
+            odeslat
+        </button>
+        <a href="{{ request.META.HTTP_REFERER }}" title="neuložit a zpět" class="ui icon button">
+            <i class="ui reply mail icon"></i>
+            zrušit
+        </a>
+    </form>
+{% endblock content %}

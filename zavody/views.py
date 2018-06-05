@@ -12,20 +12,23 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.text import slugify
-from django.views.generic import ListView, CreateView, DeleteView, DetailView, UpdateView
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
+                                  UpdateView, View)
 from django.views.generic.edit import FormView
 
 from hanes.nested_formsets import nestedformset_factory
+from zavody.templatetags.custom_filters import desetiny_sekundy
 from lide.forms import CSVsouborFormular  # , ClovekRocnikForm
+from lide.views import _referer_do_session
 from zavodnici.forms import (StarterZavodnikForm, ZavodnikForm,
                              ZavodnikPridaniForm)
 
 from .forms import *
-from .functions import exportuj_kategorie, exportuj_startovku, exportuj_vysledky
+from .functions import (exportuj_kategorie, exportuj_startovku,
+                        exportuj_vysledky)
 from .models import Kategorie, Rocnik, Sport, Zavod
 from .pdf import PdfPrint
 from .templatetags.custom_filters import desetiny_sekundy
-from lide.views import _referer_do_session
 
 
 # LISTs
@@ -269,11 +272,11 @@ def pridani_zavodniku(request, pk):
     if request.method == 'POST':
         formset = ZavodnikPridaniFormSet(request.POST)
 
-        for f in formset:
-            f.instance.rocnik = rocnik
+        for form in formset:
+            form.instance.rocnik = rocnik
         if formset.is_valid():
-            for f in formset:
-                f.save()
+            for form in formset:
+                form.save()
             formset = ZavodnikPridaniFormSet()
     else:
         formset = ZavodnikPridaniFormSet()
@@ -375,6 +378,71 @@ def formular_startera(request, rocnik_pk, ordering_str='startovni_cas--cislo'):
     )
 
 
+class ImportSouboruCasuTxtView(FormView):
+    " Importovani souboru casu z mobilu, a jeho nasledne zobrazeni do formsetu "
+    form_class = PouzeTxtSouborCasuFormular
+    template_name = 'zavody/staff/rocnik_import_souboru.html'
+    subheader = u'import cílových časů z mobilu'
+
+    def get_context_data(self, **kwargs):
+        " prida do 'rocnik' a 'subheader' "
+        context = super(ImportSouboruCasuTxtView, self).get_context_data(**kwargs)
+        context['rocnik'] = Rocnik.objects.prefetch_related('zavodnici').get(pk=self.kwargs['rocnik_pk'])
+        context['subheader'] = self.subheader
+        return context
+
+    def form_valid(self, form):
+        " zobrazi formset s daty ze souboru "
+        context = self.get_context_data()
+        context['formset'] = ImportyCilovehoCasuFormSet(initial=form.cleaned_data)
+        return render_to_response(
+            'zavody/staff/formular_importovanych_casu_txt.html', context,
+            context_instance=RequestContext(self.request)
+        )
+
+
+class ZpracovaniImportovanychCasuTxtView(View):
+
+    " zpracovani formsetu importovanych casu, pouze POST "
+
+    def post(self, request, *args, **kwargs):
+        doplneni_zavodnici = []
+        CilovyFormularFormSet = formset_factory(
+            CilovyFormular,
+            formset=KontrolaCiselFormSet,
+            extra=3)
+        rocnik = Rocnik.objects.get(pk=self.kwargs['rocnik_pk'])
+        # zmena 'form-INITIAL_FORMS' aby prosli i odmazane formulare
+        post_dict = request.POST.copy()
+        post_dict['form-INITIAL_FORMS'] = 0
+        formset = CilovyFormularFormSet(post_dict)
+        # doplneni rocniku do formulare pro validace uvnitr formulare
+        for form in formset.forms:
+            form.rocnik = rocnik
+        if formset.is_valid():
+            for form in formset.forms:
+                doplneni_zavodnici.append(form.save())
+
+            # potvrzujici zprava pro Messages
+            doplneni_zavodnici = filter(bool, doplneni_zavodnici)  # odfiltrovani None zavodniku
+            success_message = u'Úspěšně naimportováno {} cílových časů:'.format(len(doplneni_zavodnici))
+            for zavodnik in doplneni_zavodnici:
+                success_message += u'<br>- #{}: {}'.format(zavodnik.cislo, desetiny_sekundy(zavodnik.cilovy_cas))
+            messages.success(self.request, success_message, extra_tags='safe')
+
+            return HttpResponseRedirect(reverse('zavody:import_souboru_casu_txt', args=[rocnik.id]))
+
+        else:
+            context = {
+                'rocnik': Rocnik.objects.prefetch_related('zavodnici').get(pk=self.kwargs['rocnik_pk']),
+                'formset': formset
+            }
+            return render_to_response(
+                'zavody/staff/formular_importovanych_casu_txt.html', context,
+                context_instance=RequestContext(self.request)
+            )
+
+
 def cilovy_formular(request, rocnik_pk):
     rocnik = Rocnik.objects.get(pk=rocnik_pk)
     CilovyFormularFormSet = formset_factory(
@@ -384,18 +452,19 @@ def cilovy_formular(request, rocnik_pk):
 
     if request.method == 'POST':
         formset = CilovyFormularFormSet(request.POST)
-        for f in formset.forms:
-            f.rocnik = rocnik
+        # doplneni rocniku do formulare pro validace uvnitr formulare
+        for form in formset.forms:
+            form.rocnik = rocnik
         if formset.is_valid():
-            for f in formset.forms:
-                f.save()
+            for form in formset.forms:
+                form.save()
             formset = CilovyFormularFormSet()
     else:
         formset = CilovyFormularFormSet()
 
     return render_to_response(
         'zavody/staff/cilovy_formular.html', {
-            'rocnik': rocnik,
+            'rocnik': Rocnik.objects.prefetch_related('zavodnici').get(pk=rocnik_pk),
             'formset': formset
         },
         context_instance=RequestContext(request)

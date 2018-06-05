@@ -66,7 +66,7 @@ urlpatterns = patterns(
         login_required(pridani_zavodniku),
         name='pridani_zavodniku'),
     url(r'^import_zavodniku/rocnik/(?P<pk>\d+)/$',
-        ImportZavodnikuView.as_view(),
+        login_required(ImportZavodnikuView.as_view()),
         name='import_zavodniku'),
     url(r'^rocnik/(?P<rocnik_pk>\d+)/startovni_listina/$',
         startovni_listina,
@@ -81,7 +81,15 @@ urlpatterns = patterns(
     url(r'^rocnik/(?P<rocnik_pk>\d+)/cilovy_formular/$',
         login_required(cilovy_formular),
         name='cilovy_formular'),
+    url(r'^rocnik/(?P<rocnik_pk>\d+)/import_souboru_casu/txt/$',
+        login_required(ImportSouboruCasuTxtView.as_view()),
+        name='import_souboru_casu_txt'),
+    url(r'^rocnik/(?P<rocnik_pk>\d+)/zpracovani_importovanych_casu/txt/$',
+        login_required(ZpracovaniImportovanychCasuTxtView.as_view()),
+        name='zpracovani_importovanych_casu_txt'),
 
+
+    # EXPORT
     url(r'^rocnik/(?P<rocnik_pk>\d+)/startovka_export/$',
         startovka_export,
         name='startovka_export'),
@@ -107,6 +115,7 @@ urlpatterns = patterns(
     url(r'^rocnik/(?P<rocnik_pk>\d+)/pdf/startovni_listina/$',
         startovka_rocnik_PDF,
         name='startovka_rocnik_PDF'),
+
 
     # AUTOCOMPLETEs
     url(r'^sport_autocomplete/$', sport_autocomplete, name='sport_autocomplete'),

@@ -2,7 +2,7 @@
 {% load staticfiles l10n %}
 
 {% block title %}
-     CÍLOVÝ FORMULÁŘ | {{ rocnik }}
+     IMPORT ČASŮ | {{ rocnik }}
 {% endblock title %}
 
 {% block custom_js %}
@@ -21,7 +21,7 @@
         <i class="right chevron icon divider"></i>
         <a href="{{ rocnik.get_absolute_url }}" class="section">detail ročníku</a>
         <i class="right chevron icon divider"></i>
-        <div class="active section">cílový formulář</div>
+        <div class="active section">import časů</div>
     </div>
 {% endblock breadcrumb %}
 
@@ -31,9 +31,9 @@
             <i class="ui reply mail link big icon"></i>
         </a>
         <div class="content">
-            <i class="checkered flag big icon"></i>
+            <i class="mobile big icon"></i>
             {{ rocnik }}
-            <div class="sub header">cílový formulář</div>
+            <div class="sub header">úprava/potvrzení importovaných cílových časů z mobilu</div>
         </div>
     </h1>
 {% endblock header %}
@@ -49,12 +49,12 @@
                 </div>
             {% endif %}
 
-            <form action="" method="POST" id="cilovy_formular" class="ui {% if formset.errors %}error{% endif %} form">
+            <form action="{% url 'zavody:zpracovani_importovanych_casu_txt' rocnik.id %}" method="POST" id="cilovy_formular" class="ui {% if formset.errors %}error{% endif %} form">
                 <table class="ui unstackable celled table">
                     <thead>
                         <tr>
                             <th colspan=3>
-                                <h2>cílový formulář</h2>
+                                <h2>importovaná data</h2>
                             </th>
                             <th colspan=3>
                                 <button type="submit" class="ui primary fluid icon large button">
@@ -67,7 +67,6 @@
                             <th title="povinné pole">startovní číslo*</th>
                             {# <th title="povinné pole">startovní čas*</th> #}
                             <th>cílový čas</th>
-                            <th>nedokončil</th>
                             <th title="přepsat již uložené časy">
                                 <i class="lightning large icon"></i>
                             </th>
@@ -80,12 +79,18 @@
                         {% for form in formset %}
                             <tr {% if form.non_field_errors %}class="error"{% endif %}>
                                 <td>{{ forloop.counter }}</td>
-                                {% for field in form %}
-                                    <td>
-                                        {{ field }}
-                                        {% include "elements/_error_pointing_ label.html" with error=field.errors.0|safe %}
-                                    </td>
-                                {% endfor %}
+                                <td>
+                                    {{ form.cislo }}
+                                    {% include "elements/_error_pointing_ label.html" with error=form.cislo.errors.0|safe %}
+                                </td>
+                                <td>
+                                    {{ form.cilovy_cas }}
+                                    {% include "elements/_error_pointing_ label.html" with error=form.cilovy_cas.errors.0|safe %}
+                                </td>
+                                <td>
+                                    {{ form.prepsat }}
+                                    {% include "elements/_error_pointing_ label.html" with error=form.prepsat.errors.0|safe %}
+                                </td>
                                 <td>
                                     <i class="ui remove red link large icon js-smaz-inputy"></i>
                                 </td>

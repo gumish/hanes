@@ -144,8 +144,9 @@ $(document)
         });
 
     // smaz data ze radku
-        $('form .remove.red.icon.smaz_inputy').click(function() {
+        $('form .remove.red.icon.js-smaz-inputy').click(function() {
             var tr = $(this).closest('tr');
+            // tr.remove();
             tr.find('input, select').val(null);
             tr.find('.red.pointing.label').remove();
         });

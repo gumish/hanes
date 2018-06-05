@@ -114,7 +114,7 @@
                 <div class="content">
                     <ul class="list">
                         {% for message in level.list %}
-                            <li>{{ message }}</li>
+                            <li>{{ message|safe }}</li>
                         {% endfor %}
                     </ul>
                 </div>

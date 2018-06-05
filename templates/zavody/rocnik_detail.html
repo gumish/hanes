@@ -77,6 +77,10 @@
                     <a href="{% url 'zavody:cilovy_formular' rocnik.id %}" title="cílový formulář" class="item">
                         cílový formulář
                     </a>
+                    <a href="{% url 'zavody:import_souboru_casu_txt' rocnik.id %}" title="import časů txt z mobilní aplikace" class="item">
+                        <i class="mobile icon"></i>
+                        import časů z mobilu
+                    </a>
                 {% endif %}
             </div>
 
