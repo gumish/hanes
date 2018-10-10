@@ -3,6 +3,7 @@ import json
 from io import BytesIO
 
 from django import forms
+from collections import OrderedDict
 from django.contrib import messages
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.models import Count
@@ -20,6 +21,7 @@ from hanes.nested_formsets import nestedformset_factory
 from zavody.templatetags.custom_filters import desetiny_sekundy
 from lide.forms import CSVsouborFormular  # , ClovekRocnikForm
 from lide.views import _referer_do_session
+from kluby.models import Klub
 from zavodnici.forms import (StarterZavodnikForm, ZavodnikForm,
                              ZavodnikPridaniForm)
 
@@ -57,6 +59,43 @@ class RocnikDetailView(DetailView):
         return context
 
 
+class StartovneRocnikuDetailView(DetailView):
+    model = Rocnik
+    context_object_name = 'rocnik'
+    template_name = 'zavody/startovne_rocniku_detail.html'
+
+    def get_context_data(self, *args, **kwargs):
+
+        """ Doplni 'kluby'
+        kluby = {
+            'AC Bukovice' : [
+                1200,
+                12,
+                {
+                    'mensi zaci: [
+                        500,
+                        [Kuba, Jarda, Mario]
+                    ]
+                }
+            ]
+        }
+        """
+
+        kluby = OrderedDict()  # (startovne za klub, [list kategorii[startovne kategorie, list zavodniku]])
+        for zavodnik in self.object.zavodnici.all().order_by('klub__nazev', 'kategorie_temp', 'clovek'):
+            klub = zavodnik.klub
+            kategorie = zavodnik.kategorie_temp
+            kluby.setdefault(klub, [0, 0, OrderedDict()])
+            kluby[klub][0] += kategorie.startovne or 0
+            kluby[klub][1] += 1
+            kluby[klub][2].setdefault(kategorie, [0, []])
+            kluby[klub][2][kategorie][0] += kategorie.startovne or 0
+            kluby[klub][2][kategorie][1].append(zavodnik)
+        context = super(StartovneRocnikuDetailView, self).get_context_data(*args, **kwargs)
+        context['kluby'] = kluby
+        return context
+
+
 class KategorieDetailView(DetailView):
     model = Kategorie
     context_object_name = 'kategorie'
@@ -87,7 +126,8 @@ class KategorieUpdateView(UpdateView):
         'atributy',
         'delka_trate',
         'poradi',
-        'spusteni_stopek']
+        'spusteni_stopek',
+        'startovne']
     template_name = 'objekt_editace.html'
 
 
@@ -137,18 +177,19 @@ def vysledkova_listina(request, rocnik_pk):
 class ZavodPridejView(CreateView):
     form_class = ZavodCreateForm
     template_name = 'zavody/staff/zavod_pridani.html'
-    success_url = reverse_lazy('zavody:zavody_list')
 
     def get_context_data(self, **kwargs):
         context = super(ZavodPridejView, self).get_context_data(**kwargs)
         context.update({'zavody': Zavod.objects.all()})
         return context
 
+    def get_success_url(self):
+        return self.object.get_absolute_url()
+
 
 class RocnikPridejView(CreateView):
     form_class = RocnikCreateForm
     template_name = 'zavody/staff/rocnik_pridani.html'
-    success_url = reverse_lazy('zavody:zavody_list')
 
     def get_initial(self):
         slug = self.kwargs.get('slug', None)
@@ -172,6 +213,9 @@ class RocnikPridejView(CreateView):
             kat.save()
         return HttpResponseRedirect(
             rocnik.get_absolute_url())
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
 
 
 # FORMs

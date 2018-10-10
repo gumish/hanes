@@ -25,7 +25,9 @@
         <div class="content">
             <i class="checkered flag big icon"></i>
             {{ rocnik }}
-            <div class="sub header">{{ rocnik.zavod.sport }}</div>
+            <div class="sub header">
+                {{ rocnik.zavod.sport }} - detail ročníku
+            </div>
         </div>
     </h1>
 {% endblock header %}
@@ -42,6 +44,9 @@
                 <a href="{% url 'zavody:startovni_listina' rocnik.id %}" class="header item">
                     <i class="flag outline icon"></i>
                     startovní listina
+                </a>
+                <a href="{% url 'zavody:startovne_rocniku_detail' rocnik.id %}" class="item">
+                    startovné
                 </a>
                 {% if user.is_active %}
                     <a href="{% url 'zavody:pridani_zavodniku' rocnik.id %}" class="item">
@@ -149,6 +154,7 @@
                                 title="požadované vlastnosti na závodníka"></i>
                         </th>
                         <th>délka[m]</th>
+                        <th>startovné</th>
                         <th>závodníků</th>
                     </tr>
                 </thead>
@@ -184,6 +190,7 @@
                             <td>
                                 {{ kategorie.delka_trate }}
                             </td>
+                            <td class="right aligned">{{ kategorie.startovne|default:'0' }} Kč</td>
                             <td>{{ kategorie.zavodniku }}</td>
                         </tr>
                     {% endfor %}

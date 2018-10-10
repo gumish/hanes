@@ -35,3 +35,4 @@ class Klub(models.Model):
         self.slug = slugify(self.nazev)
         self.nazev_slug_sorting = _vytvor_sorting_slug(self.nazev)
         super(Klub, self).save(*args, **kwargs)
+

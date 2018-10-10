@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}
+    STARTOVNÉ ROČNÍKU | {{ rocnik }}
+{% endblock title %}
+
+{% block section %}section_zavody{% endblock %}
+
+{% block breadcrumb %}
+    <div class="ui breadcrumb">
+        <a href="{% url 'zavody:zavody_list' %}" class="section">závody</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.zavod.get_absolute_url }}" class="section">detail závodu</a>
+        <i class="right chevron icon divider"></i>
+        <a href="{{ rocnik.get_absolute_url }}" class="section">detail ročníku</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">startovné ročníku</div>
+    </div>
+{% endblock breadcrumb %}
+
+{% block header %}
+    <h1 class="ui header">
+        <a href="{{ rocnik.get_absolute_url }}" title="na detail ročníku">
+            <i class="ui reply mail link big icon"></i>
+        </a>
+        <div class="content">
+            <i class="euro sign big icon"></i>
+            {{ rocnik }}
+            <div class="sub header">
+                {{ rocnik.zavod.sport }} -
+                přehled placení startovného
+            </div>
+        </div>
+    </h1>
+{% endblock header %}
+
+
+{% block content %}
+    <table class="ui celled structured small table">
+        <thead>
+            <th>klub</th>
+            <th>kategorie</th>
+            <th>člověk</th>
+            <th>číslo</th>
+            <th>startovné</th>
+        </thead>
+        <tbody>
+            {% for klub, klub_data in kluby.items %}
+                {% for kategorie, kategorie_data in klub_data.2.items %}
+                    {% for zavodnik in kategorie_data.1 %}
+                        <tr>
+                            {% if forloop.first %}
+                                {% if forloop.parentloop.first %}
+                                    <td rowspan="{{ klub_data.1 }}" class="top aligned" title="{{ klub }} | celkem: {{  klub_data.0 }} Kč">
+                                        <b>{{ klub }}</b><br/>
+                                        celkem {{ klub_data.0 }} Kč
+                                    </td>
+                                {% endif %}
+                                <td rowspan="{{ kategorie_data.1|length }}" class="top aligned">
+                                    {% if user.is_active %}
+                                        <a href="{% url 'zavody:kategorie_editace' kategorie.id %}" title="upravit kategorii v novém okně" target="_blank">
+                                            {{ kategorie }}
+                                        </a>
+                                    {% else %}
+                                        {{ kategorie }}
+                                    {% endif %}<br/>
+                                    {{ kategorie_data.1|length }} *
+                                    {{ kategorie.startovne|default:'0' }} =
+                                    {{ kategorie_data.0 }} Kč
+                                </td>
+                            {% endif %}
+                            <td>
+                                {% if user.is_active %}
+                                    <a href="{% url 'zavodnici:editace_zavodnika' zavodnik.id %}" title="upravit závodníka v novém okně" target="_blank">
+                                        {{ zavodnik.clovek }}
+                                    </a>
+                                {% else %}
+                                    {{ zavodnik.clovek }}
+                                {% endif %}
+                            </td>
+                            <td>{{ zavodnik.cislo }}</td>
+                            <td class="right aligned">
+                                {{ kategorie.startovne|default:'0' }} Kč
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock content %}

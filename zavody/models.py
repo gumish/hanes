@@ -207,6 +207,9 @@ class Kategorie(models.Model):
         u'Čas spuštění stopek kategorie',
         null=True, blank=True,
         help_text=u'středoevropský čas, kdy byli pro kategorii spuštěny stopky')
+    startovne = models.SmallIntegerField(
+        u'Startovné', null=True, blank=True)
+
 
     class Meta:
         verbose_name = u'Kategorie'

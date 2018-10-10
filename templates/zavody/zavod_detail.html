@@ -12,7 +12,7 @@
         <a href="{% url 'zavody:zavody_list' %}" class="section">závody</a>
         <i class="right chevron icon divider"></i>
         <div class="active section">detail závodu</div>
-    </div>      
+    </div>
 {% endblock breadcrumb %}
 
 {% block header %}
@@ -23,9 +23,11 @@
         <div class="content">
             <i class="checkered flag big icon"></i>
             {{ zavod.nazev }}
-            <div class="sub header">detail závodu</div>
+            <div class="sub header">
+                    {{ zavod.sport }} - detail závodu
+            </div>
         </div>
-    </h1>    
+    </h1>
 {% endblock header %}
 
 {% block staff %}
@@ -38,7 +40,7 @@
             <a href="{% url 'zavody:zavod_editace' zavod.id %}" class="ui black icon button">
                 <i class="edit icon"></i>
                 editace závodu
-            </a> 
+            </a>
         {% endif %}
         {% if user.is_staff %}
             <a href="{% url 'admin:zavody_zavod_change' zavod.id %}" title="editovat závod v administraci" target="_blank" class="ui icon black button">
@@ -46,14 +48,14 @@
                 admin závodu
             </a>
         {% endif %}
-    </div>        
+    </div>
 {% endblock staff %}
 
 {% block content %}
     <p>sport: <b>{{ zavod.sport }}</b></p>
     <p>místo: <b>{{ zavod.misto|default:'-' }}</b></p>
     {% if user.is_active %}
-        <p>korekce sezony: <b>{{ zavod.korekce_sezony|yesno }}</b></p>    
+        <p>korekce sezony: <b>{{ zavod.korekce_sezony|yesno }}</b></p>
     {% endif %}
     <p>{{ zavod.info|safe|urlize|linebreaksbr }}</p>
 
@@ -138,11 +140,11 @@
                                     <ul>
                                         {% for attr in kategorie.atributy.all %}
                                             <li>
-                                                {{ attr.nazev }}    
+                                                {{ attr.nazev }}
                                             </li>
                                         {% endfor %}
                                     </ul>
-                                {% endif %}                        
+                                {% endif %}
                             </td>
                             <td>
                                 {{ kategorie.delka_trate }}
@@ -150,7 +152,7 @@
                         </tr>
                     {% endfor %}
                 </tbody>
-            </table>            
+            </table>
         {% endif %}
     {% endwith %}
 </div>

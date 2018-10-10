@@ -42,6 +42,7 @@ def kategorie_import(soubor):
                     vek_od=int(radek[3]),
                     vek_do=int(radek[4]),
                     delka_trate=radek[5],
+                    startovne=(radek[6] if radek[6] else 0) or 0,
                 )
                 kategorie_list.append(kategorie)
             except Exception as error:
@@ -266,7 +267,8 @@ def exportuj_kategorie(response, rocnik):
         u'Pohlaví'.encode(enctype, 'ignore'),
         u'Věk od včetně'.encode(enctype, 'ignore'),
         u'Věk do včetně'.encode(enctype, 'ignore'),
-        u'Délka tratě'.encode(enctype, 'ignore')
+        u'Délka tratě'.encode(enctype, 'ignore'),
+        u'Startovné'.encode(enctype, 'ignore')
     ])
     for kategorie in rocnik.kategorie.all():
         writer.writerow([
@@ -275,7 +277,8 @@ def exportuj_kategorie(response, rocnik):
             kategorie.pohlavi,
             kategorie.vek_od,
             kategorie.vek_do,
-            kategorie.delka_trate.encode(enctype, 'ignore')
+            kategorie.delka_trate.encode(enctype, 'ignore'),
+            kategorie.startovne or 0,
         ])
 
     return response
