@@ -31,8 +31,8 @@ class Klub(models.Model):
             return ('kluby:klub_detail', (self.slug,))
 
     def save(self, *args, **kwargs):
-        from lide.models import _vytvor_sorting_slug
+        from lide.models import _get_sorting_slug
         self.slug = slugify(self.nazev)
-        self.nazev_slug_sorting = _vytvor_sorting_slug(self.nazev)
+        self.nazev_slug_sorting = _get_sorting_slug(self.nazev)
         super(Klub, self).save(*args, **kwargs)
 
