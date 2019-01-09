@@ -28,6 +28,12 @@ def _get_sorting_slug(slovo):
 
 
 class Clovek(models.Model):
+
+    """ Clovek
+    - clovek je pres Clenstvi spojen s Klubem
+    - pres Zavodnika je spojen s Rocnikem a Kategorii
+    """
+
     jmeno = models.CharField(u'Křestní jméno', max_length=20)
     prijmeni = models.CharField(u'Příjmení', max_length=30)
     pohlavi = models.CharField(
@@ -83,7 +89,7 @@ class Clovek(models.Model):
         self.prijmeni_slug_sorting = self.prijmeni_slug
         self.prijmeni_slug_sorting = _get_sorting_slug(self.prijmeni)
         self.jmeno_slug = slugify(self.jmeno)
-        super(Clovek, self).save(*args, **kwargs)  #nejprve ulozi pro zjisteni ID
+        super(Clovek, self).save(*args, **kwargs)  # nejprve ulozi pro zjisteni ID
         self.slug = '{}-{}-{}_{}'.format(
             self.prijmeni_slug, self.jmeno_slug, str(self.narozen), str(self.id))
         return super(Clovek, self).save(update_fields=['slug']) #updatuje SLUG
@@ -94,7 +100,11 @@ class Clovek(models.Model):
 
 
     def serazene_clenstvi_pro_zavod(self, zavod):
-        'vraci serazeny seznam clenstvi v klubech dle dulezitosti pro dany `zavod`'
+
+        """ Vraci serazeny queryset clenstvi v klubech
+        dle dulezitosti pro dany `Zavod`
+        """
+
         vhodne_clenstvi = self.clenstvi.filter(
             Q(sport=zavod.sport) | Q(sport__isnull=True)
         ).order_by('-sport', '-priorita')
@@ -104,6 +114,9 @@ class Clovek(models.Model):
 
 
     def jednotlive_kluby(self):
+
+        """ Vrati set Klubu cloveka """
+
         from kluby.models import Klub
         return set(Klub.objects.filter(clenstvi__clovek=self))
 
@@ -111,7 +124,8 @@ class Clovek(models.Model):
 class Atribut(models.Model):
 
     """ Vlastnost cloveka,
-    dle ktere muze byt specialne kategorizovan """
+    dle ktere muze byt specialne kategorizovan
+    """
 
     nazev = models.CharField(u'Název atributu', max_length=30, unique=True)
     info = models.TextField(u'Info', null=True, blank=True)
@@ -126,8 +140,10 @@ class Atribut(models.Model):
 
 class Clenstvi(models.Model):
 
-    """ Propojeni cloveka, klubu a sportu,
-    mezi clovekem a klubem je vztah m2m """
+    """ Clenstvi
+    - propojeni cloveka, klubu a sportu,
+    - mezi clovekem a klubem je vztah m2m
+    """
 
     clovek = models.ForeignKey(
         'Clovek',

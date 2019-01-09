@@ -183,7 +183,9 @@ input.error {
 }
 
 #startovni_listina .tr.dns span.dns-hide,
-#startovni_listina .tr.dns span.dns-hide * {
+#startovni_listina .tr.dns span.dns-hide *,
+#startovni_listina .tr.dnp span.dns-hide,
+#startovni_listina .tr.dnp span.dns-hide * {
     color: rgb(212, 212, 212);
 }
 

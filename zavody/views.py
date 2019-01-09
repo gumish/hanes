@@ -82,14 +82,21 @@ class StartovneRocnikuDetailView(DetailView):
         """
 
         kluby = OrderedDict()  # (startovne za klub, [list kategorii[startovne kategorie, list zavodniku]])
-        for zavodnik in self.object.zavodnici.all().order_by('klub__nazev', 'kategorie_temp', 'clovek'):
+        zavod = self.object
+        zavodnici = (
+            zavod.zavodnici
+            .exclude(nedokoncil='DNP')
+            .exclude(kategorie_temp=None)
+            .order_by('klub__nazev', 'kategorie_temp', 'clovek'))
+        for zavodnik in zavodnici:
             klub = zavodnik.klub
             kategorie = zavodnik.kategorie_temp
+            kategorie.startovne = kategorie.startovne if kategorie.startovne else 0
             kluby.setdefault(klub, [0, 0, OrderedDict()])
-            kluby[klub][0] += kategorie.startovne or 0
+            kluby[klub][0] += kategorie.startovne
             kluby[klub][1] += 1
             kluby[klub][2].setdefault(kategorie, [0, []])
-            kluby[klub][2][kategorie][0] += kategorie.startovne or 0
+            kluby[klub][2][kategorie][0] += kategorie.startovne
             kluby[klub][2][kategorie][1].append(zavodnik)
         context = super(StartovneRocnikuDetailView, self).get_context_data(*args, **kwargs)
         context['kluby'] = kluby
@@ -336,20 +343,7 @@ def pridani_zavodniku(request, pk):
     )
 
 
-# def startovni_casy(request, rocnik_pk):
-#     "stranka s formsetem zavodniku, jejiz casy budou ovladany javascriptem"
-#     rocnik = Rocnik.objects.get(pk=rocnik_pk)
-#     return render_to_response(
-#         'zavody/staff/startovni_casy.html', {
-#             'rocnik': rocnik,
-#             'kategorie_list': kategorie_list,
-#             'formset': formset
-#         },
-#         context_instance=RequestContext(request)
-#     )
-
-
-class EditZavodniciView(UpdateView):
+class StartovniCasyUpdateView(UpdateView):
     model = Rocnik
 
     def get_template_names(self):

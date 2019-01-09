@@ -6,12 +6,19 @@ from django.core.exceptions import ValidationError
 
 
 class Zavodnik(models.Model):
+
+    """ Zavodnik
+    - propojeni Cloveka, Rocniku a Kategorie
+    """
+
+    # nastavena pozdeji v modelu Kategorie, casova ztrata na prvniho
     casova_ztrata = None
 
     NEDOKONCIL = (
         ('DNS', u'DNS'),
         ('DNF', u'DNF'),
-        ('DSQ', u'DSQ')
+        ('DSQ', u'DSQ'),
+        ('DNP', u'DNP'),
     )
 
     rocnik = models.ForeignKey(
@@ -75,34 +82,50 @@ class Zavodnik(models.Model):
         verbose_name_plural = u'Závodníci'
         ordering = ('startovni_cas', 'cislo')
 
+
     def __unicode__(self):
         return u'{0} - {1}'.format(self.clovek or '???', self.rocnik)
 
+
     def clean(self):
-        "uprava validace `unique_together`"
-        base_queryset = Zavodnik.objects.filter(rocnik=self.rocnik)
+
+        """ Uprava a validace `unique_together` pred ulozenim
+        - pokud uz clovek zavodi v tomto zavode nahlasit chybu
+        """
+
+        # pokud uz je zavodnik v databazi ulozen, pak ho vynechat z querysetu
+        zavodnici_rocniku = Zavodnik.objects.filter(rocnik=self.rocnik)
         if self.pk:
-            base_queryset = base_queryset.exclude(pk=self.pk)
+            zavodnici_rocniku = zavodnici_rocniku.exclude(pk=self.pk)
 
-        # CLOVEK
-        # uprava> unique_together = ('rocnik, clovek, kategorie')
-        duplicity_clovek = base_queryset.filter(clovek=self.clovek)\
-            .filter(Q(kategorie=self.kategorie) | Q(kategorie_temp=self.kategorie))\
-            .order_by('-kategorie_temp')
-        if duplicity_clovek:
-            raise ValidationError(
-                {'clovek': u'''"{0}" již v tomto ročníku závodí<br>v kategorii "{1}"<br><br>
-                Závodníka nelze přidat, nebo mu natvrdo přiřaďte jinou kategorii'''.format(
-                    self.clovek, duplicity_clovek[0].kategorie_temp)})
+        # zavodi tento clovek uz v tomto zavode?
+        duplicity_cloveka = (
+            zavodnici_rocniku
+            .filter(clovek=self.clovek)
+            .filter(
+                Q(kategorie=self.kategorie) |
+                Q(kategorie_temp=self.kategorie))
+            .order_by('-kategorie_temp'))
+        if duplicity_cloveka:
+            raise ValidationError({
+                'clovek':
+                    u'''"{0}" již v tomto ročníku závodí<br>v kategorii "{1}"<br><br>
+                    Závodníka nelze přidat, nebo mu natvrdo přiřaďte jinou kategorii'''.format(
+                        self.clovek,
+                        duplicity_cloveka[0].kategorie_temp
+                    )
+            })
 
-        # CISLO
-        # uprava> unique_together = ('rocnik, cislo')
+        # zavodi jiz toto cislo?
         if self.cislo:
-            duplicity_cislo = base_queryset.filter(cislo=self.cislo)
-            if duplicity_cislo:
-                raise ValidationError(
-                    {'cislo': u'S číslem "{0}" již závodí<br>"{1}"'.format(
-                        self.cislo, duplicity_cislo[0].clovek)})
+            duplicity_cisla = zavodnici_rocniku.filter(cislo=self.cislo)
+            if duplicity_cisla:
+                raise ValidationError({
+                    'cislo': u'S číslem "{0}" již závodí<br>"{1}"'.format(
+                        self.cislo,
+                        duplicity_cisla[0].clovek
+                    )
+                })
 
         # STARTOVNI_CAS <= CILOVY_CAS
         # if self.startovni_cas and self.cilovy_cas:
@@ -112,25 +135,40 @@ class Zavodnik(models.Model):
         #             'cilovy_cas': u'Cílový čas musí být větší než startovní čas!',
         #         })
 
+
     @models.permalink
     def get_absolute_url(self):
         return ('zavodnici:editace_zavodnika', (self.id,))
 
+
     def save(self, nekontroluj=False, *args, **kwargs):
+
+        """ Ulozeni zavodnika
+        - pokud dochazi ke kontrole (nekontroluj=False), pak:
+            - pokud je zadan klub, pak se u nej nastavi vyssi 'priorita' nez 'priorita' pro tento sport u jinych klubu
+            - 'startovni_cas' nastavit na None
+            - vypocet 'vysledneho_casu'
+        - nastaveni atributu 'odstartoval' a 'nedokoncil'
+        """
+
         if not nekontroluj:
             # KLUBY / CLENSTVI + SPORT
             from lide.models import Clenstvi
             if self.klub:
-                max_priorita = Clenstvi.objects.filter(
-                    clovek=self.clovek,
-                    sport=self.rocnik.zavod.sport).exclude(
-                        klub=self.klub).aggregate(
-                            Max('priorita'))['priorita__max'] or 0
+                max_priorita_jinych_klubu = (
+                    Clenstvi.objects
+                    .filter(
+                        clovek=self.clovek,
+                        sport=self.rocnik.zavod.sport)
+                    .exclude(klub=self.klub)
+                    .aggregate(Max('priorita'))
+                    ['priorita__max'] or 0
+                )
                 clenstvi, created = Clenstvi.objects.get_or_create(
                     clovek=self.clovek,
                     klub=self.klub,
                     sport=self.rocnik.zavod.sport)
-                clenstvi.priorita = max_priorita + 1
+                clenstvi.priorita = max_priorita_jinych_klubu + 1
                 clenstvi.save()
 
             # CASY
