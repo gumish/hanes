@@ -14,8 +14,9 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.text import slugify
 from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
-                                  UpdateView, View)
+                                  UpdateView, View, TemplateView)
 from django.views.generic.edit import FormView
+from django.template.loader import render_to_string
 
 from hanes.nested_formsets import nestedformset_factory
 from zavody.templatetags.custom_filters import desetiny_sekundy
@@ -343,36 +344,60 @@ def pridani_zavodniku(request, pk):
     )
 
 
-class StartovniCasyUpdateView(UpdateView):
+class StartovniCasyView(DetailView):
+    """
+    pouze zobrazi stranku s formulary startovnich casu kategorii a zavodniku,
+    updatovani jednotlivych formularu kategorii uz necha na ajaxu jine funkce
+    """
     model = Rocnik
+    template_name = 'zavody/staff/startovni_casy.html'
 
-    def get_template_names(self):
-        return ['zavody/staff/startovni_casy.html']
 
-    def get_form_class(self):
-        return nestedformset_factory(
-            Rocnik,
-            Kategorie,
-            inlineformset_factory(
-                Kategorie,
-                Zavodnik,
-                fk_name='kategorie_temp',
-                fields=['startovni_cas'],
-                can_delete=False,
-                extra=0
-            ),
-            fields=['spusteni_stopek'],
-            widgets={
-                'spusteni_stopek': forms.TimeInput(
-                    attrs={'placeholder': 'hh:mm:ss'}
-                )
-            },
-            can_delete=False,
-            extra=0
+    def add_nested_formset_to_kategorie(self, kategorie_list):
+        """
+        do kazde kategorie vlozi jako atribut 'formset' nestedformset
+        """
+        for kategorie in kategorie_list:
+            kategorie.zavodnici_formset = ZavodniciKategorieFormSet(instance=kategorie)
+            kategorie.form = StartovniCasKategorieForm(instance=kategorie)
+
+
+    def get_context_data(self, **kwargs):
+        """
+        - do kontextu vlozi kategorie_list rocniku
+        - do instance kategorie vlozi formset
+        """
+        context = super(StartovniCasyView, self).get_context_data(**kwargs)
+        kategorie_list = self.object.kategorie.all()
+        self.add_nested_formset_to_kategorie(kategorie_list)
+        context['kategorie_list'] = kategorie_list
+        return context
+
+
+class AjaxKategorieStartovniCasyUpdateView(UpdateView):
+    """
+    Startovni listina: zmena zavodniku kategorie pomoci ajaxu
+    """
+    model = Kategorie
+    form_class = StartovniCasKategorieForm
+
+    def form_invalid(self, form):
+        pass
+
+    def form_valid(self, form):
+        """
+        Ulozi StartovniCasKategorieForm do kategorie
+        + zpracuje ZavodniciKategorieFormSet
+        """
+        kategorie = form.save()
+        formset = ZavodniciKategorieFormSet(self.request.POST, instance=kategorie)
+        zavodnici = formset.save()
+        data = render_to_string(
+            'zavody/staff/_ajax_startovni_casy_confimation.html',
+            context={'zavodnici': zavodnici}
         )
+        return HttpResponse(data)
 
-    def get_success_url(self):
-        return '.'  # reverse('blocks-list')
 
 
 def formular_startera(request, rocnik_pk, ordering_str='startovni_cas--cislo'):

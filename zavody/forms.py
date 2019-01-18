@@ -5,9 +5,10 @@ from django.forms.formsets import BaseFormSet
 from django.core.exceptions import ValidationError, MultipleObjectsReturned
 from django.db import transaction
 from django.forms.formsets import formset_factory
+from django.forms.models import inlineformset_factory
 
 from lide.forms import LideImportCSVForm
-from .models import Zavodnik, Zavod, Sport, Rocnik
+from .models import Zavodnik, Zavod, Sport, Rocnik, Kategorie
 from .functions import kategorie_import
 from zavodnici.custom_fields import CustomTimeField
 
@@ -209,6 +210,29 @@ class SloupceVysledkoveListinyForm(forms.Form):
     poradi_na_trati = forms.BooleanField(required=False, label=u'pořadí na trati', initial=True)
 
 
+class StartovniCasKategorieForm(forms.ModelForm):
+    class Meta:
+        model = Kategorie
+        fields = ['spusteni_stopek']
+        widgets = {
+            'spusteni_stopek': forms.TimeInput(
+                attrs={'placeholder': 'hh:mm:ss'}
+            )
+        }
+
+class StartovniCasZavodnikaForm(forms.ModelForm):
+    class Meta:
+        model = Zavodnik
+        fields = ['startovni_cas']
+
+    def has_changed(self):
+        """
+        Aby se ukladal vzdy, i kdyz se cas nezmeni,
+        ale zmeni se kategorie a je nutno prepocitat
+        """
+        return True
+
+
 # FORMSETS
 # -----
 class KontrolaKolonekFormSet(BaseFormSet):
@@ -250,6 +274,15 @@ class KontrolaLidiFormSet(KontrolaKolonekFormSet):
 class PridaniZavodnikuFormSet(KontrolaLidiFormSet):
     pass
 
+# Formset zavodniku kategorie pri zadavani startovnich casu
+ZavodniciKategorieFormSet = inlineformset_factory(
+    Kategorie,
+    Zavodnik,
+    form=StartovniCasZavodnikaForm,
+    fk_name='kategorie_temp',
+    can_delete=False,
+    extra=0
+)
 
 ImportyCilovehoCasuFormSet = formset_factory(
     ImportCilovehoCasuFormular,

@@ -1,10 +1,12 @@
 # coding: utf-8
 from django.core.urlresolvers import reverse_lazy
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.views.generic import CreateView, DetailView, ListView
 from io import BytesIO
 
 from zavody.pdf import PdfPrint
+from zavody.views import TITLE_TEMPLATE
+from zavodnici.views import desetiny_sekundy
 
 from .forms import PoharCreateForm
 from .models import KategoriePoharu, Pohar
@@ -51,6 +53,7 @@ class PoharCreateView(CreateView):
                 del values['delka_trate']
                 del values['rocnik_id']
                 del values['spusteni_stopek']
+                del values['startovne']
                 values['pohar'] = pohar
                 KategoriePoharu.objects.create(**values)
         return HttpResponseRedirect(

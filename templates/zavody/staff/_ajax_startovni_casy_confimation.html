@@ -1,0 +1,35 @@
+{% load l10n custom_filters %}
+{% if zavodnici %}
+    <div class="ui visible compact success message js-ajax-message">
+        <div>
+            <i class="ui green checkmark icon"></i>
+            Hodnoty kategorie uloženy.
+        </div>
+        <u>Výsledné časy závodníků:</u><br/>
+        <ul class="ui small list vysledne-casy">
+            {% for zavodnik in zavodnici %}
+                <li>
+                    <span class="cislo">
+                        {{ zavodnik.cislo }}
+                    </span>
+                    <span class="prijmeni">
+                        {{ zavodnik.clovek.prijmeni }}
+                    </span>
+                    <span class="cas">
+                        {{ zavodnik.vysledny_cas|desetiny_sekundy|default:'-' }}
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% else %}
+    <div class="ui visible compact warning message js-ajax-message">
+        <div>
+            <i class="ui green checkmark icon"></i>
+            Hodnoty kategorie uloženy.
+        </div>
+        <i class="orange warning icon"></i>
+        Závodníkům nebyli přiřazeny nové hodnoty.
+    </div>
+
+{% endif %}

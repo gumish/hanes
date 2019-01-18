@@ -27,6 +27,9 @@ urlpatterns = patterns(
     url(r'^rocnik/(?P<rocnik_pk>\d+)/vysledkova_listina/$',
         vysledkova_listina,
         name='vysledkova_listina'),
+    url(r'^rocnik/(?P<pk>\d+)/startovni_casy/$',
+        login_required(StartovniCasyView.as_view()),
+        name='startovni_casy'),
 
     # CREATEs
     url(r'^zavod/novy/$',
@@ -77,9 +80,6 @@ urlpatterns = patterns(
     url(r'^rocnik/(?P<rocnik_pk>\d+)/startovni_listina/(?P<ordering_str>[-\w]+)/$',
         startovni_listina,
         name='startovni_listina'),
-    url(r'^rocnik/(?P<pk>\d+)/startovni_casy/$',
-        login_required(StartovniCasyUpdateView.as_view()),
-        name='startovni_casy'),
     url(r'^rocnik/(?P<rocnik_pk>\d+)/cilovy_formular/$',
         login_required(cilovy_formular),
         name='cilovy_formular'),
@@ -90,6 +90,10 @@ urlpatterns = patterns(
         login_required(ZpracovaniImportovanychCasuTxtView.as_view()),
         name='zpracovani_importovanych_casu_txt'),
 
+    # AJAX
+    url(r'^kategorie/(?P<pk>\d+)/startovni_casy/upravit/$',
+        login_required(AjaxKategorieStartovniCasyUpdateView.as_view()),
+        name='ajax_kategorie_startovni_casy_update'),
 
     # EXPORT
     url(r'^rocnik/(?P<rocnik_pk>\d+)/startovka_export/$',

@@ -80,7 +80,7 @@ class Zavodnik(models.Model):
     class Meta:
         verbose_name = u'Závodník'
         verbose_name_plural = u'Závodníci'
-        ordering = ('startovni_cas', 'cislo')
+        ordering = ('rocnik', 'startovni_cas', 'cislo')
 
 
     def __unicode__(self):

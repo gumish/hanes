@@ -1,0 +1,155 @@
+{% load l10n %}
+
+<h2 class="ui top attached header">
+    <a href="{% url 'zavody:kategorie_editace' kategorie.id %}" title="editace kategorie">
+        {{ kategorie }}
+    </a>
+</h2>
+<div class="ui attached segment">
+
+    <form action="{% url 'zavody:ajax_kategorie_startovni_casy_update' kategorie.id %}" method="POST" class="ui small {% if form.errors %}error{% endif %} form">
+        {% csrf_token %}
+        {{ kategorie.form.id }}
+        {{ kategorie.zavodnici_formset.management_form }}
+
+        {% if kategorie.zavodnici_formset.0 %}
+
+            {% if kategorie.zavodnici_formset.errors %}
+                <div class="ui error message">
+                    CHYBA: {{ kategorie.zavodnici_formset.non_form_errors }}
+                </div>
+            {% endif %}
+
+            <div class="ui stackable grid">
+
+                <!-- ZAVODNICI -->
+                <div class="twelve wide column zavodnici">
+                    <table class="ui table sortable">
+                        <thead>
+                            <tr>
+                                <th>číslo</th>
+                                <th>příjmení</th>
+                                <th>jméno</th>
+                                <th>nar.</th>
+                                <th>klub</th>
+                                <th style="width: 13em;">startovní čas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for zavodnik in kategorie.zavodnici_formset %}
+                                <tr {% if zavodnik.instance.cilovy_cas %}class="warning" title="závodník má již zadán cílový čas!"{% endif %}>
+                                    <td>
+                                        <a href="{% url 'zavodnici:editace_zavodnika' zavodnik.instance.id %}" title="editovat závodníka">
+                                            {{ zavodnik.instance.cislo }}
+                                        </a>
+                                        {{ zavodnik.id|safe }}
+                                    </td>
+                                    <td>
+                                        {{ zavodnik.instance.clovek.prijmeni }}
+                                    </td>
+                                    <td>
+                                        {{ zavodnik.instance.clovek.jmeno }}
+                                    </td>
+                                    <td>
+                                        {{ zavodnik.instance.clovek.narozen|unlocalize }}
+                                    </td>
+                                    {% if zavodnik.instance.cilovy_cas %}
+                                        <td class="warning">
+                                            <i class="warning sign icon"></i>
+                                            {{ zavodnik.instance.cilovy_cas|time:'H:i:s' }}
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            {{ zavodnik.instance.klub.nazev }}
+                                        </td>
+                                    {% endif %}
+                                    <td>
+                                        {{ zavodnik.startovni_cas }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- KATEGORIE -->
+                <div class="four wide column cas">
+
+                    <div class="ui tertiary segment form">
+                        <div class="spusteni_stopek field">
+                            <label>
+                                {{ kategorie.form.spusteni_stopek.label }}
+                                <i class="help circle icon" title="{{ kategorie.form.spusteni_stopek.help_text }}"></i>
+                            </label>
+                            <div class="ui action input">
+                                {{ kategorie.form.spusteni_stopek }}
+                                <button type="button" class="ui icon button js-copy-values" title="kopírovat aktualní hodnotu i do ostatních kategorií">
+                                    <i class="copy icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui secondary segment form">
+                        <div class="start field">
+                            <label>
+                                Start prvního závodníka
+                                <i class="help circle icon" title="středoevropský čas, kdy startuje první závodník"></i>
+                            </label>
+                            <div class="ui action input">
+                                <input type="text" placeholder="hh:mm:ss" value="{{ kategorie.zavodnici_formset.0.startovni_cas.value|default:kategorie.spusteni_stopek|time:'H:i:s' }}">
+                                <button type="button" class="ui icon button js-copy-values" title="kopírovat aktualní hodnotu i do ostatních kategorií">
+                                    <i class="copy icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="rozdil field">
+                            <label>Sekundový rozdíl mezi starty</label>
+                            <div class="ui action input">
+                                <input type="text" placeholder="sekundy" value=30>
+                                <button type="button" class="ui icon button js-copy-values" title="kopírovat aktualní hodnotu i do ostatních kategorií">
+                                    <i class="copy icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="kolik field">
+                            <label>Velikost startované skupinky</label>
+                            <div class="ui action input">
+                                <select>
+                                    <option value="1">1</option>
+                                    <option value="2" selected="selected">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="0">všichni</option>
+                                </select>
+                                <button type="button" class="ui icon button js-copy-values" title="kopírovat aktualní hodnotu i do ostatních kategorií">
+                                    <i class="copy icon"></i>
+                                </button>
+                            </div>
+                        </div>
+{% comment "" %}
+    TODO: ROZDAVANI STARTOVNICH CISEL JAKO CASU
+{% endcomment %}
+                        <!-- BUTTONS -->
+                        <div class="ui vertical fluid buttons">
+                            <button type="button" class="ui secondary button js-assign-times" title="přiřadit časy závodníkům v kategorii">
+                                <i class="left arrow icon"></i>
+                                přiřadit časy
+                            </button>
+                            <button type="submit" class="ui primary button" title="uložit pouze tuto kategorii">
+                                <i class="save icon"></i>
+                                odeslat
+                            </button>
+                        </div>
+                        <div class="js-ajax-message"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+    </form>
+</div>

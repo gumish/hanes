@@ -289,3 +289,9 @@ dl.vlastnosti dd {
 #zebricek_kategorie tr.error.pozice:not(.zmena-varovani) td {
     border-top-color: hsl(0, 0%, 65%);
 }
+
+#start_times tbody tr {cursor: move;}
+#start_times ul.vysledne-casy .cislo {
+    width: 1.5em;
+    display: inline-block;}
+#start_times ul.vysledne-casy .prijmeni {width:8em; display: inline-block;}
