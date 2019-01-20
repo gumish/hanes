@@ -291,7 +291,6 @@ dl.vlastnosti dd {
 }
 
 #start_times tbody tr {cursor: move;}
-#start_times ul.vysledne-casy .cislo {
-    width: 1.5em;
-    display: inline-block;}
+#start_times tbody td.cislo {width: 7em;}
+#start_times ul.vysledne-casy .cislo { width: 2.8em; display: inline-block;}
 #start_times ul.vysledne-casy .prijmeni {width:8em; display: inline-block;}

@@ -2,11 +2,10 @@
 import json
 from io import BytesIO
 
-from django import forms
 from collections import OrderedDict
 from django.contrib import messages
 from django.core.urlresolvers import reverse, reverse_lazy
-from django.db.models import Count
+from django.db.models import Count, Min
 from django.forms.formsets import formset_factory
 from django.forms.models import inlineformset_factory
 from django.http import HttpResponse, HttpResponseRedirect
@@ -355,11 +354,14 @@ class StartovniCasyView(DetailView):
 
     def add_nested_formset_to_kategorie(self, kategorie_list):
         """
-        do kazde kategorie vlozi jako atribut 'formset' nestedformset
+        do kazde kategorie vlozi dalsi atributy a 'formset' nestedformset
         """
         for kategorie in kategorie_list:
             kategorie.zavodnici_formset = ZavodniciKategorieFormSet(instance=kategorie)
             kategorie.form = StartovniCasKategorieForm(instance=kategorie)
+            values = kategorie.zavodnici_temp.aggregate(Min('cislo'), Min('startovni_cas'))
+            kategorie.min_cislo = values['cislo__min']
+            kategorie.min_startovni_cas = values['startovni_cas__min']
 
 
     def get_context_data(self, **kwargs):
@@ -377,25 +379,34 @@ class StartovniCasyView(DetailView):
 class AjaxKategorieStartovniCasyUpdateView(UpdateView):
     """
     Startovni listina: zmena zavodniku kategorie pomoci ajaxu
+    TODO: cely ajax resit pres posilani celeho htl kategoie, tak aby se
+    chyby zbrazovali na spravnzych mistech, a aby byli u yavodniku
+    rovnou videt vysledne casy
     """
     model = Kategorie
     form_class = StartovniCasKategorieForm
 
-    def form_invalid(self, form):
-        pass
 
     def form_valid(self, form):
         """
         Ulozi StartovniCasKategorieForm do kategorie
         + zpracuje ZavodniciKategorieFormSet
         """
-        kategorie = form.save()
+        kategorie = self.object
         formset = ZavodniciKategorieFormSet(self.request.POST, instance=kategorie)
-        zavodnici = formset.save()
-        data = render_to_string(
-            'zavody/staff/_ajax_startovni_casy_confimation.html',
-            context={'zavodnici': zavodnici}
-        )
+        if formset.is_valid():
+            form.save()
+            zavodnici = formset.save()
+            data = render_to_string(
+                'zavody/staff/_ajax_startovni_casy_confimation.html',
+                context={'zavodnici': zavodnici}
+            )
+            return HttpResponse(data)
+        else:
+            data = render_to_string(
+                'zavody/staff/_ajax_startovni_casy_confimation.html',
+                context={'errors': formset.errors}
+            )
         return HttpResponse(data)
 
 

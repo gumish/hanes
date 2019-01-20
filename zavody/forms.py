@@ -1,11 +1,10 @@
 # coding: utf-8
 import csv
 from django import forms
-from django.forms.formsets import BaseFormSet
+from django.forms.formsets import BaseFormSet, formset_factory
 from django.core.exceptions import ValidationError, MultipleObjectsReturned
 from django.db import transaction
-from django.forms.formsets import formset_factory
-from django.forms.models import inlineformset_factory
+from django.forms.models import inlineformset_factory, BaseInlineFormSet
 
 from lide.forms import LideImportCSVForm
 from .models import Zavodnik, Zavod, Sport, Rocnik, Kategorie
@@ -220,10 +219,10 @@ class StartovniCasKategorieForm(forms.ModelForm):
             )
         }
 
-class StartovniCasZavodnikaForm(forms.ModelForm):
+class CisloStartovniCasZavodnikaForm(forms.ModelForm):
     class Meta:
         model = Zavodnik
-        fields = ['startovni_cas']
+        fields = ['cislo', 'startovni_cas']
 
     def has_changed(self):
         """
@@ -274,11 +273,32 @@ class KontrolaLidiFormSet(KontrolaKolonekFormSet):
 class PridaniZavodnikuFormSet(KontrolaLidiFormSet):
     pass
 
+
+class KontrolaCiselInlineFormSet(BaseInlineFormSet):
+    pass
+    # def is_valid(self):
+    #     """
+    #     zkontroluje zda-li nekde v jinych kategoriich nejsou stejna cisla zavodniku
+    #     """
+    #     form_valid = super(KontrolaCiselInlineFormSet, self).is_valid()
+    #     print(form_valid)
+    #     if form_valid:
+    #         kategorie = self.instance
+    #         print(self.forms[0].cleaned_data)
+    #         cisla = [form.cleaned_data.get('cislo', None) for form in self.forms]
+    #         is_dupl_cislo = Zavodnik.objects.exclude(kategorie_temp=kategorie).filter(cislo__in=cisla).exists()
+    #         print(cisla, is_dupl_cislo)
+    #         if is_dupl_cislo:
+    #             raise forms.ValidationError(u"Chyba. Duplikatni cislo.")
+    #     return False
+
+
 # Formset zavodniku kategorie pri zadavani startovnich casu
 ZavodniciKategorieFormSet = inlineformset_factory(
     Kategorie,
     Zavodnik,
-    form=StartovniCasZavodnikaForm,
+    form=CisloStartovniCasZavodnikaForm,
+    formset=KontrolaCiselInlineFormSet,
     fk_name='kategorie_temp',
     can_delete=False,
     extra=0
