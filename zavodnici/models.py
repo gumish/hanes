@@ -216,11 +216,15 @@ class Zavodnik(models.Model):
 
     def poradi_v_kategorii(self):
         if self.kategorie_temp and self.vysledny_cas and not self.nedokoncil:
-            lepsich = Zavodnik.objects.filter(
-                rocnik=self.rocnik,
-                kategorie_temp=self.kategorie_temp,
-                vysledny_cas__lt=self.vysledny_cas,
-                ).aggregate(pocet=Count('vysledny_cas'))
+            lepsich = (
+                Zavodnik.objects
+                .filter(
+                    rocnik=self.rocnik,
+                    kategorie_temp=self.kategorie_temp,
+                    vysledny_cas__lt=self.vysledny_cas,
+                )
+                .aggregate(pocet=Count('vysledny_cas'))
+            )
             return str(lepsich['pocet'] + 1) + '.'
         else:
             return None

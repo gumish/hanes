@@ -277,7 +277,9 @@ class Kategorie(models.Model):
         return (nezarazeni, duplikati, zpravy)
 
     def serazeni_zavodnici(self, razeni, ignoruj_nedokoncil=False):
-        "vrati serazene zavodniky kategorie a doplni do nich casove ztraty na prvniho"
+        """
+        Vrati serazene zavodniky kategorie a doplni do nich casove ztraty na prvniho
+        """
         # pomoci annotate Count, se radi prazdna pole na konec (null_value = 1 / 0)
         annotate_kwargs = {}
         ordering_kwargs = _string_to_ordering_kwargs(razeni, ignoruj_nedokoncil)

@@ -1,6 +1,6 @@
 # coding: utf-8
 from operator import attrgetter
-from datetime import date
+from datetime import date, timedelta
 
 from django.db import models
 from django.utils.text import slugify
@@ -11,7 +11,10 @@ from zavody.models import kategorie_test_cloveka
 
 
 class Pohar(models.Model):
+
+    # list pouzit pro fci 'Pohar.zavodnici_bez_kategorie()'
     zavodnici_s_kategorii = []
+
     nazev = models.CharField(u'Název', max_length=50)
     datum = models.DateField(u'Datum pořádání')
     slug = models.SlugField(editable=False, unique=True)
@@ -59,14 +62,24 @@ class Pohar(models.Model):
         return self.rocniky_chronologicky().first()
 
     def zavodnici_vsichni(self):
-        zavodnici = Zavodnik.objects.filter(
-            rocnik__in=self.rocniky.all(), vysledny_cas__isnull=False, nedokoncil=None) \
+        zavodnici = (
+            Zavodnik.objects
+            .filter(
+                rocnik__in=self.rocniky.all(),
+                vysledny_cas__isnull=False,
+                nedokoncil=None
+            )
             .order_by('rocnik__datum', 'vysledny_cas')
+        )
         return zavodnici
 
     def zavodnici_bez_kategorie(self):
-        "!! musi byt volano az po kategoriich !!"
+        """
+        Musi byt volano az po kategoriich,
+        tak aby se nejprve naplnil atribut 'Pohar.zavodnici_s_kategorii' !!
+        """
         return set(list(self.zavodnici_vsichni())) - set(self.zavodnici_s_kategorii)
+
 
 class KategoriePoharu(models.Model):
     POHLAVI = (
@@ -127,17 +140,26 @@ class KategoriePoharu(models.Model):
                 self.vek_do or '?')
         return popis
 
+
     @models.permalink
     def get_absolute_url(self):
         return ('pohary:kategorie-poharu_detail', (self.id,))
 
 
-
-
     def zavodnici(self):
-        "vrati zavodniky kategorie serazene dle zavodu/vysledneho_casu"
+        """
+        Prefiltruje vsechny zavodniky 'Poharu' a vrati pouze ty, co patri do 'KategoriePoharu'.
+        Pokud je vhodny, pak je zarazen do vysledneho listu,
+        a je pridan do listu atributu 'Pohar.zavodnici_s_kategorii'
+
+        Returns:
+            zarazeni(list) - list zavodniku kategorie serazene dle zavodu/vysledneho_casu
+        """
 
         def _rozsah_narozeni(rocnik):
+            """
+            Vrati tuple rozsahu roku narozeni zavodniku pro tuto kategorii
+            """
             rok = rocnik.datum.year
             # korekce pro sezonu zari-duben
             if rocnik.zavod.korekce_sezony:
@@ -159,51 +181,94 @@ class KategoriePoharu(models.Model):
                 self.pohar.zavodnici_s_kategorii.append(zavodnik)
         return zarazeni
 
+
     def pocet_zavodu(self):
+        """
+        Vrati pocet zavodu, ktere jsou pocitany do poharu
+        """
         return self.zavodu or self.pohar.zavodu or False
 
+
     def bodove_hodnoceni(self):
+        """
+        Vrati pocet zavodu, ktere jsou pocitany do poharu
+        """
         return self.bod_hodnoceni or self.pohar.bod_hodnoceni
 
+
     def poradi_zavodniku(self):
-        def _nejlepsi_zavody(zavodnici):
-            '''tabulka lidi a jejich opozicovane zavody dle datumu
-            {<Clovek: Jirman Jan 2014>:
+        """
+        Vrati serazany list-zebricek zavodniku.
+        Lide se radi v poharu dle tohoto systemu:
+
+        """
+
+        def _get_lide_s_nejlepsimi_zavody(zavodnici):
+            """
+            Vrati nerazeny slovnik lidi a jejich opozicovane zavody dle datumu.
+            Do zavodnika jsou dany atribut 'zavodnik.poradi'(int).
+            'Zavodnik.poradi' je pouzit pro rozhodovani, ktere zavody se nakonec zapocitaji do
+            poharu. Toto je pak zapsano jako 'zavodnik.zapocitane'(bool).
+
+            Attrs:
+                zavodnici(list) - zavodnici kategorie serazeni dle 'rocnik', 'vysledneho casu'
+            Returns:
+                (dict)
+                {<Clovek: Jirman Jan 2014>:
                 [<Zavodnik: Jirman Jan 2014 - Okolo Osta┼íe 2015>,
-                <Zavodnik: Jirman Jan 2014 - Okolo Osta┼íe 2016>], ...'''
+                <Zavodnik: Jirman Jan 2014 - Okolo Osta┼íe 2016>], ...
+            """
             lide = {}
             rocnik = None
             i = 1
+            umisteni = 1
+            minuly_cas = timedelta()
             for zavodnik in zavodnici:
                 if rocnik == zavodnik.rocnik:
                     i += 1
+                    if minuly_cas < zavodnik.vysledny_cas:
+                        umisteni = i
+                    elif minuly_cas == zavodnik.vysledny_cas:
+                        pass
                 else:
                     i = 1
-                clovek = zavodnik.clovek
+                    umisteni = 1
+                    minuly_cas = timedelta()
+                    rocnik = zavodnik.rocnik
                 # zapise poradi do attributu zavodnika!
-                zavodnik.poradi = i
+                zavodnik.poradi = umisteni
+                clovek = zavodnik.clovek
                 lide.setdefault(clovek, [])
                 lide[clovek].append(zavodnik)
-                rocnik = zavodnik.rocnik
+                minuly_cas = zavodnik.vysledny_cas
 
             # oznaceni zapocitavanych zavodu do atributu zavodnika
-            for clovek, zavodnici in lide.items():
-                zapocitane = sorted(zavodnici, key=attrgetter('poradi'))[:self.pocet_zavodu()]
-                for zavodnik in zapocitane:
+            for clovek, zavodnici_cloveka in lide.items():
+                zapocitane = sorted(
+                    zavodnici_cloveka, key=attrgetter('poradi')
+                )
+                for zavodnik in zapocitane[:self.pocet_zavodu()]:
                     zavodnik.zapocitane = True
             return lide
 
         def _oboduj_a_serad(lide):
-            '''projede lide, oboduje zavody a seradi lidi do listu dle bodu
-            [(53 ,Clovek, [zavody,...]),..]'''
+            """
+            Projede slovnik lide, oboduje zavody a seradi lidi do listu dle bodu
+
+            Attrs:
+                lide(dict) - slovnik lidi a jejich zavodniku z '_get_lide_s_nejlepsimi_zavody()'
+            Returns:
+                zebricek(list) - [(53 ,Clovek, [zavody,...]),..]
+            """
             zebricek = []
-            body_dict = self.bodove_hodnoceni().hodnoceni_dict()
-            for clovek, zavody in lide.items():
+            # slovnik bodu za poradi v zavodu
+            body_za_poradi = self.bodove_hodnoceni().hodnoceni_dict()
+            for clovek, zavody in lide.items(): # pro zjednoduseni zavodnici => zavody
                 soucet = 0
                 # maximum bodu z nejlepsi pozice pro 2.stupen razeni
                 maximum = []
                 for zavod in zavody:
-                    body = body_dict.get(zavod.poradi, 0)
+                    body = body_za_poradi.get(zavod.poradi, 0)
                     zavod.body = body
                     if hasattr(zavod, 'zapocitane'):
                         soucet += body
@@ -215,7 +280,9 @@ class KategoriePoharu(models.Model):
             return zebricek
 
         def _stejne_body(zebricek):
-            '''vyresi lidi se stejnym poctem bodu'''
+            """
+            Vyresi lidi se stejnym poctem bodu
+            """
 
             def _stejne_soucty(zebricek):
                 'vrati slovnik lidi se stejnymi soucty'
@@ -282,7 +349,9 @@ class KategoriePoharu(models.Model):
             return zebricek
 
         def _doplnit_zavody_nulou(zebricek):
-            '''doplneni nezucastnenych zavodu NONE'''
+            """
+            doplneni nezucastnenych zavodu NONE
+            """
             vsechny_rocniky = list(self.pohar.rocniky_chronologicky())
             novy_zebricek = []
             for clovek, zavody, soucet, pozice in zebricek:
@@ -301,7 +370,7 @@ class KategoriePoharu(models.Model):
             return novy_zebricek
 
 
-        lide = _nejlepsi_zavody(self.zavodnici())
+        lide = _get_lide_s_nejlepsimi_zavody(self.zavodnici())
         zebricek = _oboduj_a_serad(lide)
         zebricek = _stejne_body(zebricek)
         zebricek = _doplnit_zavody_nulou(zebricek)
@@ -309,6 +378,11 @@ class KategoriePoharu(models.Model):
 
 
 class BodoveHodnoceni(models.Model):
+    """
+    Tabulka bodovych hodnoceni prvnich pozic.
+    Pres FK je spojen s 'Poharem' nebo 'KategoriiPoharu'
+    """
+
     nazev = models.CharField(u'Název', max_length=50)
     hodnoceni = models.TextField(
         u'Hodnocení prvních pozic',
@@ -323,7 +397,11 @@ class BodoveHodnoceni(models.Model):
         return self.nazev
 
     def hodnoceni_dict(self):
-        '''rozparsuje body do slovniku, doplni zbytek pozic'''
+        """
+        Rozparsuje body do slovniku {(poradi: body)}, doplni zbytek pozic
+        Returns:
+            body(dict) - {1: 50, 2: 47, 3: 44, ...}
+        """
         dvojice = self.hodnoceni.split('\n')
         body = {}
         for dvoj in dvojice:

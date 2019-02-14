@@ -82,8 +82,12 @@ class CilovyFormular(forms.Form):
     cilovy_cas = CustomTimeField(label=u'Cílový čas', required=False)
     nedokoncil = forms.ChoiceField(
         label=u'Nedokonončil(a)', required=False,
-        choices=((None, '---'),) + Zavodnik.NEDOKONCIL)
-    prepsat = forms.BooleanField(required=False, help_text=u'povolit přepsání již zapsaných časů')
+        choices=((None, '---'),) + Zavodnik.NEDOKONCIL,
+        widget=forms.Select(attrs={'tabindex': '-1'}))
+    prepsat = forms.BooleanField(
+        required=False,
+        help_text=u'povolit přepsání již zapsaných časů',
+        widget=forms.CheckboxInput(attrs={'tabindex': '-1'}))
 
     def clean_cislo(self):
         """
@@ -219,17 +223,35 @@ class StartovniCasKategorieForm(forms.ModelForm):
             )
         }
 
+
 class CisloStartovniCasZavodnikaForm(forms.ModelForm):
+    """
+    Formular pouzit v startovni_casy.html
+    """
+
     class Meta:
         model = Zavodnik
         fields = ['cislo', 'startovni_cas']
 
     def has_changed(self):
         """
+        Prepsani interni fce rodice.
         Aby se ukladal vzdy, i kdyz se cas nezmeni,
         ale zmeni se kategorie a je nutno prepocitat
         """
         return True
+
+
+    def clean_cislo(self):
+        """
+        Vynechani validace cisla, tak aby mohlo byt cislo v zavode klidne i vicekrat
+        """
+        print('clean_cislo')
+        cislo = self.cleaned_data['cislo']
+        return cislo
+
+    def clean(self):
+        print('CLEAN')
 
 
 # FORMSETS
@@ -275,7 +297,10 @@ class PridaniZavodnikuFormSet(KontrolaLidiFormSet):
 
 
 class KontrolaCiselInlineFormSet(BaseInlineFormSet):
-    pass
+
+    def full_clean(self):
+        return
+#     pass
     # def is_valid(self):
     #     """
     #     zkontroluje zda-li nekde v jinych kategoriich nejsou stejna cisla zavodniku

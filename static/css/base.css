@@ -99,7 +99,8 @@ input.error {
 }
 
 .autocomplete-selected {
-    background: #F0F0F0;
+    background: hsl(0, 0%, 86%);
+    border: 1px solid black;
 }
 
 .autocomplete-group {
