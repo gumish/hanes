@@ -12,11 +12,11 @@ from django.utils.text import slugify
 
 # FORMS
 class ZavodnikPridaniForm(forms.ModelForm):
-    prijmeni = forms.CharField(label=u'Příjmení')
-    jmeno = forms.CharField(label=u'Jméno')
-    pohlavi = forms.ChoiceField(label=u'Pohlaví', choices=POHLAVI, required=False)
-    narozen = forms.IntegerField(label=u'Narozen(a)', min_value=1920, max_value=2020)
-    klub_nazev = forms.CharField(label=u'Klub', required=False)
+    prijmeni = forms.CharField(label='Příjmení')
+    jmeno = forms.CharField(label='Jméno')
+    pohlavi = forms.ChoiceField(label='Pohlaví', choices=POHLAVI, required=False)
+    narozen = forms.IntegerField(label='Narozen(a)', min_value=1920, max_value=2020)
+    klub_nazev = forms.CharField(label='Klub', required=False)
 
     class Meta:
         model = Zavodnik
@@ -89,8 +89,8 @@ class ZavodnikPridaniForm(forms.ModelForm):
 
 
 class ZavodnikEditaceForm(ZavodnikPridaniForm):
-    startovni_cas = CustomTimeField(label=u'Startovní čas')
-    cilovy_cas = CustomTimeField(label=u'Cílový čas')
+    startovni_cas = CustomTimeField(label='Startovní čas')
+    cilovy_cas = CustomTimeField(label='Cílový čas')
 
     class Meta:
         model = Zavodnik

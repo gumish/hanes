@@ -31,21 +31,21 @@ def th_sortable(context, verbose, order, width=None, kat=0):
         if aktualni_order[0] == '-':
             # aktualne je razen sestupne
             caret = 'down'
-            url_smer = u'vzestupně'
+            url_smer = 'vzestupně'
             url += order
         else:
             # aktualne je razen vzestupne
             caret = 'up'
-            url_smer = u'sestupně'
+            url_smer = 'sestupně'
             url += '-' + order
     else:
         # tento sloupec neni nyni razen
         caret = ''
-        url_smer = u'vzestupně'
+        url_smer = 'vzestupně'
         url += order
     # width
     width = 'width:{0}em'.format(width) if width else ''
-    vysledek = u"""
+    vysledek = """
     <span class='th' style='{1}'>
         <a href='{2}/#kat_{5}' title='seřadit sloupec {3}'>
             <i class='ui caret {0} icon'></i>

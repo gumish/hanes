@@ -27,7 +27,7 @@ def _clean_radek(i, radek):
             }
         except:
             return ValidationError(
-                u'#{0}: chybějící údaj u člověka: {1[0]},  {1[1]},  {1[2]},  {1[3]}'.format(
+                '#{0}: chybějící údaj u člověka: {1[0]},  {1[1]},  {1[2]},  {1[3]}'.format(
                     i,
                     ['???' if not r else r for r in radek]))
 

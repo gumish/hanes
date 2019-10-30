@@ -20,8 +20,8 @@ class ClovekModelTest(TestCase):
     #     create_clovek(u'Martin Hruška 1981')
 
     def test_get_sorting_slug(self):
-        slovo = u'Martin Hruška'
-        self.assertEqual(_get_sorting_slug(slovo), U'martin-hruszka')
+        slovo = 'Martin Hruška'
+        self.assertEqual(_get_sorting_slug(slovo), 'martin-hruszka')
 
     def test_testplus_get(self):
         url = self.reverse('lide:clovek_detail', slug='adamek-petr-1993_2')

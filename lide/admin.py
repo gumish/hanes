@@ -23,7 +23,7 @@ class ClovekAdmin(admin.ModelAdmin):
     def pocet_zavodu(self, obj):
         return obj.zavodu
     pocet_zavodu.admin_order_field = 'zavodu'
-    pocet_zavodu.short_description = u'Počet závodů'
+    pocet_zavodu.short_description = 'Počet závodů'
 
 
 admin.site.register(Clovek, ClovekAdmin)

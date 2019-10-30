@@ -1,4 +1,3 @@
-# coding: utf-8
 from datetime import date
 
 from django.db import models
@@ -27,15 +26,15 @@ def _string_to_ordering_kwargs(razeni='vysledny_cas--startovni_cas--cislo', igno
 
 
 class Sport(models.Model):
-    nazev = models.CharField(u'Název', max_length=50, unique=True)
+    nazev = models.CharField('Název', max_length=50, unique=True)
     slug = models.SlugField(editable=False)
-    info = models.TextField(u'Info', null=True, blank=True)
+    info = models.TextField('Info', null=True, blank=True)
 
     class Meta:
-        verbose_name = u'Sport'
-        verbose_name_plural = u'Sporty'
+        verbose_name = 'Sport'
+        verbose_name_plural = 'Sporty'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.nazev
 
     def save(self, *args, **kwargs):
@@ -44,25 +43,25 @@ class Sport(models.Model):
 
 
 class Zavod(models.Model):
-    nazev = models.CharField(u'Název', max_length=50, unique=True)
+    nazev = models.CharField('Název', max_length=50, unique=True)
     slug = models.SlugField(editable=False, unique=True)
     sport = models.ForeignKey(
         'Sport',
-        verbose_name=u'sport',
+        verbose_name='sport',
         related_name='zavody')
     korekce_sezony = models.BooleanField(
-        u'Korekce sezóny',
-        help_text=u'zatrhni u podzimních lyžařských běhů pro použití kategorií zimní sezóny',
+        'Korekce sezóny',
+        help_text='zatrhni u podzimních lyžařských běhů pro použití kategorií zimní sezóny',
         default=False)
-    misto = models.CharField(u'Místo', max_length=120, null=True, blank=True)
-    info = models.TextField(u'Info', null=True, blank=True)
+    misto = models.CharField('Místo', max_length=120, null=True, blank=True)
+    info = models.TextField('Info', null=True, blank=True)
 
     class Meta:
-        verbose_name = u'Závod'
-        verbose_name_plural = u'Závody'
+        verbose_name = 'Závod'
+        verbose_name_plural = 'Závody'
         ordering = ('-rocniky__datum', 'sport', 'nazev')  #zavody serazeny od nejaktualnejsiho
 
-    def __unicode__(self):
+    def __str__(self):
         return self.nazev
 
     @models.permalink
@@ -83,27 +82,27 @@ class Zavod(models.Model):
 
 class Rocnik(models.Model):
     zavod = models.ForeignKey(Zavod,
-                              verbose_name=u'závod',
+                              verbose_name='závod',
                               related_name='rocniky')
     nazev = models.CharField(
-        u'Název', max_length=50, null=True, blank=True,
-        help_text=u'pokud není název vyplněn, pak se dědí z rodičovského závodu')
-    datum = models.DateField(u'Datum pořádání')
-    cas = models.TimeField(u'Čas', null=True, blank=True)
+        'Název', max_length=50, null=True, blank=True,
+        help_text='pokud není název vyplněn, pak se dědí z rodičovského závodu')
+    datum = models.DateField('Datum pořádání')
+    cas = models.TimeField('Čas', null=True, blank=True)
     misto = models.CharField(
-        u'Místo konání', max_length=120, null=True, blank=True,
-        help_text=u'pokud není místo vyplněno, pak se dědí z rodičovského závodu')
-    info = models.TextField(u'Info', null=True, blank=True)
+        'Místo konání', max_length=120, null=True, blank=True,
+        help_text='pokud není místo vyplněno, pak se dědí z rodičovského závodu')
+    info = models.TextField('Info', null=True, blank=True)
 
     class Meta:
-        verbose_name = u'Ročník závodu'
-        verbose_name_plural = u'Ročníky zavodů'
+        verbose_name = 'Ročník závodu'
+        verbose_name_plural = 'Ročníky zavodů'
         ordering = ('-datum',)
         unique_together = ('zavod', 'datum')
 
-    def __unicode__(self):
+    def __str__(self):
         nazev = self.nazev or self.zavod.nazev
-        return u'{0} {1}'.format(
+        return '{0} {1}'.format(
             nazev, self.datum.year)
 
     @models.permalink
@@ -136,7 +135,7 @@ class Rocnik(models.Model):
             zpravy += zpravy_kategorie
 
         for nezarazen in set(nezarazeni).difference(duplikati):
-            zpravy.append(u'pro "{0}" nenalezena vhodná kategorie'.format(nezarazen.clovek))
+            zpravy.append('pro "{0}" nenalezena vhodná kategorie'.format(nezarazen.clovek))
 
         Zavodnik.objects.filter(id__in=[z.id for z in nezarazeni]).update(kategorie_temp=None)
         return zpravy
@@ -157,7 +156,7 @@ def kategorie_test_cloveka(kategorie, zavodnik, narozeni):
     pouzito u: zavody.Kategorie, pohary.KategirePoharu"""
     if zavodnik.clovek:
         vhodny = True
-        if zavodnik.clovek.narozen not in range(narozeni[0], narozeni[1] + 1):
+        if zavodnik.clovek.narozen not in list(range(narozeni[0], narozeni[1] + 1)):
             vhodny = False
         if kategorie.pohlavi:
             if zavodnik.clovek.pohlavi != kategorie.pohlavi:
@@ -174,57 +173,57 @@ def kategorie_test_cloveka(kategorie, zavodnik, narozeni):
 
 class Kategorie(models.Model):
     POHLAVI = (
-        ('m', u'muži'),
-        ('z', u'ženy'),
+        ('m', 'muži'),
+        ('z', 'ženy'),
     )
-    nazev = models.CharField(u'Název', max_length=50)
+    nazev = models.CharField('Název', max_length=50)
     znacka = models.CharField(
-        u'Značka', max_length=10,
+        'Značka', max_length=10,
         null=True, blank=True,
-        help_text=u'značka kategorie se použije při\
+        help_text='značka kategorie se použije při\
         porovnávání s vnucenými kategoriemi závodníků <b>u kategorií pohárů</b>')
     pohlavi = models.CharField(
-        u'Pohlaví', max_length=1, choices=POHLAVI,
+        'Pohlaví', max_length=1, choices=POHLAVI,
         null=True, blank=True)
     vek_od = models.SmallIntegerField(
-        u'Věk od', null=True, blank=True,
-        help_text=u'věk závodníka včetně')
+        'Věk od', null=True, blank=True,
+        help_text='věk závodníka včetně')
     vek_do = models.SmallIntegerField(
-        u'Věk do', null=True, blank=True,
-        help_text=u'věk závodníka včetně')
+        'Věk do', null=True, blank=True,
+        help_text='věk závodníka včetně')
     atributy = models.ManyToManyField(
-        'lide.Atribut', verbose_name=u'Požadované atributy člověka', blank=True
+        'lide.Atribut', verbose_name='Požadované atributy člověka', blank=True
         # null=True,
         )
     delka_trate = models.CharField(
-        u'Délka tratě', null=True, blank=True, max_length=20)
+        'Délka tratě', null=True, blank=True, max_length=20)
     rocnik = models.ForeignKey(
-        Rocnik, verbose_name=u'ročník',
+        Rocnik, verbose_name='ročník',
         related_name='kategorie')
     poradi = models.SmallIntegerField(
-        u'Pořadí', null=True, blank=True)
+        'Pořadí', null=True, blank=True)
     spusteni_stopek = models.TimeField(
-        u'Čas spuštění stopek kategorie',
+        'Čas spuštění stopek kategorie',
         null=True, blank=True,
-        help_text=u'středoevropský čas, kdy byli pro kategorii spuštěny stopky')
+        help_text='středoevropský čas, kdy byli pro kategorii spuštěny stopky')
     startovne = models.SmallIntegerField(
-        u'Startovné', null=True, blank=True)
+        'Startovné', null=True, blank=True)
 
 
     class Meta:
-        verbose_name = u'Kategorie'
-        verbose_name_plural = u'Kategorie'
+        verbose_name = 'Kategorie'
+        verbose_name_plural = 'Kategorie'
         unique_together = (('rocnik', 'nazev'),)
         ordering = ('poradi', 'id')
 
-    def __unicode__(self):
-        popis = u'{0} - {1}'.format(
+    def __str__(self):
+        popis = '{0} - {1}'.format(
             self.nazev,
             self.get_pohlavi_display() or 'unisex')
         if self.znacka:
             popis = self.znacka + ' - ' + popis
         if self.vek_od or self.vek_do:
-            popis += u' / {0}-{1}'.format(
+            popis += ' / {0}-{1}'.format(
                 self.vek_od or '?',
                 self.vek_do or '?')
         return popis
@@ -262,9 +261,9 @@ class Kategorie(models.Model):
                     duplikati.append(zavodnik)
                     nezarazeni.append(zavodnik)
                     if zavodnik.clovek.pohlavi == 'm':
-                        zprava = u'"{0}" je již v kategorii "{1}" přítomen! Proto nezařazen.'
+                        zprava = '"{0}" je již v kategorii "{1}" přítomen! Proto nezařazen.'
                     else:
-                        zprava = u'"{0}" je již v kategorii "{1}" přítomna! Proto nezařazena.'
+                        zprava = '"{0}" je již v kategorii "{1}" přítomna! Proto nezařazena.'
                     zpravy.append(zprava.format(zavodnik.clovek, self.nazev))
                 else:
                     zarazeni_lide.add(zavodnik.clovek)

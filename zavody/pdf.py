@@ -76,12 +76,12 @@ class PdfPrint:
 
             # TABULKA
             headers = [
-                [Paragraph(unicode(value), styles['TableHeader']) for value in row]
+                [Paragraph(str(value), styles['TableHeader']) for value in row]
                 for row in table['headers']
             ]
 
             rows = [
-                [Paragraph(unicode(value), styles['Right' if i in right_aligned else 'Arial']) for i, value in enumerate(row)]
+                [Paragraph(str(value), styles['Right' if i in right_aligned else 'Arial']) for i, value in enumerate(row)]
                 for row in table['rows']
             ]
 

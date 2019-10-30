@@ -80,7 +80,7 @@ def klub_autocomplete(request):
         kluby = kluby.exclude(clenstvi__clovek=clovek)
     else:
         vlastni_kluby = []
-    for kluby, skupina in ((vlastni_kluby, u'registrované'), (kluby, u'ostatní')):
+    for kluby, skupina in ((vlastni_kluby, 'registrované'), (kluby, 'ostatní')):
         pouzite_kluby = []
         for klub in kluby:
             if klub not in pouzite_kluby:

@@ -9,10 +9,10 @@ from django.utils.text import slugify
 
 class KlubUpdateForm(forms.ModelForm):
     smazat = forms.BooleanField(
-        label=u'Smazat klub',
+        label='Smazat klub',
         required=False)
     presunout_do = forms.CharField(
-        label=u'Členy po smazání přesunout do',
+        label='Členy po smazání přesunout do',
         required=False)
 
     class Meta:
@@ -35,12 +35,12 @@ class KlubUpdateForm(forms.ModelForm):
             Clenstvi.objects.filter(klub=self.instance).update(klub=klub)
             Zavodnik.objects.filter(klub=self.instance).update(klub=klub)
             zpravy.append(
-                u"členové a závodnici přesunuti z klubu '{0}'' do klubu '{1}'".format(self.instance, klub))
+                "členové a závodnici přesunuti z klubu '{0}'' do klubu '{1}'".format(self.instance, klub))
 
         if data['smazat']:
-            zpravy.append(u"klub '{0}' smazán".format(self.instance))
+            zpravy.append("klub '{0}' smazán".format(self.instance))
             self.instance.delete()
         else:
             klub = super(KlubUpdateForm, self).save(*args, **kwargs)
-            zpravy.append(u'změny v klubu uloženy')
+            zpravy.append('změny v klubu uloženy')
         return (klub, zpravy)

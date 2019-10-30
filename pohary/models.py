@@ -15,32 +15,32 @@ class Pohar(models.Model):
     # list pouzit pro fci 'Pohar.zavodnici_bez_kategorie()'
     zavodnici_s_kategorii = []
 
-    nazev = models.CharField(u'Název', max_length=50)
-    datum = models.DateField(u'Datum pořádání')
+    nazev = models.CharField('Název', max_length=50)
+    datum = models.DateField('Datum pořádání')
     slug = models.SlugField(editable=False, unique=True)
-    info = models.TextField(u'Info', null=True, blank=True)
+    info = models.TextField('Info', null=True, blank=True)
     zavodu = models.SmallIntegerField(
-        u'Počet nejlepších výsledků',
-        help_text=u'počet nejlepších závodů jež budou započítany,<br>\
+        'Počet nejlepších výsledků',
+        help_text='počet nejlepších závodů jež budou započítany,<br>\
         při prázdné kolonce budou použity všechny závody',
         blank=True, null=True)
     bod_hodnoceni = models.ForeignKey(
-        'BodoveHodnoceni', verbose_name=u'Bodové hodnocení',
-        help_text=u'bodová tabulka pro pohár,<br>\
+        'BodoveHodnoceni', verbose_name='Bodové hodnocení',
+        help_text='bodová tabulka pro pohár,<br>\
         bude použita v případě nespecifikované tabulky u kategorie,<br>\
         v případě prázdného kolonky se boduje postupně odzadu',
         related_name='pohary', on_delete=models.CASCADE,
         blank=True, null=True)
     rocniky = models.ManyToManyField(
-        'zavody.Rocnik', verbose_name=u'Ročníky', related_name='pohary')
+        'zavody.Rocnik', verbose_name='Ročníky', related_name='pohary')
 
     class Meta:
-        verbose_name = u'Pohár'
-        verbose_name_plural = u'Poháry'
+        verbose_name = 'Pohár'
+        verbose_name_plural = 'Poháry'
         ordering = ('-datum',)
         unique_together = ('nazev', 'datum')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.nazev
 
     @models.permalink
@@ -83,59 +83,59 @@ class Pohar(models.Model):
 
 class KategoriePoharu(models.Model):
     POHLAVI = (
-        ('m', u'muži'),
-        ('z', u'ženy'),
+        ('m', 'muži'),
+        ('z', 'ženy'),
     )
-    nazev = models.CharField(u'Název', max_length=50)
+    nazev = models.CharField('Název', max_length=50)
     znacka = models.CharField(
-        u'Značka', max_length=10,
+        'Značka', max_length=10,
         null=True, blank=True,
-        help_text=u'značka kategorie se použije při\
+        help_text='značka kategorie se použije při\
         porovnávání s <b>vnucenými kategoriemi</b> závodníků')
     pohlavi = models.CharField(
-        u'Pohlaví', max_length=1, choices=POHLAVI,
+        'Pohlaví', max_length=1, choices=POHLAVI,
         null=True, blank=True)
     vek_od = models.SmallIntegerField(
-        u'Věk od', null=True, blank=True,
-        help_text=u'věk závodníka včetně')
+        'Věk od', null=True, blank=True,
+        help_text='věk závodníka včetně')
     vek_do = models.SmallIntegerField(
-        u'Věk do', null=True, blank=True,
-        help_text=u'věk závodníka včetně')
+        'Věk do', null=True, blank=True,
+        help_text='věk závodníka včetně')
     poradi = models.SmallIntegerField(
-        u'Pořadí', null=True, blank=True)
+        'Pořadí', null=True, blank=True)
 
     atributy = models.ManyToManyField(
-        'lide.Atribut', verbose_name=u'Požadované atributy člověka', blank=True
+        'lide.Atribut', verbose_name='Požadované atributy člověka', blank=True
         )
     zavodu = models.SmallIntegerField(
-        u'Počet nejlepších výsledků',
-        help_text=u'počet nejlepších závodů jež budou započítany,\
+        'Počet nejlepších výsledků',
+        help_text='počet nejlepších závodů jež budou započítany,\
         <br>při prázdné kolonce bude použita hodnota poháru',
         blank=True, null=True)
     bod_hodnoceni = models.ForeignKey(
-        'BodoveHodnoceni', verbose_name=u'Bodové hodnocení',
-        help_text=u'bodová tabulka pro kategorii poháru,<br>\
+        'BodoveHodnoceni', verbose_name='Bodové hodnocení',
+        help_text='bodová tabulka pro kategorii poháru,<br>\
         při prázdné kolonce bude použita tabulka z poháru',
         related_name='kategorie', on_delete=models.CASCADE,
         blank=True, null=True)
     pohar = models.ForeignKey(
-        Pohar, verbose_name=u'pohár',
+        Pohar, verbose_name='pohár',
         related_name='kategorie_poharu')
 
     class Meta:
-        verbose_name = u'Kategorie poháru'
-        verbose_name_plural = u'Kategorie pohárů'
+        verbose_name = 'Kategorie poháru'
+        verbose_name_plural = 'Kategorie pohárů'
         unique_together = (('pohar', 'nazev'),)
         ordering = ('poradi', 'id')
 
-    def __unicode__(self):
-        popis = u'{0} - {1}'.format(
+    def __str__(self):
+        popis = '{0} - {1}'.format(
             self.nazev,
             self.get_pohlavi_display() or 'unisex')
         if self.znacka:
             popis = self.znacka + ' - ' + popis
         if self.vek_od or self.vek_do:
-            popis += u' / {0}-{1}'.format(
+            popis += ' / {0}-{1}'.format(
                 self.vek_od or '?',
                 self.vek_do or '?')
         return popis
@@ -243,7 +243,7 @@ class KategoriePoharu(models.Model):
                 minuly_cas = zavodnik.vysledny_cas
 
             # oznaceni zapocitavanych zavodu do atributu zavodnika
-            for clovek, zavodnici_cloveka in lide.items():
+            for clovek, zavodnici_cloveka in list(lide.items()):
                 zapocitane = sorted(
                     zavodnici_cloveka, key=attrgetter('poradi')
                 )
@@ -263,7 +263,7 @@ class KategoriePoharu(models.Model):
             zebricek = []
             # slovnik bodu za poradi v zavodu
             body_za_poradi = self.bodove_hodnoceni().hodnoceni_dict()
-            for clovek, zavody in lide.items(): # pro zjednoduseni zavodnici => zavody
+            for clovek, zavody in list(lide.items()): # pro zjednoduseni zavodnici => zavody
                 soucet = 0
                 # maximum bodu z nejlepsi pozice pro 2.stupen razeni
                 maximum = []
@@ -299,7 +299,7 @@ class KategoriePoharu(models.Model):
                 zebricek[index][2] = float(soucet_str)
 
             # stejne soucty
-            for indexy_zebricku in _stejne_soucty(zebricek).values():
+            for indexy_zebricku in list(_stejne_soucty(zebricek).values()):
                 # lide stejneho souctu
                 for i_domaci in indexy_zebricku:
                     # ostatni_indexy = list(indexy_zebricku)
@@ -341,7 +341,7 @@ class KategoriePoharu(models.Model):
                         skok_pozic += 1
                 zebricek[index].append(pozice)
 
-            for indexy_zebricku in _stejne_soucty(zebricek).values():
+            for indexy_zebricku in list(_stejne_soucty(zebricek).values()):
                 for index in indexy_zebricku:
                     if zebricek[index][0].varovani != 'error':
                         zebricek[index][0].varovani = 'warning'
@@ -383,17 +383,17 @@ class BodoveHodnoceni(models.Model):
     Pres FK je spojen s 'Poharem' nebo 'KategoriiPoharu'
     """
 
-    nazev = models.CharField(u'Název', max_length=50)
+    nazev = models.CharField('Název', max_length=50)
     hodnoceni = models.TextField(
-        u'Hodnocení prvních pozic',
-        help_text=u'formát:<br>1-50<i>(enter)</i><br>2-47<br>3-44')
-    info = models.TextField(u'Informace', blank=True, null=True)
+        'Hodnocení prvních pozic',
+        help_text='formát:<br>1-50<i>(enter)</i><br>2-47<br>3-44')
+    info = models.TextField('Informace', blank=True, null=True)
 
     class Meta:
-        verbose_name = u'Bodové hodnocení pozic'
-        verbose_name_plural = u'Bodová hodnocení pozic'
+        verbose_name = 'Bodové hodnocení pozic'
+        verbose_name_plural = 'Bodová hodnocení pozic'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.nazev
 
     def hodnoceni_dict(self):

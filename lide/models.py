@@ -5,9 +5,9 @@ from django.db.models import Q
 from django.utils.text import slugify
 
 POHLAVI = (
-    ('', u'---'),
-    ('m', u'muž'),
-    ('z', u'žena'),
+    ('', '---'),
+    ('m', 'muž'),
+    ('z', 'žena'),
 )
 
 
@@ -19,11 +19,11 @@ def _get_sorting_slug(slovo):
     """
 
     slovo = slovo.upper()
-    vysledek = u''
+    vysledek = ''
     for pismeno in slovo:
         vysledek += pismeno
-        if pismeno in u'ĚŠČŘŽÝÁÍÉŤĎŇÓÚŮÜÖËŁ':
-            vysledek += u'Z'
+        if pismeno in 'ĚŠČŘŽÝÁÍÉŤĎŇÓÚŮÜÖËŁ':
+            vysledek += 'Z'
     return slugify(vysledek)
 
 
@@ -34,16 +34,16 @@ class Clovek(models.Model):
     - pres Zavodnika je spojen s Rocnikem a Kategorii
     """
 
-    jmeno = models.CharField(u'Křestní jméno', max_length=20)
-    prijmeni = models.CharField(u'Příjmení', max_length=30)
+    jmeno = models.CharField('Křestní jméno', max_length=20)
+    prijmeni = models.CharField('Příjmení', max_length=30)
     pohlavi = models.CharField(
-        u'Pohlaví', max_length=1,
+        'Pohlaví', max_length=1,
         choices=POHLAVI,
         null=True, blank=True)
-    narozen = models.PositiveSmallIntegerField(u'Narozen(a)')
+    narozen = models.PositiveSmallIntegerField('Narozen(a)')
     atributy = models.ManyToManyField(
         'Atribut',
-        verbose_name=u'Atributy člověka',
+        verbose_name='Atributy člověka',
         # null=True,
         blank=True
         )
@@ -55,14 +55,14 @@ class Clovek(models.Model):
 
 
     class Meta:
-        verbose_name = u'Člověk'
-        verbose_name_plural = u'Lidé'
+        verbose_name = 'Člověk'
+        verbose_name_plural = 'Lidé'
         ordering = ('prijmeni_slug_sorting', 'jmeno_slug')
         unique_together = ('jmeno', 'prijmeni', 'narozen')
 
 
-    def __unicode__(self):
-        return u'{0} {1} {2}'.format(self.prijmeni, self.jmeno, self.narozen)
+    def __str__(self):
+        return '{0} {1} {2}'.format(self.prijmeni, self.jmeno, self.narozen)
 
 
     @models.permalink
@@ -82,7 +82,7 @@ class Clovek(models.Model):
         """
 
         if not self.pohlavi:
-            self.pohlavi = 'z' if self.prijmeni[-1] == u'á' else 'm'
+            self.pohlavi = 'z' if self.prijmeni[-1] == 'á' else 'm'
         elif self.pohlavi not in POHLAVI:
             self.pohlavi = 'm' if self.pohlavi[0].lower() == 'm' else 'z'
         self.prijmeni_slug = slugify(self.prijmeni)
@@ -96,7 +96,7 @@ class Clovek(models.Model):
 
 
     def cele_jmeno(self):
-        return u'{0} {1}'.format(self.prijmeni, self.jmeno)
+        return '{0} {1}'.format(self.prijmeni, self.jmeno)
 
 
     def serazene_clenstvi_pro_zavod(self, zavod):
@@ -127,14 +127,14 @@ class Atribut(models.Model):
     dle ktere muze byt specialne kategorizovan
     """
 
-    nazev = models.CharField(u'Název atributu', max_length=30, unique=True)
-    info = models.TextField(u'Info', null=True, blank=True)
+    nazev = models.CharField('Název atributu', max_length=30, unique=True)
+    info = models.TextField('Info', null=True, blank=True)
 
     class Meta:
-        verbose_name = u'Atribut člověka'
-        verbose_name_plural = u'Atributy lidí'
+        verbose_name = 'Atribut člověka'
+        verbose_name_plural = 'Atributy lidí'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.nazev
 
 
@@ -147,26 +147,26 @@ class Clenstvi(models.Model):
 
     clovek = models.ForeignKey(
         'Clovek',
-        verbose_name=u'člověk',
+        verbose_name='člověk',
         related_name='clenstvi')
     klub = models.ForeignKey(
         'kluby.Klub',
-        verbose_name=u'klub',
+        verbose_name='klub',
         related_name='clenstvi')
     sport = models.ForeignKey(
         'zavody.Sport',
         on_delete=models.SET_NULL,
         null=True, blank=True)
     priorita = models.SmallIntegerField(
-        u'Priorita', null=True, blank=True,
-        help_text=u'určuje prioritu klubů se stejným sportem - větší číslo vyhrává !')
+        'Priorita', null=True, blank=True,
+        help_text='určuje prioritu klubů se stejným sportem - větší číslo vyhrává !')
 
     class Meta:
-        verbose_name = u'Členství v klubu'
-        verbose_name_plural = u'Členství v klubech'
+        verbose_name = 'Členství v klubu'
+        verbose_name_plural = 'Členství v klubech'
         ordering = ('clovek', '-sport', '-priorita')
         unique_together = ('clovek', 'klub', 'sport')
 
 
-    def __unicode__(self):
-        return u'{0} - {1}'.format(self.clovek, self.klub)
+    def __str__(self):
+        return '{0} - {1}'.format(self.clovek, self.klub)

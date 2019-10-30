@@ -46,7 +46,7 @@ def kategorie_import(soubor):
                 )
                 kategorie_list.append(kategorie)
             except Exception as error:
-                chyby.append(u'#{0} {1}'.format(i, error))
+                chyby.append('#{0} {1}'.format(i, error))
     return (kategorie_list, chyby)
 
 def rocnik_import(soubor):
@@ -66,27 +66,27 @@ def rocnik_import(soubor):
             # prazdny radek
             predchozi_radek = 'prazdny'
         else:
-            print '*'*10
+            print('*'*10)
             if i == 1:
                 # hlavicka
                 sport, created = Sport.objects.get_or_create(nazev=radek[2])
                 if created:
-                    zpravy.append(u'#{0} uložen nový sport: {1}'.format(i, sport))
+                    zpravy.append('#{0} uložen nový sport: {1}'.format(i, sport))
                 zavod, created = Zavod.objects.get_or_create(nazev=radek[0], sport=sport)
                 if created:
-                    zpravy.append(u'#{0} uložen nový závod: {1}'.format(i, zavod))
+                    zpravy.append('#{0} uložen nový závod: {1}'.format(i, zavod))
                 rocnik, created = Rocnik.objects.get_or_create(
                     zavod=zavod,
                     datum=datetime.strptime(radek[1], '%Y-%m-%d').date()
                 )
-            elif radek[0] == u'pořadí':
+            elif radek[0] == 'pořadí':
                 # hlavicka zavodniku
-                print i, 'hlavicka zavodniku'
+                print(i, 'hlavicka zavodniku')
                 predchozi_radek = 'hlavicka zavodniku'
             elif predchozi_radek == 'prazdny' and radek[0]:
                 # kategorie_import
-                print i, 'kategorie'
-                od_do = map(int, radek[2].split(' - '))
+                print(i, 'kategorie')
+                od_do = list(map(int, radek[2].split(' - ')))
                 od_do = [rocnik.datum.year - x for x in od_do]
                 kategorie, created = Kategorie.objects.get_or_create(
                     znacka=radek[0],
@@ -100,22 +100,22 @@ def rocnik_import(soubor):
                 )
                 predchozi_radek = 'kategorie'
                 if created:
-                    zpravy.append(u'#{0} uložena nová kategorie: {1}'.format(i, kategorie))
+                    zpravy.append('#{0} uložena nová kategorie: {1}'.format(i, kategorie))
             elif predchozi_radek in ('hlavicka zavodniku', 'zavodnik'):
                 # Zavodnik
-                print i, 'zavodnik'
+                print(i, 'zavodnik')
                 klub, created = Klub.objects.get_or_create(
                     slug=slugify(radek[5]),
                     defaults={'nazev': radek[5]})
                 if created:
-                    zpravy.append(u'#{0} uložen nový klub: {1}'.format(i, klub))
+                    zpravy.append('#{0} uložen nový klub: {1}'.format(i, klub))
                 clovek, created = Clovek.objects.get_or_create(
                     jmeno=radek[3],
                     prijmeni=radek[2],
                     narozen=int(radek[4])
                 )
                 if created:
-                    zpravy.append(u'#{0} uložen nový člověk: {1}'.format(i, clovek))
+                    zpravy.append('#{0} uložen nový člověk: {1}'.format(i, clovek))
                 try:
                     clenstvi, created = Clenstvi.objects.get_or_create(
                         clovek=clovek,
@@ -162,7 +162,7 @@ def exportuj_startovku(response, rocnik, ordering_str):
     kategorie_list = rocnik.kategorie_list(ordering_str)
     nezarazeni = rocnik.nezarazeni(ordering_str)
 
-    writer.writerow([rocnik.__unicode__().encode(enctype, 'ignore')])
+    writer.writerow([rocnik.__str__().encode(enctype, 'ignore')])
     writer.writerow([])
     writer.writerow([])
 
@@ -181,7 +181,7 @@ def exportuj_startovku(response, rocnik, ordering_str):
     if nezarazeni:
         writer.writerow([
             '',
-            u'nezařazení'.encode(enctype, 'ignore')
+            'nezařazení'.encode(enctype, 'ignore')
         ])
         _zavodnici_write(nezarazeni)
 
@@ -213,7 +213,7 @@ def exportuj_vysledky(response, rocnik):
     writer.writerow([
         rocnik.zavod.nazev.encode(enctype, 'ignore'),
         rocnik.datum,
-        rocnik.zavod.sport.__unicode__().encode(enctype, 'ignore')
+        rocnik.zavod.sport.__str__().encode(enctype, 'ignore')
     ])
     writer.writerow([])
     writer.writerow([])
@@ -228,18 +228,18 @@ def exportuj_vysledky(response, rocnik):
             kategorie.spusteni_stopek
         ])
         writer.writerow([
-            u'pořadí'.encode(enctype, 'ignore'),
-            u'číslo'.encode(enctype, 'ignore'),
-            u'příjmení'.encode(enctype, 'ignore'),
-            u'jméno'.encode(enctype, 'ignore'),
-            u'nar.',
-            u'klub',
-            u'startovní čas'.encode(enctype, 'ignore'),
-            u'cílový čas'.encode(enctype, 'ignore'),
-            u'výsledný čas'.encode(enctype, 'ignore'),
-            u'nedokončil'.encode(enctype, 'ignore'),
-            u'odstartoval'.encode(enctype, 'ignore'),
-            u'na trati',
+            'pořadí'.encode(enctype, 'ignore'),
+            'číslo'.encode(enctype, 'ignore'),
+            'příjmení'.encode(enctype, 'ignore'),
+            'jméno'.encode(enctype, 'ignore'),
+            'nar.',
+            'klub',
+            'startovní čas'.encode(enctype, 'ignore'),
+            'cílový čas'.encode(enctype, 'ignore'),
+            'výsledný čas'.encode(enctype, 'ignore'),
+            'nedokončil'.encode(enctype, 'ignore'),
+            'odstartoval'.encode(enctype, 'ignore'),
+            'na trati',
         ])
         _zavodnici_write(zavodnici)
         writer.writerow([])
@@ -253,22 +253,22 @@ def exportuj_kategorie(response, rocnik):
     writer = csv.writer(response, delimiter=';')
 
     writer.writerow([
-        u'Název závodu'.encode(enctype, 'ignore'),
-        u'Sport'
+        'Název závodu'.encode(enctype, 'ignore'),
+        'Sport'
     ])
     writer.writerow([
-        rocnik.__unicode__().encode(enctype, 'ignore'),
-        rocnik.zavod.sport.__unicode__().encode(enctype, 'ignore')
+        rocnik.__str__().encode(enctype, 'ignore'),
+        rocnik.zavod.sport.__str__().encode(enctype, 'ignore')
     ])
     writer.writerow([])
     writer.writerow([
-        u'Název'.encode(enctype, 'ignore'),
-        u'Značka'.encode(enctype, 'ignore'),
-        u'Pohlaví'.encode(enctype, 'ignore'),
-        u'Věk od včetně'.encode(enctype, 'ignore'),
-        u'Věk do včetně'.encode(enctype, 'ignore'),
-        u'Délka tratě'.encode(enctype, 'ignore'),
-        u'Startovné'.encode(enctype, 'ignore')
+        'Název'.encode(enctype, 'ignore'),
+        'Značka'.encode(enctype, 'ignore'),
+        'Pohlaví'.encode(enctype, 'ignore'),
+        'Věk od včetně'.encode(enctype, 'ignore'),
+        'Věk do včetně'.encode(enctype, 'ignore'),
+        'Délka tratě'.encode(enctype, 'ignore'),
+        'Startovné'.encode(enctype, 'ignore')
     ])
     for kategorie in rocnik.kategorie.all():
         writer.writerow([

@@ -15,76 +15,76 @@ class Zavodnik(models.Model):
     casova_ztrata = None
 
     NEDOKONCIL = (
-        ('DNS', u'DNS'),
-        ('DNF', u'DNF'),
-        ('DSQ', u'DSQ'),
-        ('DNP', u'DNP'),
+        ('DNS', 'DNS'),
+        ('DNF', 'DNF'),
+        ('DSQ', 'DSQ'),
+        ('DNP', 'DNP'),
     )
 
     rocnik = models.ForeignKey(
         'zavody.Rocnik',
-        verbose_name=u'ročník závodu',
+        verbose_name='ročník závodu',
         related_name='zavodnici')
     clovek = models.ForeignKey(
         'lide.Clovek',
         null=True, blank=True,  # kvuli docasnym neznamym zavodnikum
-        verbose_name=u'člověk',
+        verbose_name='člověk',
         related_name='zavodnici')
     cislo = models.CharField(
-        u'Startovní číslo',
+        'Startovní číslo',
         max_length=10,
         null=True, blank=True,
-        help_text=u'číslo je unikátní pro daný ročník - hlídáno')
+        help_text='číslo je unikátní pro daný ročník - hlídáno')
     klub = models.ForeignKey(
         'kluby.Klub',
         null=True, blank=True,
         on_delete=models.SET_NULL,
-        verbose_name=u'klub',
+        verbose_name='klub',
         related_name='zavodnici')
     kategorie = models.ForeignKey(
         'zavody.Kategorie',
         db_index=True,
-        help_text=u'vnucená kategorie, která ruší automatické přiřazení',
+        help_text='vnucená kategorie, která ruší automatické přiřazení',
         null=True, blank=True,
         on_delete=models.SET_NULL,
-        verbose_name=u'kategorie natvrdo',
+        verbose_name='kategorie natvrdo',
         related_name='zavodnici')
     kategorie_temp = models.ForeignKey(
         'zavody.Kategorie',
         db_index=True,
-        help_text=u'dočasná kategorie systému',
+        help_text='dočasná kategorie systému',
         null=True, blank=True,
         on_delete=models.SET_NULL,
         # editable=False,
-        verbose_name=u'kategorie dočasná',
+        verbose_name='kategorie dočasná',
         related_name='zavodnici_temp')
 
     startovni_cas = models.TimeField(
-        u'Startovní čas', null=True, blank=True,
-        help_text=u'pokud je zadán, pak se výsledný čas počítá z rozdílu časů start-cíl')
+        'Startovní čas', null=True, blank=True,
+        help_text='pokud je zadán, pak se výsledný čas počítá z rozdílu časů start-cíl')
     cilovy_cas = models.TimeField(
-        u'Cílový čas',
+        'Cílový čas',
         null=True, blank=True,
-        help_text=u'pokud není zadán `startovní čas`, pak se jedná o výsledný čas závodu')
+        help_text='pokud není zadán `startovní čas`, pak se jedná o výsledný čas závodu')
     vysledny_cas = models.DurationField(
-        u'Výsledný čas',
+        'Výsledný čas',
         null=True, blank=True, editable=False)
     nedokoncil = models.CharField(
-        u'Nedokončil', null=True, blank=True,
+        'Nedokončil', null=True, blank=True,
         choices=NEDOKONCIL, max_length=10)
     odstartoval = models.NullBooleanField(
-        u'Odstartoval', default=None,
-        help_text=u'pouze informační hodnota od startéra, že závodník opravdu odstartoval')
-    info = models.CharField(u'Info', max_length=256, null=True, blank=True)
+        'Odstartoval', default=None,
+        help_text='pouze informační hodnota od startéra, že závodník opravdu odstartoval')
+    info = models.CharField('Info', max_length=256, null=True, blank=True)
 
     class Meta:
-        verbose_name = u'Závodník'
-        verbose_name_plural = u'Závodníci'
+        verbose_name = 'Závodník'
+        verbose_name_plural = 'Závodníci'
         ordering = ('rocnik', 'startovni_cas', 'cislo')
 
 
-    def __unicode__(self):
-        return u'{0} - {1}'.format(self.clovek or '???', self.rocnik)
+    def __str__(self):
+        return '{0} - {1}'.format(self.clovek or '???', self.rocnik)
 
 
     def clean(self):
@@ -109,7 +109,7 @@ class Zavodnik(models.Model):
         if duplicity_cloveka:
             raise ValidationError({
                 'clovek':
-                    u'''"{0}" již v tomto ročníku závodí<br>v kategorii "{1}"<br><br>
+                    '''"{0}" již v tomto ročníku závodí<br>v kategorii "{1}"<br><br>
                     Závodníka nelze přidat, nebo mu natvrdo přiřaďte jinou kategorii'''.format(
                         self.clovek,
                         duplicity_cloveka[0].kategorie_temp
@@ -121,7 +121,7 @@ class Zavodnik(models.Model):
             duplicity_cisla = zavodnici_rocniku.filter(cislo=self.cislo)
             if duplicity_cisla:
                 raise ValidationError({
-                    'cislo': u'S číslem "{0}" již závodí<br>"{1}"'.format(
+                    'cislo': 'S číslem "{0}" již závodí<br>"{1}"'.format(
                         self.cislo,
                         duplicity_cisla[0].clovek
                     )

@@ -250,16 +250,16 @@ class ImportZavodnikuView(FormView):
         if prirazenych:
             messages.success(
                 self.request,
-                u'Do ročníku přiřazeno {0} lidí z interního seznamu.'.format(prirazenych))
+                'Do ročníku přiřazeno {0} lidí z interního seznamu.'.format(prirazenych))
         if novych:
             messages.success(
                 self.request,
-                u'Do ročníku přidáno {0} nových lidí,\
+                'Do ročníku přidáno {0} nových lidí,\
                 kteří byli i zaregistrování do seznamu lidí.'.format(novych))
         if not any((prirazenych, novych)):
             messages.warning(
                 self.request,
-                u'Nebylo nic přidáno!')
+                'Nebylo nic přidáno!')
         return super(ImportZavodnikuView, self).form_valid(form)
 
 
@@ -267,7 +267,7 @@ def rozkategorizovat_zavodniky(request, rocnik_pk):
     rocnik = Rocnik.objects.get(pk=rocnik_pk)
     zpravy = rocnik.rozkategorizovat_zavodniky()
     if not zpravy:
-        messages.success(request, u'Všichni závodníci zařazení úspěšně do kategorií')
+        messages.success(request, 'Všichni závodníci zařazení úspěšně do kategorií')
     else:
         for z in zpravy:
             messages.warning(request, z)
@@ -286,10 +286,10 @@ def startovni_listina(request, rocnik_pk, ordering_str='startovni_cas--cislo--vy
         # zarazeni formularu do `kategorie_list`
         for kategorie, zavodnici in kategorie_list_temp:
             formulare = [ZavodnikForm(instance=zav, prefix=zav.id) for zav in zavodnici]
-            kategorie_list.append((kategorie, zip(zavodnici, formulare)))
+            kategorie_list.append((kategorie, list(zip(zavodnici, formulare))))
 
         formulare = [ZavodnikForm(instance=zav, prefix=zav.id) for zav in nezarazeni_temp]
-        nezarazeni = zip(nezarazeni_temp, formulare)
+        nezarazeni = list(zip(nezarazeni_temp, formulare))
 
         return render_to_response(
             'zavody/staff/startovni_listina.html', {
@@ -425,10 +425,10 @@ def formular_startera(request, rocnik_pk, ordering_str='startovni_cas--cislo'):
         formset = StarterZavodnikFormSet(request.POST, instance=rocnik, queryset=queryset)
         if formset.is_valid():
             formset.save()
-            messages.success(request, u'Změny úspěšně uloženy')
+            messages.success(request, 'Změny úspěšně uloženy')
             return HttpResponseRedirect('.')
         else:
-            messages.error(request, u'Chyba ve formuláři! Změny neuloženy..')
+            messages.error(request, 'Chyba ve formuláři! Změny neuloženy..')
     else:
         formset = StarterZavodnikFormSet(instance=rocnik, queryset=queryset)
 
@@ -440,7 +440,7 @@ def formular_startera(request, rocnik_pk, ordering_str='startovni_cas--cislo'):
     # zarazeni formularu do `kategorie_list`
     for kategorie, zavodnici in rocnik.kategorie_list(ordering_str):
         formulare = [formulare_dict[zav.id] for zav in zavodnici if zav.id in formulare_dict]
-        kategorie_list.append((kategorie, zip(zavodnici, formulare)))
+        kategorie_list.append((kategorie, list(zip(zavodnici, formulare))))
 
     return render_to_response(
         'zavody/staff/formular_startera.html', {
@@ -456,7 +456,7 @@ class ImportSouboruCasuTxtView(FormView):
     " Importovani souboru casu z mobilu, a jeho nasledne zobrazeni do formsetu "
     form_class = PouzeTxtSouborCasuFormular
     template_name = 'zavody/staff/rocnik_import_souboru.html'
-    subheader = u'import cílových časů z mobilu'
+    subheader = 'import cílových časů z mobilu'
 
     def get_context_data(self, **kwargs):
         " prida do 'rocnik' a 'subheader' "
@@ -498,10 +498,10 @@ class ZpracovaniImportovanychCasuTxtView(View):
                 doplneni_zavodnici.append(form.save())
 
             # potvrzujici zprava pro Messages
-            doplneni_zavodnici = filter(bool, doplneni_zavodnici)  # odfiltrovani None zavodniku
-            success_message = u'Úspěšně naimportováno {} cílových časů:'.format(len(doplneni_zavodnici))
+            doplneni_zavodnici = list(filter(bool, doplneni_zavodnici))  # odfiltrovani None zavodniku
+            success_message = 'Úspěšně naimportováno {} cílových časů:'.format(len(doplneni_zavodnici))
             for zavodnik in doplneni_zavodnici:
-                success_message += u'<br>- #{}: {}'.format(zavodnik.cislo, desetiny_sekundy(zavodnik.cilovy_cas))
+                success_message += '<br>- #{}: {}'.format(zavodnik.cislo, desetiny_sekundy(zavodnik.cilovy_cas))
             messages.success(self.request, success_message, extra_tags='safe')
 
             return HttpResponseRedirect(reverse('zavody:import_souboru_casu_txt', args=[rocnik.id]))
@@ -597,7 +597,7 @@ def zavod_autocomplete(request):
         json.dumps({'suggestions': vysledek}),
         content_type='application/json')
 
-TITLE_TEMPLATE = u'{0.znacka} - {0.nazev} &nbsp;&nbsp; nar. {1[0]}-{1[1]} &nbsp;&nbsp; trať: {0.delka_trate}'
+TITLE_TEMPLATE = '{0.znacka} - {0.nazev} &nbsp;&nbsp; nar. {1[0]}-{1[1]} &nbsp;&nbsp; trať: {0.delka_trate}'
 
 
 def vysledky_kategorie_PDF(request, kategorie_pk):
@@ -622,8 +622,8 @@ def vysledky_kategorie_PDF(request, kategorie_pk):
         [{
             'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),
             'headers': ([
-                u'poř.', u'číslo', u'příjmení', u'jméno', u'nar.', u'klub',
-                u'výsledný čas', u'časová ztráta', u'na trati'],),
+                'poř.', 'číslo', 'příjmení', 'jméno', 'nar.', 'klub',
+                'výsledný čas', 'časová ztráta', 'na trati'],),
             'rows': rows}],
         widths, right_aligned)
     return HttpResponse(pdf, content_type='application/pdf')
@@ -650,8 +650,8 @@ def vysledky_rocnik_PDF(request, rocnik_pk):
         tables.append({
             'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),
             'headers': ([
-                u'poř.', u'číslo', u'příjmení', u'jméno', u'nar.', u'klub',
-                u'výsledný čas', u'časová ztráta', u'na trati'],),
+                'poř.', 'číslo', 'příjmení', 'jméno', 'nar.', 'klub',
+                'výsledný čas', 'časová ztráta', 'na trati'],),
             'rows': rows})
 
     widths = [1.2, 1.2, 3, 2.5, 1.5, 5, 2.3, 2.3, 1.5]
@@ -687,7 +687,7 @@ def startovka_kategorie_PDF(request, kategorie_pk):
     pdf = pdf_print.sheet(
         [{
             'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),
-            'headers': ([u'číslo', u'příjmení', u'jméno', u'nar.', u'klub', u'startovní čas'],),
+            'headers': (['číslo', 'příjmení', 'jméno', 'nar.', 'klub', 'startovní čas'],),
             'rows': rows}],
         widths)
     return HttpResponse(pdf, content_type='application/pdf')
@@ -722,7 +722,7 @@ def startovka_rocnik_PDF(request, rocnik_pk):
                     ])
         tables.append({
             'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),
-            'headers': ([u'číslo', u'příjmení', u'jméno', u'nar.', u'klub', u'startovní čas'],),
+            'headers': (['číslo', 'příjmení', 'jméno', 'nar.', 'klub', 'startovní čas'],),
             'rows': rows})
 
     pdf = pdf_print.sheet(tables, widths)

@@ -11,13 +11,13 @@ from zavody.models import Zavodnik
 
 class ClovekUpdateForm(forms.ModelForm):
     smazat = forms.BooleanField(
-        label=u'Smazat člověka',
+        label='Smazat člověka',
         required=False)
     presunout_vysledky = forms.ModelChoiceField(
-        label=u'Výsledky přesunout na jiného člověka',
+        label='Výsledky přesunout na jiného člověka',
         required=False,
         queryset=Clovek.objects.all(),
-        help_text=u'Výsledky lze přesunout na jiného člověka i bez smazání původního člověka.',
+        help_text='Výsledky lze přesunout na jiného člověka i bez smazání původního člověka.',
         widget=forms.Select(attrs={'class': 'dropdown search'}))
 
     class Meta:
@@ -42,15 +42,15 @@ class ClovekUpdateForm(forms.ModelForm):
             clovek = data['presunout_vysledky']
             Zavodnik.objects.filter(clovek=self.instance).update(clovek=clovek)
             zpravy.append(
-                u"Výsledky přesunuty z člověka '{0}'' na '{1}'".format(self.instance, clovek))
+                "Výsledky přesunuty z člověka '{0}'' na '{1}'".format(self.instance, clovek))
 
         if data['smazat']:
-            zpravy.append(u"Člověk '{0}' smazán".format(self.instance))
+            zpravy.append("Člověk '{0}' smazán".format(self.instance))
             self.instance.delete()
             smazan = True
         else:
             clovek = super(ClovekUpdateForm, self).save(*args, **kwargs)
-            zpravy.append(u'změny v člověku uloženy')
+            zpravy.append('změny v člověku uloženy')
             smazan = False
 
         return (clovek, zpravy, smazan)
@@ -58,15 +58,15 @@ class ClovekUpdateForm(forms.ModelForm):
 
 class CSVsouborFormular(forms.Form):
     soubor = forms.FileField(
-        label=u'soubor *.csv',
+        label='soubor *.csv',
         required=True,
         widget=forms.FileInput(attrs={'accept': '.csv'}))
 
 
 class LideImportCSVForm(forms.Form):
     soubor = forms.FileField(
-        label=u'soubor *.csv',
-        help_text=u'csv soubor seznamu lidí (může být i s hlavičkou) v pořadí:\
+        label='soubor *.csv',
+        help_text='csv soubor seznamu lidí (může být i s hlavičkou) v pořadí:\
         příjmení, jméno, pohlaví, rok narození, klub',
         required=True,
         widget=forms.FileInput(attrs={'accept': '.csv'}))

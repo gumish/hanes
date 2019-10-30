@@ -31,7 +31,7 @@ class ClovekDetailView(DetailView):
         context = super(ClovekDetailView, self).get_context_data(**kwargs)
         context['zavodnici'] = self.object.zavodnici.filter(kategorie_temp__isnull=False).order_by('-rocnik__datum')
         context['jmenovci'] = Clovek.objects.filter(
-            prijmeni__istartswith=self.object.prijmeni.rstrip(u'ová')).exclude(pk=self.object.pk)
+            prijmeni__istartswith=self.object.prijmeni.rstrip('ová')).exclude(pk=self.object.pk)
         _referer_do_session(self.request)
         context['referer'] = self.request.session.get('referer', None)
         return context
@@ -53,15 +53,15 @@ class LideImportCSV(FormView):
         if novy_lide:
             messages.success(
                 self.request,
-                u'Přidáno {0} lidí do seznamu.'.format(novy_lide))
+                'Přidáno {0} lidí do seznamu.'.format(novy_lide))
         if nove_kluby:
             messages.success(
                 self.request,
-                u'Přidáno {0} klubů do seznamu.'.format(nove_kluby))
+                'Přidáno {0} klubů do seznamu.'.format(nove_kluby))
         if not any((novy_lide, nove_kluby)):
             messages.warning(
                 self.request,
-                u'Nebylo nic přidáno!')
+                'Nebylo nic přidáno!')
         return super(LideImportCSV, self).form_valid(form)
 
 
@@ -70,7 +70,7 @@ def clovek_update(request, slug):
     clovek = Clovek.objects.get(slug=slug)
     zavodnici = clovek.zavodnici.filter(kategorie_temp__isnull=False).order_by('-rocnik__datum')
     jmenovci = Clovek.objects.filter(
-            prijmeni__istartswith=clovek.prijmeni.rstrip(u'ová')).exclude(slug=clovek.slug)
+            prijmeni__istartswith=clovek.prijmeni.rstrip('ová')).exclude(slug=clovek.slug)
     ClenstviFormSet = inlineformset_factory(
         Clovek,
         Clenstvi,

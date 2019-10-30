@@ -37,7 +37,7 @@ class Pohar(models.Model):
         ordering = ('-datum',)
         unique_together = ('nazev', 'datum')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.nazev
 
     @models.permalink
@@ -112,7 +112,7 @@ class KategoriePoharu(models.Model):
         unique_together = (('pohar', 'nazev'),)
         ordering = ('poradi', 'id')
 
-    def __unicode__(self):
+    def __str__(self):
         popis = u'{0} - {1}'.format(
             self.nazev,
             self.get_pohlavi_display() or 'unisex')
@@ -237,7 +237,7 @@ class BodoveHodnoceni(models.Model):
         verbose_name = u'Bodové hodnocení pozic'
         verbose_name_plural = u'Bodová hodnocení pozic'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.nazev
 
     def hodnoceni_dict(self):

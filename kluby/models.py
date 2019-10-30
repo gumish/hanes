@@ -4,23 +4,23 @@ from django.utils.text import slugify
 
 
 class Klub(models.Model):
-    nazev = models.CharField(u'Název', max_length=50, unique=True)
+    nazev = models.CharField('Název', max_length=50, unique=True)
     slug = models.SlugField(editable=False, unique=True)
     nazev_slug_sorting = models.SlugField(editable=False, unique=False)
     sport = models.ForeignKey(
         'zavody.Sport',
         null=True, blank=True,
         on_delete=models.SET_NULL,
-        verbose_name=u'sport',
+        verbose_name='sport',
         related_name='kluby')
-    info = models.TextField(u'Info', null=True, blank=True)
+    info = models.TextField('Info', null=True, blank=True)
 
     class Meta:
-        verbose_name = u'Klub'
-        verbose_name_plural = u'Kluby'
+        verbose_name = 'Klub'
+        verbose_name_plural = 'Kluby'
         ordering = ('nazev_slug_sorting',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.nazev
 
     @models.permalink

@@ -60,4 +60,4 @@ def backup_database(request):
     new_filename = filename + delimiter + new_index + ext
     dest_path = os.path.join(dest_folder, new_filename)
     shutil.copy(src_path, dest_path)
-    return HttpResponse(u'databázový soubor zálohován')
+    return HttpResponse('databázový soubor zálohován')

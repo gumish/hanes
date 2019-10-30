@@ -48,7 +48,7 @@ class PoharCreateView(CreateView):
         pohar = form.save()
         if form.cleaned_data['kopirovat_kategorie']:
             rocnik = pohar.rocniky.first()
-            for values in rocnik.kategorie.all().values():
+            for values in list(rocnik.kategorie.all().values()):
                 del values['id']
                 del values['delka_trate']
                 del values['rocnik_id']
@@ -79,7 +79,7 @@ def vysledky_kategorie_pdf(request, kategorie_pk):
     pdf = pdf_print.sheet(
         [{
             'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),
-            'headers': ([u'pořadí', u'číslo', u'příjmení', u'jméno', u'nar.', u'klub', u'výsledný čas', u'na trati'],),
+            'headers': (['pořadí', 'číslo', 'příjmení', 'jméno', 'nar.', 'klub', 'výsledný čas', 'na trati'],),
             'rows': rows}],
         widths)
     return HttpResponse(pdf, content_type='application/pdf')

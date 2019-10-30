@@ -17,8 +17,8 @@ from zavodnici.custom_fields import CustomTimeField
 
 class PouzeTxtSouborCasuFormular(forms.Form):
     soubor = forms.FileField(
-        label=u'soubor *.txt',
-        help_text=u'soubor s výslednými časy z mobilní aplikace',
+        label='soubor *.txt',
+        help_text='soubor s výslednými časy z mobilní aplikace',
         required=True,
         widget=forms.FileInput(attrs={'accept': '.txt'}))
 
@@ -36,9 +36,9 @@ class PouzeTxtSouborCasuFormular(forms.Form):
 
 
 class ImportCilovehoCasuFormular(forms.Form):
-    cislo = forms.IntegerField(label=u'Startovní číslo', min_value=0)
-    cilovy_cas = CustomTimeField(label=u'Cílový čas', required=True)
-    prepsat = forms.BooleanField(required=False, help_text=u'povolit přepsání již zapsaných časů')
+    cislo = forms.IntegerField(label='Startovní číslo', min_value=0)
+    cilovy_cas = CustomTimeField(label='Cílový čas', required=True)
+    prepsat = forms.BooleanField(required=False, help_text='povolit přepsání již zapsaných časů')
 
     def clean_cislo(self):
         """
@@ -59,11 +59,11 @@ class ImportCilovehoCasuFormular(forms.Form):
         if self.zavodnik and not self.cleaned_data['prepsat']:
             if self.zavodnik.cilovy_cas:
                 raise forms.ValidationError(
-                    {'cilovy_cas': u'''<u>Závodník má již zadaný čas.</u><br>
+                    {'cilovy_cas': '''<u>Závodník má již zadaný čas.</u><br>
                     Pokud ho chceš přepsat, zatrhni políčko vpravo.'''})
             elif self.zavodnik.nedokoncil:
                 raise forms.ValidationError(
-                    {'cilovy_cas': u'''<u>Závodník závod nedokončil!</u><br>
+                    {'cilovy_cas': '''<u>Závodník závod nedokončil!</u><br>
                     Pokud i tak chceš cílový čas zapsat,<br>
                     zatrhni políčko vpravo.'''})
         return self.cleaned_data
@@ -78,15 +78,15 @@ class ImportCilovehoCasuFormular(forms.Form):
 
 
 class CilovyFormular(forms.Form):
-    cislo = forms.IntegerField(label=u'Startovní číslo', min_value=0)
-    cilovy_cas = CustomTimeField(label=u'Cílový čas', required=False)
+    cislo = forms.IntegerField(label='Startovní číslo', min_value=0)
+    cilovy_cas = CustomTimeField(label='Cílový čas', required=False)
     nedokoncil = forms.ChoiceField(
-        label=u'Nedokonončil(a)', required=False,
+        label='Nedokonončil(a)', required=False,
         choices=((None, '---'),) + Zavodnik.NEDOKONCIL,
         widget=forms.Select(attrs={'tabindex': '-1'}))
     prepsat = forms.BooleanField(
         required=False,
-        help_text=u'povolit přepsání již zapsaných časů',
+        help_text='povolit přepsání již zapsaných časů',
         widget=forms.CheckboxInput(attrs={'tabindex': '-1'}))
 
     def clean_cislo(self):
@@ -113,15 +113,15 @@ class CilovyFormular(forms.Form):
 
         data = self.cleaned_data
         if not ('cilovy_cas' in data or data['nedokoncil']):
-            raise ValidationError({'cilovy_cas': u'Musí být vyplněn buď `cílový čas` nebo `nedokončil`'})
+            raise ValidationError({'cilovy_cas': 'Musí být vyplněn buď `cílový čas` nebo `nedokončil`'})
         if hasattr(self, 'zavodnik') and not self.cleaned_data['prepsat']:
             if self.zavodnik.cilovy_cas:
                 raise forms.ValidationError(
-                    {'cilovy_cas': u'''<u>Závodník má již zadaný čas.</u><br>
+                    {'cilovy_cas': '''<u>Závodník má již zadaný čas.</u><br>
                     Pokud ho chceš přepsat, zatrhni políčko vpravo.'''})
             elif self.zavodnik.nedokoncil:
                 raise forms.ValidationError(
-                    {'cilovy_cas': u'''<u>Závodník závod nedokončil!</u><br>
+                    {'cilovy_cas': '''<u>Závodník závod nedokončil!</u><br>
                     Pokud i tak chceš cílový čas zapsat,<br>
                     zatrhni políčko vpravo.'''})
         return self.cleaned_data
@@ -140,7 +140,7 @@ class CilovyFormular(forms.Form):
 
 
 class ZavodCreateForm(forms.ModelForm):
-    sport = forms.CharField(label=u'Sport')
+    sport = forms.CharField(label='Sport')
 
     class Meta:
         model = Zavod
@@ -153,9 +153,9 @@ class ZavodCreateForm(forms.ModelForm):
 
 class RocnikCreateForm(forms.ModelForm):
     kategorie = forms.FileField(
-        label=u'Import kategorií z *.csv', required=False,
+        label='Import kategorií z *.csv', required=False,
         widget=forms.FileInput(attrs={'accept': '.csv'}),
-        help_text=u'pro nové kategorie nahrát soubor CSV, jinak se budou dědit z předcházejícího ročníku')
+        help_text='pro nové kategorie nahrát soubor CSV, jinak se budou dědit z předcházejícího ročníku')
 
     class Meta:
         model = Rocnik
@@ -201,16 +201,16 @@ class ImportZavodnikuCSVForm(LideImportCSVForm):
                     })
                 zavodnici.append(
                     (zavodnik, zavodnik_novy, radek['defaults']))
-            except MultipleObjectsReturned, e:
-                print clovek, e
+            except MultipleObjectsReturned as e:
+                print((clovek, e))
         return zavodnici
 
 
 class SloupceVysledkoveListinyForm(forms.Form):
-    startovni_cas = forms.BooleanField(required=False, label=u'startovní čas', initial=False)
-    cilovy_cas = forms.BooleanField(required=False, label=u'cílový čas', initial=False)
-    casova_ztrata = forms.BooleanField(required=False, label=u'časová ztráta', initial=False)
-    poradi_na_trati = forms.BooleanField(required=False, label=u'pořadí na trati', initial=True)
+    startovni_cas = forms.BooleanField(required=False, label='startovní čas', initial=False)
+    cilovy_cas = forms.BooleanField(required=False, label='cílový čas', initial=False)
+    casova_ztrata = forms.BooleanField(required=False, label='časová ztráta', initial=False)
+    poradi_na_trati = forms.BooleanField(required=False, label='pořadí na trati', initial=True)
 
 
 class StartovniCasKategorieForm(forms.ModelForm):
@@ -284,12 +284,12 @@ class KontrolaKolonekFormSet(BaseFormSet):
 
 class KontrolaCiselFormSet(KontrolaKolonekFormSet):
     kontrolovano_list = ('cislo',)
-    errror_hlaska = u'Číslo {} ve formuláři musí být pouze jednou!'
+    errror_hlaska = 'Číslo {} ve formuláři musí být pouze jednou!'
 
 
 class KontrolaLidiFormSet(KontrolaKolonekFormSet):
     kontrolovano_list = ('prijmeni', 'jmeno', 'narozen')
-    errror_hlaska = u'{} ve formuláři musí být pouze jednou!'
+    errror_hlaska = '{} ve formuláři musí být pouze jednou!'
 
 
 class PridaniZavodnikuFormSet(KontrolaLidiFormSet):

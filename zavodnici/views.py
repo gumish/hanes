@@ -59,7 +59,7 @@ def cislo_autocomplete(request, rocnik_pk=None):
 
 def _desetiny_sekundy(puvodni_dict):
     """funkce jez projede slovnik a upravi casy"""
-    for k, v in puvodni_dict.items():
+    for k, v in list(puvodni_dict.items()):
         if k.endswith('_cas') and v:
             puvodni_dict[k] = desetiny_sekundy(str(v))
     return puvodni_dict
@@ -102,8 +102,8 @@ def smaz_zavodnika_ze_startovky(request, pk):
     try:
         Zavodnik.objects.get(pk=pk).delete()
         return HttpResponse(True)
-    except Exception, e:
-        print e
+    except Exception as e:
+        print(e)
         return HttpResponse(e, status=500)
 
 
