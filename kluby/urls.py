@@ -1,17 +1,21 @@
-# coding: utf-8
-from django.conf.urls import patterns, url
+
+from django.urls import path
 from django.contrib.auth.decorators import login_required
 from .views import *
 
-urlpatterns = patterns(
-    '',
+app_name = 'kluby'
+urlpatterns = [
     # LISTs
-    url(r'^$', KlubyListView.as_view(), name='kluby_list'),
+    path('',
+        KlubyListView.as_view(), name='kluby_list'),
 
     # DETAILs
-    url(r'^detail/(?P<slug>[-\w]+)/$', KlubDetailView.as_view(), name='klub_detail'),
-    url(r'^editace/(?P<slug>[-\w]+)/$', login_required(KlubUpdateView.as_view()), name='klub_update'),
+    path('detail/<str:slug>/',
+        KlubDetailView.as_view(), name='klub_detail'),
+    path('editace/<str:slug>/',
+        login_required(KlubUpdateView.as_view()), name='klub_update'),
 
     # AUTOCOMPLETEs
-    url(r'^klub_autocomplete/$', klub_autocomplete, name='klub_autocomplete'),
-)
+    path('klub_autocomplete/',
+        klub_autocomplete, name='klub_autocomplete'),
+]

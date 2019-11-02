@@ -1,30 +1,33 @@
-# coding: utf-8
-from django.conf.urls import patterns, url
+
+from django.urls import path
 from django.contrib.auth.decorators import login_required
 from .views import *
 
-urlpatterns = patterns(
-    '',
-
+app_name = 'zavodnici'
+urlpatterns = [
     # UPDATEs
-    url(r'^editace_zavodnika/(?P<zavodnik_pk>\d+)/$',
+    path(
+        'editace_zavodnika/<int:zavodnik_pk>/',
         login_required(editace_zavodnika),
         name='editace_zavodnika'),
 
-    url(
-        r'^rocnik/(?P<rocnik_pk>\d+)/cislo_autocomplete/$',
+    path(
+        'rocnik/<int:rocnik_pk>/cislo_autocomplete/',
         cislo_autocomplete, name='cislo_autocomplete'),
 
-    url(r'^uprav_zavodnika_ze_startovky/(?P<pk>\d+)/$',
+    path(
+        'uprav_zavodnika_ze_startovky/<int:pk>/',
         ZavodnikUpdateView.as_view(),
         name='uprav_zavodnika_ze_startovky'),
 
-    url(r'^aktualizuj_data_startovky/(?P<pk>\d+)/$',
+    path(
+        'aktualizuj_data_startovky/<int:pk>/',
         login_required(aktualizuj_data_startovky),
         name='aktualizuj_data_startovky'),
 
     # DELETE
-    url(r'^smaz_zavodnika_ze_startovky/(?P<pk>\d+)/$',
+    path(
+        'smaz_zavodnika_ze_startovky/<int:pk>/',
         login_required(smaz_zavodnika_ze_startovky),
         name='smaz_zavodnika_ze_startovky'),
-)
+]

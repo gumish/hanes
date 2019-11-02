@@ -1,9 +1,9 @@
-# coding: utf-8
+
 import json
 from django.views.generic import DetailView, ListView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic.edit import UpdateView
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib import messages
 from django.db.models import Count
 from django.utils.text import slugify

@@ -1,4 +1,4 @@
-# coding: utf-8
+
 # SOURCE: http://www.yergler.net/blog/2013/09/03/nested-formsets-redux/
 
 

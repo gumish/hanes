@@ -1,8 +1,8 @@
-# coding: utf-8
-
 from django.db import models
 from django.db.models import Q
 from django.utils.text import slugify
+from django.urls import reverse
+
 
 POHLAVI = (
     ('', '---'),
@@ -65,12 +65,11 @@ class Clovek(models.Model):
         return '{0} {1} {2}'.format(self.prijmeni, self.jmeno, self.narozen)
 
 
-    @models.permalink
     def get_absolute_url(self, user=None):
         if user and user.is_active:
-            return ('lide:clovek_update', (self.slug,))
+            return reverse('lide:clovek_update', args=(self.slug,))
         else:
-            return ('lide:clovek_detail', (self.slug,))
+            return reverse('lide:clovek_detail', args=(self.slug,))
 
 
     def save(self, *args, **kwargs):
@@ -147,12 +146,12 @@ class Clenstvi(models.Model):
 
     clovek = models.ForeignKey(
         'Clovek',
-        verbose_name='člověk',
-        related_name='clenstvi')
+        verbose_name='člověk', related_name='clenstvi',
+        on_delete=models.CASCADE)
     klub = models.ForeignKey(
         'kluby.Klub',
-        verbose_name='klub',
-        related_name='clenstvi')
+        verbose_name='klub', related_name='clenstvi',
+        on_delete=models.CASCADE)
     sport = models.ForeignKey(
         'zavody.Sport',
         on_delete=models.SET_NULL,

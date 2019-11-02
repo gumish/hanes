@@ -65,6 +65,15 @@ input.error {
     color: #db2828 !important;
 }
 
+ul.errorlist {
+    padding: 0;
+}
+
+ul.errorlist li {
+    display: block;
+    color: red;
+}
+
 /* MENU */
 #section_uvod #menu_uvod,
 #section_zavody #menu_zavody,

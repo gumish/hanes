@@ -1,10 +1,10 @@
-# coding: utf-8
+
 import os
 import datetime
 import shutil
 from django.views.generic.edit import UpdateView
 from django.contrib.flatpages.models import FlatPage
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import RequestContext
 from django.http import HttpResponse
 
@@ -22,17 +22,17 @@ def uvod(request, url):
     start = dnes - datetime.timedelta(dnes.weekday())
     konec = start + datetime.timedelta(7)
     zavody_seznam = (
-        Rocnik.objects.filter(datum__gt=konec).reverse()[:3].reverse(),
-        Rocnik.objects.filter(datum__range=(start, konec)).exclude(datum=dnes),
-        Rocnik.objects.filter(datum=dnes),
-        Rocnik.objects.filter(datum__lt=start)[:5]
+        reversed(Rocnik.objects.filter(datum__gt=konec).order_by('datum')[:3]),  # za tyden a dal (max 3)
+        Rocnik.objects.filter(datum__range=(start, konec)).exclude(datum=dnes),  # tento tyden
+        Rocnik.objects.filter(datum=dnes),  # dnes
+        Rocnik.objects.filter(datum__lt=start)[:5]  # minulych pet zavodu
     )
-    return render_to_response(
-        'uvod.html', {
+    return render(request,
+        'uvod.html',
+        {
             'flatpage': uvod,
             'zavody_seznam': zavody_seznam,
-        },
-        context_instance=RequestContext(request))
+        })
 
 
 class FlatPageUpdate(UpdateView):

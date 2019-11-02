@@ -1,20 +1,22 @@
-# coding: utf-8
+
 import json
-from django.views.generic import DetailView
-from django.views.generic.edit import FormView
-from django.http import HttpResponse, HttpResponseRedirect
-from django.core.urlresolvers import reverse
-from django.core.urlresolvers import reverse_lazy
+
 from django.contrib import messages
-from django.shortcuts import render_to_response
-from django.template import RequestContext
 from django.db.models import Count
 from django.forms.models import inlineformset_factory
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render
+from django.template import RequestContext
+from django.urls import reverse, reverse_lazy
 from django.utils.text import slugify
+from django.views.generic import DetailView
+from django.views.generic.edit import FormView
 
-from .models import Clovek, Clenstvi
-from .forms import ClovekUpdateForm, LideImportCSVForm
 from zavody.models import Rocnik
+
+from .forms import ClovekUpdateForm, LideImportCSVForm
+from .models import Clenstvi, Clovek
+
 
 def _referer_do_session(request):
     referer = request.META.get('HTTP_REFERER', '')
@@ -100,7 +102,7 @@ def clovek_update(request, slug):
             request.session['referer'] = None
         form = ClovekUpdateForm(instance=clovek)
         clenstvi_formset = ClenstviFormSet(instance=clovek)
-    return render_to_response(
+    return render(request,
         'lide/staff/clovek_editace.html', {
             'clovek': clovek,
             'zavodnici': zavodnici,
@@ -108,7 +110,7 @@ def clovek_update(request, slug):
             'form': form,
             'clenstvi_formset': clenstvi_formset,
             'referer': request.session.get('referer', None)},
-        context_instance=RequestContext(request))
+        )
 
 
 def clovek_list(request):
@@ -116,10 +118,10 @@ def clovek_list(request):
         pocet_zavodu=Count('zavodnici'))
     for clovek in lide:
         clovek.kluby = clovek.clenstvi.values_list('klub', flat=True).distinct()
-    return render_to_response(
+    return render(request,
         'lide/clovek_list.html',
         {'lide': lide},
-        context_instance=RequestContext(request))
+        )
 
 
 def clovek_autocomplete(request, rocnik_pk=None):

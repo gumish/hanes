@@ -1,4 +1,4 @@
-# coding: utf-8
+
 import csv
 from django import forms
 from django.forms.formsets import BaseFormSet, formset_factory

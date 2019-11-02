@@ -1,41 +1,52 @@
-from django.conf.urls import patterns, include, url
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+"""new URL Configuration
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/2.2/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
 from django.contrib import admin
-# from django.contrib.flatpages import views
-from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.urls import path, include
+from django.contrib.auth.decorators import login_required
 
-from .views import backup_database, uvod, FlatPageUpdate
+from . import views
 
-admin.autodiscover()
+urlpatterns = [
+    path('zavody/',
+        include('zavody.urls', namespace='zavody')),
+    path('lide/',
+        include('lide.urls', namespace='lide')),
+    path('kluby/',
+        include('kluby.urls', namespace='kluby')),
+    path('zavodnici/',
+        include('zavodnici.urls', namespace='zavodnici')),
+    path('pohary/',
+        include('pohary.urls', namespace='pohary')),
 
-urlpatterns = patterns(
-    '',
-    url(r'^zavody/', include('zavody.urls', namespace='zavody')),
-    url(r'^lide/', include('lide.urls', namespace='lide')),
-    url(r'^kluby/', include('kluby.urls', namespace='kluby')),
-    url(r'^zavodnici/', include('zavodnici.urls', namespace='zavodnici')),
-    url(r'^pohary/', include('pohary.urls', namespace='pohary')),
+    path('zalohovat_databazi/',
+        login_required(views.backup_database), name='backup_database'),
+    path('flatpages/editace/<int:pk>/',
+        login_required(views.FlatPageUpdate.as_view()), name='flatpage_editace'),
+    path('',
+        views.uvod, {'url': '/uvod/'}, name='uvod'),
 
-    url(r'^zalohovat_databazi/$', login_required(backup_database), name='backup_database'),
-    url(r'^flatpages/editace/(?P<pk>[0-9]+)/$',
-        login_required(FlatPageUpdate.as_view()), name='flatpage_editace'),
-    url(r'^$', uvod, {'url': '/uvod/'}, name='uvod'),
-
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
-    url(r'^admin/', include(admin.site.urls), name='admin'),
-    url(r'^accounts/', include('django.contrib.auth.urls')),
-)
-
-urlpatterns += staticfiles_urlpatterns()
-
-# urlpatterns += url(r'^(?P<url>.*/)$', views.flatpage),
+    # django
+    path('admin/', admin.site.urls),
+    path('accounts/',
+        include('django.contrib.auth.urls')),
+]
 
 if settings.TEMPLATE_DEBUG:
     import debug_toolbar
     urlpatterns = [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
+        path('__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns

@@ -1,29 +1,29 @@
-# coding: utf-8
 import json
+from collections import OrderedDict
 from io import BytesIO
 
-from collections import OrderedDict
 from django.contrib import messages
-from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.models import Count, Min
 from django.forms.formsets import formset_factory
 from django.forms.models import inlineformset_factory
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import RequestContext
-from django.utils.text import slugify
-from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
-                                  UpdateView, View, TemplateView)
-from django.views.generic.edit import FormView
 from django.template.loader import render_to_string
+from django.urls import reverse, reverse_lazy
+from django.utils.text import slugify
+from django.views.generic import (
+    CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView,
+    View)
+from django.views.generic.edit import FormView
 
 from hanes.nested_formsets import nestedformset_factory
-from zavody.templatetags.custom_filters import desetiny_sekundy
+from kluby.models import Klub
 from lide.forms import CSVsouborFormular  # , ClovekRocnikForm
 from lide.views import _referer_do_session
-from kluby.models import Klub
 from zavodnici.forms import (StarterZavodnikForm, ZavodnikForm,
                              ZavodnikPridaniForm)
+from zavody.templatetags.custom_filters import desetiny_sekundy
 
 from .forms import *
 from .functions import (exportuj_kategorie, exportuj_startovku,
@@ -169,14 +169,14 @@ def vysledkova_listina(request, rocnik_pk):
     else:
         sloupce_form = SloupceVysledkoveListinyForm()
 
-    return render_to_response(
+    return render(request,
         'zavody/vysledkova_listina.html', {
             'rocnik': rocnik,
             'kategorie_list': kategorie_list,
             'sloupce_form': sloupce_form,
             'colspan': colspan
         },
-        context_instance=RequestContext(request)
+        
     )
 
 
@@ -291,22 +291,22 @@ def startovni_listina(request, rocnik_pk, ordering_str='startovni_cas--cislo--vy
         formulare = [ZavodnikForm(instance=zav, prefix=zav.id) for zav in nezarazeni_temp]
         nezarazeni = list(zip(nezarazeni_temp, formulare))
 
-        return render_to_response(
+        return render(request,
             'zavody/staff/startovni_listina.html', {
                 'rocnik': rocnik,
                 'kategorie_list': kategorie_list,
                 'nezarazeni': nezarazeni,
                 'ordering_str': ordering_str},
-            context_instance=RequestContext(request)
+            
         )
     else:
-        return render_to_response(
+        return render(request,
             'zavody/startovni_listina.html', {
                 'rocnik': rocnik,
                 'kategorie_list': kategorie_list_temp,
                 'nezarazeni': nezarazeni_temp,
                 'ordering_str': ordering_str},
-            context_instance=RequestContext(request)
+            
         )
 
 
@@ -334,31 +334,29 @@ def pridani_zavodniku(request, pk):
     for f in formset.forms:
         f.fields['kategorie'].queryset = Kategorie.objects.filter(rocnik=rocnik)
 
-    return render_to_response(
+    return render(request,
         'zavody/staff/zavodnici_pridani.html', {
             'rocnik': rocnik,
             'formset': formset
         },
-        context_instance=RequestContext(request)
+        
     )
 
 
 class StartovniCasyView(DetailView):
-    """
-    pouze zobrazi stranku s formulary startovnich casu kategorii a zavodniku,
+    """ Pouze zobrazi stranku s formulary startovnich casu kategorii a zavodniku,
     updatovani jednotlivych formularu kategorii uz necha na ajaxu jine funkce
     """
     model = Rocnik
     template_name = 'zavody/staff/startovni_casy.html'
 
-
     def add_nested_formset_to_kategorie(self, kategorie_list):
-        """
-        do kazde kategorie vlozi dalsi atributy a 'formset' nestedformset
+        """ Do kazde kategorie vlozi dalsi atributy a 'formset' nestedformset
         """
         for kategorie in kategorie_list:
             kategorie.zavodnici_formset = ZavodniciKategorieFormSet(instance=kategorie)
             kategorie.form = StartovniCasKategorieForm(instance=kategorie)
+            # najde nejnizsi cislo a startovni cas v kategorii
             values = kategorie.zavodnici_temp.aggregate(Min('cislo'), Min('startovni_cas'))
             kategorie.min_cislo = values['cislo__min']
             kategorie.min_startovni_cas = values['startovni_cas__min']
@@ -442,13 +440,13 @@ def formular_startera(request, rocnik_pk, ordering_str='startovni_cas--cislo'):
         formulare = [formulare_dict[zav.id] for zav in zavodnici if zav.id in formulare_dict]
         kategorie_list.append((kategorie, list(zip(zavodnici, formulare))))
 
-    return render_to_response(
+    return render(request,
         'zavody/staff/formular_startera.html', {
             'rocnik': rocnik,
             'kategorie_list': kategorie_list,
             'formset': formset
         },
-        context_instance=RequestContext(request)
+        
     )
 
 
@@ -469,7 +467,7 @@ class ImportSouboruCasuTxtView(FormView):
         " zobrazi formset s daty ze souboru "
         context = self.get_context_data()
         context['formset'] = ImportyCilovehoCasuFormSet(initial=form.cleaned_data)
-        return render_to_response(
+        return render(request,
             'zavody/staff/formular_importovanych_casu_txt.html', context,
             context_instance=RequestContext(self.request)
         )
@@ -511,7 +509,7 @@ class ZpracovaniImportovanychCasuTxtView(View):
                 'rocnik': Rocnik.objects.prefetch_related('zavodnici').get(pk=self.kwargs['rocnik_pk']),
                 'formset': formset
             }
-            return render_to_response(
+            return render(request,
                 'zavody/staff/formular_importovanych_casu_txt.html', context,
                 context_instance=RequestContext(self.request)
             )
@@ -536,12 +534,12 @@ def cilovy_formular(request, rocnik_pk):
     else:
         formset = CilovyFormularFormSet()
 
-    return render_to_response(
+    return render(request,
         'zavody/staff/cilovy_formular.html', {
             'rocnik': Rocnik.objects.prefetch_related('zavodnici').get(pk=rocnik_pk),
             'formset': formset
         },
-        context_instance=RequestContext(request)
+        
     )
 
 
@@ -701,7 +699,6 @@ def startovka_rocnik_PDF(request, rocnik_pk):
         rows = []
         widths = [1.5, 3, 2.7, 1.5, 6, 3]
         for zavodnik in kategorie.serazeni_zavodnici(razeni='startovni_cas--cislo', ignoruj_nedokoncil=True):
-            startovni_cas = str(zavodnik.startovni_cas)
             if not zavodnik.nedokoncil:
                 rows.append([
                         zavodnik.cislo or '',
@@ -709,7 +706,7 @@ def startovka_rocnik_PDF(request, rocnik_pk):
                         zavodnik.clovek.jmeno,
                         zavodnik.clovek.narozen,
                         zavodnik.klub.nazev if zavodnik.klub else '',
-                        startovni_cas,
+                        zavodnik.startovni_cas or '-',
                     ])
             else:
                 rows.append([
@@ -718,7 +715,9 @@ def startovka_rocnik_PDF(request, rocnik_pk):
                         '',
                         '',
                         '',
-                        startovni_cas + ' | ' + zavodnik.nedokoncil,
+                        '{} | {}'.format(
+                            zavodnik.startovni_cas or '-', zavodnik.nedokoncil
+                        )
                     ])
         tables.append({
             'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),

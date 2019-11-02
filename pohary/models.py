@@ -1,11 +1,10 @@
-# coding: utf-8
-from operator import attrgetter
 from datetime import date, timedelta
+from operator import attrgetter
 
 from django.db import models
+from django.urls import reverse
 from django.utils.text import slugify
 
-# from zavody.models import Rocnik
 from zavodnici.models import Zavodnik
 from zavody.models import kategorie_test_cloveka
 
@@ -43,11 +42,9 @@ class Pohar(models.Model):
     def __str__(self):
         return self.nazev
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('pohary:pohar_detail', (self.slug,))
+        return reverse('pohary:pohar_detail', args=(self.slug,))
 
-    @models.permalink
     def get_delete_url(self):
         return ('pohary:pohar_smazani', (self.slug,))
 
@@ -113,14 +110,15 @@ class KategoriePoharu(models.Model):
         <br>při prázdné kolonce bude použita hodnota poháru',
         blank=True, null=True)
     bod_hodnoceni = models.ForeignKey(
-        'BodoveHodnoceni', verbose_name='Bodové hodnocení',
+        'BodoveHodnoceni',
+        verbose_name='Bodové hodnocení', related_name='kategorie',
         help_text='bodová tabulka pro kategorii poháru,<br>\
         při prázdné kolonce bude použita tabulka z poháru',
-        related_name='kategorie', on_delete=models.CASCADE,
-        blank=True, null=True)
+        on_delete=models.CASCADE, blank=True, null=True)
     pohar = models.ForeignKey(
-        Pohar, verbose_name='pohár',
-        related_name='kategorie_poharu')
+        Pohar,
+        verbose_name='pohár', related_name='kategorie_poharu',
+        on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Kategorie poháru'
@@ -141,9 +139,8 @@ class KategoriePoharu(models.Model):
         return popis
 
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('pohary:kategorie-poharu_detail', (self.id,))
+        return reverse('pohary:kategorie-poharu_detail', args=(self.id,))
 
 
     def zavodnici(self):

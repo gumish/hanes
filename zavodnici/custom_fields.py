@@ -1,4 +1,4 @@
-# coding: utf-8
+
 from django import forms
 from zavody.templatetags.custom_filters import desetiny_sekundy
 

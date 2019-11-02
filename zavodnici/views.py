@@ -1,9 +1,9 @@
-# coding: utf-8
+
 import json
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.views.generic.edit import UpdateView
 from django.template.loader import render_to_string
 
@@ -29,13 +29,13 @@ def editace_zavodnika(request, zavodnik_pk):
     else:
         _referer_do_session(request)
         form = ZavodnikEditaceForm(instance=zavodnik)
-    return render_to_response(
+    return render(request,
         'zavody/staff/zavodnik_editace.html', {
             'zavodnik': zavodnik,
             'rocnik': rocnik,
             'form': form
         },
-        context_instance=RequestContext(request)
+        
     )
 
 

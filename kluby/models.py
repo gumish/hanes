@@ -1,5 +1,5 @@
-# coding: utf-8
 from django.db import models
+from django.urls import reverse
 from django.utils.text import slugify
 
 
@@ -23,16 +23,14 @@ class Klub(models.Model):
     def __str__(self):
         return self.nazev
 
-    @models.permalink
     def get_absolute_url(self, user=None):
         if user and user.is_active:
-            return ('kluby:klub_update', (self.slug,))
+            return reverse('kluby:klub_update', args=(self.slug,))
         else:
-            return ('kluby:klub_detail', (self.slug,))
+            return reverse('kluby:klub_detail',args=(self.slug,))
 
     def save(self, *args, **kwargs):
         from lide.models import _get_sorting_slug
         self.slug = slugify(self.nazev)
         self.nazev_slug_sorting = _get_sorting_slug(self.nazev)
         super(Klub, self).save(*args, **kwargs)
-

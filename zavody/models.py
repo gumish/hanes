@@ -2,22 +2,30 @@ from datetime import date
 
 from django.db import models
 from django.db.models import Count
+from django.urls import reverse
 from django.utils.text import slugify
 
 from zavodnici.models import Zavodnik
 
-def _string_to_ordering_kwargs(razeni='vysledny_cas--startovni_cas--cislo', ignoruj_nedokoncil=False):
-    " ignoruj_nedokoncil: promena pro zruseni zarazovani DNS na konec "
-    if ignoruj_nedokoncil:
+
+def _string_to_ordering_kwargs(razeni='', ignoruj_nedokoncil=False):
+    """ Pripravy slovnik pro vyzuziti v query
+    Args:
+        razeni (str): string pro prevod ordering_kwargs['razeni']
+        ignoruj_nedokoncil (bool): zruseni zarazovani DNS na konec
+    Returns:
+        ordering_kwargs (dict): slovnik pouzity dale u query
+    """
+    if not ignoruj_nedokoncil:  # neignoruj nedokoncil - normal
         ordering_kwargs = {
-            'prvni': [],
-            'count': [],
+            'prvni': ['nedokoncil'],
+            'count': ['-vysledny_cas'],
             'razeni': ['vysledny_cas', 'startovni_cas', 'cislo']
         }
     else:
         ordering_kwargs = {
-            'prvni': ['nedokoncil'],
-            'count': ['-vysledny_cas'],
+            'prvni': [],
+            'count': [],
             'razeni': ['vysledny_cas', 'startovni_cas', 'cislo']
         }
     if razeni:
@@ -47,8 +55,8 @@ class Zavod(models.Model):
     slug = models.SlugField(editable=False, unique=True)
     sport = models.ForeignKey(
         'Sport',
-        verbose_name='sport',
-        related_name='zavody')
+        verbose_name='sport', related_name='zavody',
+        on_delete=models.CASCADE)
     korekce_sezony = models.BooleanField(
         'Korekce sezóny',
         help_text='zatrhni u podzimních lyžařských běhů pro použití kategorií zimní sezóny',
@@ -64,11 +72,9 @@ class Zavod(models.Model):
     def __str__(self):
         return self.nazev
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('zavody:zavod_detail', (self.id,))
+        return reverse('zavody:zavod_detail', args=(self.id,))
 
-    @models.permalink
     def get_delete_url(self):
         return ('zavody:zavod_smazani', (self.id,))
 
@@ -81,9 +87,10 @@ class Zavod(models.Model):
 
 
 class Rocnik(models.Model):
-    zavod = models.ForeignKey(Zavod,
-                              verbose_name='závod',
-                              related_name='rocniky')
+    zavod = models.ForeignKey(
+        Zavod,
+        verbose_name='závod', related_name='rocniky',
+        on_delete=models.CASCADE)
     nazev = models.CharField(
         'Název', max_length=50, null=True, blank=True,
         help_text='pokud není název vyplněn, pak se dědí z rodičovského závodu')
@@ -105,11 +112,9 @@ class Rocnik(models.Model):
         return '{0} {1}'.format(
             nazev, self.datum.year)
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('zavody:rocnik_detail', (self.id,))
+        return reverse('zavody:rocnik_detail', args=(self.id,))
 
-    @models.permalink
     def get_delete_url(self):
         return ('zavody:rocnik_smazani', (self.id,))
 
@@ -198,8 +203,9 @@ class Kategorie(models.Model):
     delka_trate = models.CharField(
         'Délka tratě', null=True, blank=True, max_length=20)
     rocnik = models.ForeignKey(
-        Rocnik, verbose_name='ročník',
-        related_name='kategorie')
+        Rocnik,
+        verbose_name='ročník', related_name='kategorie',
+        on_delete=models.CASCADE)
     poradi = models.SmallIntegerField(
         'Pořadí', null=True, blank=True)
     spusteni_stopek = models.TimeField(
@@ -228,9 +234,8 @@ class Kategorie(models.Model):
                 self.vek_do or '?')
         return popis
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('zavody:kategorie_detail', (self.id,))
+        return reverse('zavody:kategorie_detail', args=(self.id,))
 
     def rozsah_narozeni(self):
         rok = self.rocnik.datum.year
@@ -276,30 +281,32 @@ class Kategorie(models.Model):
         return (nezarazeni, duplikati, zpravy)
 
     def serazeni_zavodnici(self, razeni, ignoruj_nedokoncil=False):
+        """ Seradi zavodniky kategorie
+        Args:
+            razeni (str), ignoruj_nedokoncil (bool): parametry predane fci _string_to_ordering_kwargs
+        Returns:
+            zavodnici (list): serazeni zavodnici dle 'ordering_kwargs' s dpolnenymi ztratami na prvnihio
         """
-        Vrati serazene zavodniky kategorie a doplni do nich casove ztraty na prvniho
-        """
-        # pomoci annotate Count, se radi prazdna pole na konec (null_value = 1 / 0)
         annotate_kwargs = {}
         ordering_kwargs = _string_to_ordering_kwargs(razeni, ignoruj_nedokoncil)
-        ordering_list = ordering_kwargs['prvni']
+        vysledne_razeni = ordering_kwargs['prvni']
         for i in ordering_kwargs['count']:
             actual = i + '_value'
-            annotate_kwargs[actual.strip('-')] = Count(i.strip('-'))
-            ordering_list.append(actual)
-        ordering_list += ordering_kwargs['razeni']
+            annotate_kwargs[actual.strip('-')] = Count(i.strip('-'))  # pomoci annotate Count, se radi prazdna pole na konec (null_value = 1 / 0)
+            vysledne_razeni.append(actual)
+        vysledne_razeni += ordering_kwargs['razeni']
 
         zavodnici = self.zavodnici_temp.all()\
                 .annotate(**annotate_kwargs)\
-                .order_by(*ordering_list)
+                .order_by(*vysledne_razeni)
 
         # vypocet casove ztraty na prvniho
         if zavodnici:
             nejlepsi_cas = zavodnici[0].vysledny_cas
             if nejlepsi_cas:
                 for i, zavodnik in enumerate(zavodnici[1:], 1):
-                    cas = zavodnik.vysledny_cas
-                    if cas:
-                        zavodnici[i].casova_ztrata = cas - nejlepsi_cas
+                    # zavodnik ktery nedokoncil se nepocita ztrata
+                    if not zavodnik.nedokoncil and zavodnik.vysledny_cas:
+                        zavodnici[i].casova_ztrata = zavodnik.vysledny_cas - nejlepsi_cas
 
         return zavodnici

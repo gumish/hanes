@@ -50,18 +50,11 @@
                     </div>
                     <div class="field">
                         <div class="ui left icon input">
-                            <input type="password" name="password" placeholder="heslo" autofocus>
+                            <input type="password" name="password" placeholder="heslo">
                             <i class="lock icon"></i>
                         </div>
                     </div>
-                    {% if form.errors %}
-                        <div class="ui error message">
-                            <p>
-                                Špatně zadané uživatelské jméno nebo heslo. Zkuste se prosím přihlásit znovu.
-                            </p>
-                        </div>
-                    {% endif %}
-
+                    {{ form.non_field_errors }}
                     <input type="submit" class="ui large fluid blue submit button" value="přihlásit se">
                 </div>
             </form>            

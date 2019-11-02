@@ -1,8 +1,9 @@
-# coding: utf-8
 import datetime
-from django.db import models
-from django.db.models import Q, Count, Max
+
 from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models import Count, Max, Q
+from django.urls import reverse
 
 
 class Zavodnik(models.Model):
@@ -23,13 +24,13 @@ class Zavodnik(models.Model):
 
     rocnik = models.ForeignKey(
         'zavody.Rocnik',
-        verbose_name='ročník závodu',
-        related_name='zavodnici')
+        verbose_name='ročník závodu', related_name='zavodnici',
+        on_delete=models.CASCADE)
     clovek = models.ForeignKey(
         'lide.Clovek',
+        verbose_name='člověk', related_name='zavodnici',
         null=True, blank=True,  # kvuli docasnym neznamym zavodnikum
-        verbose_name='člověk',
-        related_name='zavodnici')
+        on_delete=models.CASCADE)
     cislo = models.CharField(
         'Startovní číslo',
         max_length=10,
@@ -136,9 +137,8 @@ class Zavodnik(models.Model):
         #         })
 
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('zavodnici:editace_zavodnika', (self.id,))
+        return reverse('zavodnici:editace_zavodnika', args=(self.id,))
 
 
     def save(self, nekontroluj=False, *args, **kwargs):
