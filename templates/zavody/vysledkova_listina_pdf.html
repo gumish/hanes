@@ -36,7 +36,7 @@
                         {{ kategorie.nazev }}
                     </th>
                     <th>
-                        nar. {{ kategorie.rozsah_narozeni.0|unlocalize }} - {{ kategorie.rozsah_narozeni.1|unlocalize }}
+                        {{ kategorie.rozsah_narozeni|rozsah_narozeni }}
                     </th>
                     <th>
                         {% if kategorie.atributy.all.exists %}

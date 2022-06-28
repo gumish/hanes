@@ -66,7 +66,7 @@
 {% endblock staff %}
 
 {% block content %}
-    <form action="" method="POST" class="ui {% if form.errors %}error{% endif %} form" id="clovek_form">
+    <form action="" method="POST" class="ui {% if form.errors or clenstvi_formset.errors %}error{% endif %} form" id="clovek_form">
 
         <div class="ui stackable grid">
 
@@ -108,6 +108,7 @@
                         {% for field in clenstvi_form %}
                             {% include "elements/_form_error_field.html" with label=True help=True %}
                         {% endfor %}
+                        {% include "elements/_error_pointing_ label.html" with error=clenstvi_form.non_field_errors.0 %}
                     </div>
                 {% endfor %}
             </div>

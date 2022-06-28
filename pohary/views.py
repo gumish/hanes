@@ -61,6 +61,9 @@ class PoharCreateView(CreateView):
 
 
 def vysledky_kategorie_pdf(request, kategorie_pk):
+
+    from zavody.templatetags import custom_filters
+
     kategorie = KategoriePoharu.objects.get(pk=kategorie_pk)
     rows = []
     widths = [1.5, 1.5, 3, 2.7, 1.5, 6, 2.3, 1.5]
@@ -78,7 +81,10 @@ def vysledky_kategorie_pdf(request, kategorie_pk):
     pdf_print = PdfPrint(BytesIO())
     pdf = pdf_print.sheet(
         [{
-            'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),
+            'title': TITLE_TEMPLATE.format(
+                kategorie, 
+                custom_filters.rozsah_narozeni(kategorie.rozsah_narozeni())
+            ),
             'headers': (['pořadí', 'číslo', 'příjmení', 'jméno', 'nar.', 'klub', 'výsledný čas', 'na trati'],),
             'rows': rows}],
         widths)

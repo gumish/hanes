@@ -7,3 +7,7 @@ _BACKUP_
 _DBs
 .vscode
 _packages
+_virtenv
+templates/git_sha.txt
+templates/git_msg.txt
+db *.sql

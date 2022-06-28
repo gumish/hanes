@@ -1,7 +1,9 @@
 
+from datetime import date
+
 from django import template
-from django.utils.safestring import mark_safe
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -18,6 +20,18 @@ def desetiny_sekundy(val):
     else:
         val = ''
     return val
+
+
+@register.filter
+def rozsah_narozeni(roky):
+    """ preklada pocatecni rok 0 na text """
+    od, do = roky
+    if not od:
+        return 'nar. {} a starší'.format(do)
+    elif date.today().year == do:
+        return 'nar. {} a mladší'.format(od)
+    else:
+        return 'nar. {} - {}'.format(od, do)
 
 
 @register.simple_tag(takes_context=True)
@@ -65,3 +79,4 @@ def th_sortable(context, verbose, order, width=None, kat=0):
 def detail_url(context, objekt):
     user = context['user']
     return objekt.get_absolute_url(user)
+

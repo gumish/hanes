@@ -1,1 +1,1 @@
-cmd /k "..\virtualenv\Scripts\activate.bat"
+cmd /k "_virtenv\Scripts\activate.bat"

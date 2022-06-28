@@ -1,5 +1,6 @@
 
 import csv
+from lide.models import Clenstvi
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 
@@ -48,3 +49,20 @@ def clean_lide_import_csv(soubor):
         elif data:
             radky.append(data)
     return (radky, chyby)
+
+
+def cistit_clenstvi():
+    """ utilita pro odstraneni duplicitnich clenstvi
+        nepouzite ve webu, pouze pro shell konzoli
+    """
+    from lide.models import Clenstvi
+    smazat = []
+    for c in Clenstvi.objects.all():
+        try:
+            c.full_clean()
+        except Exception as e:
+            ds = Clenstvi.objects.filter(clovek=c.clovek, klub=c.klub, sport=c.sport).order_by('-priorita')
+            smazat.extend([d.id for d in ds[1:]])
+    if smazat:
+        print(smazat)
+        Clenstvi.objects.filter(id__in=smazat).delete()

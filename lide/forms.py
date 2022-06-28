@@ -28,7 +28,7 @@ class ClovekUpdateForm(forms.ModelForm):
         }
 
     def __init__(self, *arg, **kwargs):
-        super(ClovekUpdateForm, self).__init__(*arg, **kwargs)
+        super().__init__(*arg, **kwargs)
         self.fields['presunout_vysledky'].queryset = Clovek.objects.exclude(pk=self.instance.pk)
 
     def save(self, *args, **kwargs):
@@ -49,7 +49,7 @@ class ClovekUpdateForm(forms.ModelForm):
             self.instance.delete()
             smazan = True
         else:
-            clovek = super(ClovekUpdateForm, self).save(*args, **kwargs)
+            clovek = super().save(*args, **kwargs)
             zpravy.append('změny v člověku uloženy')
             smazan = False
 

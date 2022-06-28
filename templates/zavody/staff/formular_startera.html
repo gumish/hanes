@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load l10n staticfiles custom_filters %}
+{% load l10n static custom_filters %}
 
 {% block title %}
     FORMULÁŘ STARTÉRA | {{ rocnik }}
@@ -72,7 +72,7 @@
                             </a>
                         </div>
                         <div class="four wide column">
-                            nar. {{ kategorie.rozsah_narozeni.0|unlocalize }} - {{ kategorie.rozsah_narozeni.1|unlocalize }}
+                            {{ kategorie.rozsah_narozeni|rozsah_narozeni }}
                         </div>
                         <div class="three wide column">
                             {{ kategorie.delka_trate|default:'-' }}

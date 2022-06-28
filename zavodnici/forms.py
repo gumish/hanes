@@ -70,11 +70,26 @@ class ZavodnikPridaniForm(forms.ModelForm):
         super(ZavodnikPridaniForm, self).add_error(field, error)
 
     def save(self):
-        """- automaticky zarazuje cloveka do klubu - pokud neexistuje vytvari nove clenstvi
+        """
+        - pokud existuje uz zavodnik, pak jenom upravi jeho cislo, klub, kategorii
+        - automaticky zarazuje cloveka do klubu
+        - pokud neexistuje vytvari nove clenstvi
         - dovyplnuje `zavodnika` a uklada ho
         """
         data = self.cleaned_data
         if data:
+            # existuje uz zavodnik?
+            existujici = Zavodnik.objects.filter(
+                clovek=self.instance.clovek, rocnik=self.instance.rocnik).first()
+            if existujici:
+                self.instance = existujici
+                for attr in ('cislo', 'kategorie'):
+                    if data[attr]:
+                        setattr(self.instance, attr, data[attr])
+            # pokud je vyplnena kategorie, pak ho rovnou i prirad
+            if self.instance.kategorie:
+                self.instance.kategorie_temp = self.instance.kategorie
+
             if data['klub_nazev']:
                 klub, created = Klub.objects.get_or_create(
                     slug=slugify(data['klub_nazev']),
@@ -84,7 +99,6 @@ class ZavodnikPridaniForm(forms.ModelForm):
                     })
                 self.instance.klub = klub
 
-            self.instance.kategorie_temp = self.instance.kategorie
             self.instance.save()
 
 

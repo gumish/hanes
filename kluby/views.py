@@ -71,7 +71,7 @@ def klub_autocomplete(request):
     vysledek = []
 
     if 'query' in request.GET:
-        query = slugify(request.GET['query'].encode('utf8'))
+        query = slugify(request.GET['query'])
         kluby = Klub.objects.filter(slug__contains=query)
 
     if 'clovek_id' in request.GET:

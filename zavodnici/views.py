@@ -1,9 +1,7 @@
 
 import json
 from django.shortcuts import render
-from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.urls import reverse
 from django.views.generic.edit import UpdateView
 from django.template.loader import render_to_string
 

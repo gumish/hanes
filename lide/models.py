@@ -142,6 +142,7 @@ class Clenstvi(models.Model):
     """ Clenstvi
     - propojeni cloveka, klubu a sportu,
     - mezi clovekem a klubem je vztah m2m
+    - Clenstvi je pouzito pouze pro nabidnuti klubu u vkladani zavodnika, neni na nej nic natvrdo navazano
     """
 
     clovek = models.ForeignKey(

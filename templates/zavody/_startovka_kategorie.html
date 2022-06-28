@@ -14,7 +14,7 @@
                     </a>
                 </div>
                 <div class="three wide column">
-                    nar. {{ kategorie.rozsah_narozeni.0|unlocalize }} - {{ kategorie.rozsah_narozeni.1|unlocalize }}
+                    {{ kategorie.rozsah_narozeni|rozsah_narozeni }}
                 </div>
                 <div class="column">
                     {{ kategorie.delka_trate|default:'-' }}

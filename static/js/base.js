@@ -4,34 +4,31 @@ function printPage(url) {
 };
 
 $(document)
-  .ready(function() {
+    .ready(function() {
 
         message = $('#ajax_messages');
 
         $('.message .close')
-          .on('click', function() {
-            $(this)
-              .closest('.message')
-              .transition('fade')
-            ;
-          })
-        ;
+            .on('click', function() {
+                $(this)
+                    .closest('.message')
+                    .transition('fade');
+            });
 
         $('.ui.sticky')
-          .sticky({
-            context: '#content',
-          })
-        ;
+            .sticky({
+                context: '#content',
+            });
 
         $('.dropdown').dropdown();
 
         $("#id_form-0-cislo").focus();
 
-        $('#backup_database').click(function(){
+        $('#backup_database').click(function() {
             var el = $(this);
             $.ajax({
                 url: el.attr('href'),
-                success: function(data){
+                success: function(data) {
                     message
                         .show()
                         .removeClass('error')
@@ -50,7 +47,7 @@ $(document)
             return false;
         });
 
-    // lide autocomplete
+        // lide autocomplete
         $("#zavodnici_forms input[name$='prijmeni']").each(function() {
             // pri focusu vycisteni pole i ID
             // $(this).focus(function(){
@@ -66,7 +63,7 @@ $(document)
                 triggerSelectOnValidInput: false,
                 groupBy: 'klub',
                 width: 300,
-                formatResult:  function (suggestion, currentValue) {
+                formatResult: function(suggestion, currentValue) {
                     // zformatovani vystupu do napovedy
                     // console.log(suggestion.data);
                     data = suggestion.data;
@@ -77,7 +74,7 @@ $(document)
                         return base
                     }
                 },
-                onSelect: function (suggestion) {
+                onSelect: function(suggestion) {
                     // vyplneni ostatnich poli formulare pomoci dat
                     data = suggestion.data;
                     var tr = $(this).parent().parent().parent();
@@ -95,7 +92,7 @@ $(document)
             $(this).devbridgeAutocomplete().clear();
         });
 
-    // kluby autocomplete
+        // kluby autocomplete
         $("#zavodnici_forms input[name$='klub_nazev'], input#id_presunout_do").each(function() {
             $(this).devbridgeAutocomplete({
                 serviceUrl: klub_autocomplete_url,
@@ -107,7 +104,7 @@ $(document)
                 groupBy: 'skupina',
                 noCache: true,
                 width: 300,
-                onSelect: function (suggestion) {
+                onSelect: function(suggestion) {
                     // vyplneni ostatnich poli formulare pomoci dat
                     data = suggestion.data;
                     $(this).parent().parent().parent().next().find("input[name$='cislo']").focus();
@@ -116,7 +113,7 @@ $(document)
             $(this).devbridgeAutocomplete().clear();
         });
 
-    // cisla autocomplete
+        // cisla autocomplete
         $("#cilovy_formular input[name$='-cislo']").each(function() {
             $(this).devbridgeAutocomplete({
                 serviceUrl: cislo_autocomplete_url,
@@ -127,7 +124,7 @@ $(document)
                 triggerSelectOnValidInput: false,
                 noCache: true,
                 width: 500,
-                formatResult:  function (suggestion, currentValue) {
+                formatResult: function(suggestion, currentValue) {
                     // zformatovani vystupu do napovedy
                     data = suggestion.data;
                     base = suggestion.value + '   -   ' + data.jmeno;
@@ -143,7 +140,7 @@ $(document)
             $(this).devbridgeAutocomplete().clear();
         });
 
-    // smaz data ze radku
+        // smaz data ze radku
         $('form .remove.red.icon.js-smaz-inputy').click(function() {
             var tr = $(this).closest('tr');
             // tr.remove();
@@ -151,4 +148,4 @@ $(document)
             tr.find('.red.pointing.label').remove();
         });
 
-});
+    });

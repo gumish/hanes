@@ -2,7 +2,7 @@
 {% load static l10n %}
 
 {% block title %}
-     IMPORT SOUBORU | {{ rocnik }}
+     IMPORT TEXTU | {{ rocnik }}
 {% endblock title %}
 
 {% block section %}section_zavody{% endblock %}
@@ -15,7 +15,7 @@
         <i class="right chevron icon divider"></i>
         <a href="{{ rocnik.get_absolute_url }}" class="section">detail ročníku</a>
         <i class="right chevron icon divider"></i>
-        <div class="active section">import souboru</div>
+        <div class="active section">import z textu</div>
     </div>
 {% endblock breadcrumb %}
 
@@ -34,20 +34,20 @@
 
 
 {% block content %}
-    <form method="POST" action="." enctype="multipart/form-data" class="ui form">
+    <form method="POST" action="." class="ui form">
         {% csrf_token %}
 
-        <div class="field {% if form.soubor.errors %}error{% endif %}">
+        <div class="field {% if form.errors %}error{% endif %}">
             <label class="underlined">
-                {{ form.soubor.label }}
-                <i class="circle help icon" title="{{ form.soubor.help_text }}"></i>
+                {{ form.text.label }}
+                <i class="circle help icon" title="{{ form.text.help_text }}"></i>
             </label>
 
-            {{ form.soubor }}
+            {{ form.text }}
 
-            {% if form.soubor.errors %}
+            {% if form.text.errors %}
                 <div class="ui red inverted segment">
-                    {{ form.soubor.errors }}
+                    {{ form.text.errors }}
                 </div>
             {% endif %}
 

@@ -2,7 +2,7 @@ import datetime
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, Max, Q
+from django.db.models import Count, Max, Q, F
 from django.urls import reverse
 
 
@@ -73,15 +73,19 @@ class Zavodnik(models.Model):
     nedokoncil = models.CharField(
         'Nedokončil', null=True, blank=True,
         choices=NEDOKONCIL, max_length=10)
-    odstartoval = models.NullBooleanField(
-        'Odstartoval', default=None,
+    odstartoval = models.BooleanField(
+        'Odstartoval', default=None, null=True,
         help_text='pouze informační hodnota od startéra, že závodník opravdu odstartoval')
     info = models.CharField('Info', max_length=256, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Závodník'
         verbose_name_plural = 'Závodníci'
-        ordering = ('rocnik', 'startovni_cas', 'cislo')
+        ordering = (
+            'rocnik',
+            'vysledny_cas',
+            F('startovni_cas').asc(nulls_last=True),
+            'cislo')
 
 
     def __str__(self):
@@ -99,23 +103,24 @@ class Zavodnik(models.Model):
         if self.pk:
             zavodnici_rocniku = zavodnici_rocniku.exclude(pk=self.pk)
 
+        ## NA PRANI 2020-06-26 VALIDACE ZRUSENA
         # zavodi tento clovek uz v tomto zavode?
-        duplicity_cloveka = (
-            zavodnici_rocniku
-            .filter(clovek=self.clovek)
-            .filter(
-                Q(kategorie=self.kategorie) |
-                Q(kategorie_temp=self.kategorie))
-            .order_by('-kategorie_temp'))
-        if duplicity_cloveka:
-            raise ValidationError({
-                'clovek':
-                    '''"{0}" již v tomto ročníku závodí<br>v kategorii "{1}"<br><br>
-                    Závodníka nelze přidat, nebo mu natvrdo přiřaďte jinou kategorii'''.format(
-                        self.clovek,
-                        duplicity_cloveka[0].kategorie_temp
-                    )
-            })
+        # duplicity_cloveka = (
+        #     zavodnici_rocniku
+        #     .filter(clovek=self.clovek)
+        #     .filter(
+        #         Q(kategorie=self.kategorie) |
+        #         Q(kategorie_temp=self.kategorie))
+        #     .order_by('-kategorie_temp'))
+        # if duplicity_cloveka:
+        #     raise ValidationError({
+        #         'clovek':
+        #             '''"{0}" již v tomto ročníku závodí<br>v kategorii "{1}"<br><br>
+        #             Závodníka nelze přidat, nebo mu natvrdo přiřaďte jinou kategorii'''.format(
+        #                 self.clovek,
+        #                 duplicity_cloveka[0].kategorie_temp
+        #             )
+        #     })
 
         # zavodi jiz toto cislo?
         if self.cislo:
@@ -164,7 +169,7 @@ class Zavodnik(models.Model):
                     .aggregate(Max('priorita'))
                     ['priorita__max'] or 0
                 )
-                clenstvi, created = Clenstvi.objects.get_or_create(
+                clenstvi, _created = Clenstvi.objects.get_or_create(
                     clovek=self.clovek,
                     klub=self.klub,
                     sport=self.rocnik.zavod.sport)
@@ -182,7 +187,7 @@ class Zavodnik(models.Model):
                         spusteni_stopek = datetime.time(0, 0, 0)
                 except:
                     spusteni_stopek = datetime.time(0, 0, 0)
-
+                # print(spusteni_stopek)
                 self.vysledny_cas = (
                     # C) CILOVY CAS 00:30:00
                     datetime.timedelta(

@@ -1,6 +1,6 @@
-import json
 from collections import OrderedDict
 from io import BytesIO
+from urllib import request
 
 from django.contrib import messages
 from django.db.models import Count, Min
@@ -12,17 +12,11 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils.text import slugify
-from django.views.generic import (
-    CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView,
-    View)
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView, View
 from django.views.generic.edit import FormView
-
-from hanes.nested_formsets import nestedformset_factory
-from kluby.models import Klub
-from lide.forms import CSVsouborFormular  # , ClovekRocnikForm
 from lide.views import _referer_do_session
-from zavodnici.forms import (StarterZavodnikForm, ZavodnikForm,
-                             ZavodnikPridaniForm)
+from zavodnici.forms import StarterZavodnikForm, ZavodnikForm, ZavodnikPridaniForm
+
 from zavody.templatetags.custom_filters import desetiny_sekundy
 
 from .forms import *
@@ -30,6 +24,7 @@ from .functions import (exportuj_kategorie, exportuj_startovku,
                         exportuj_vysledky)
 from .models import Kategorie, Rocnik, Sport, Zavod
 from .pdf import PdfPrint
+from .templatetags import custom_filters
 from .templatetags.custom_filters import desetiny_sekundy
 
 
@@ -81,7 +76,7 @@ class StartovneRocnikuDetailView(DetailView):
         }
         """
 
-        kluby = OrderedDict()  # (startovne za klub, [list kategorii[startovne kategorie, list zavodniku]])
+        kluby = OrderedDict()  # (startovne za klub, pocet zavodniku [list kategorii[startovne kategorie, list zavodniku]])
         zavod = self.object
         zavodnici = (
             zavod.zavodnici
@@ -98,8 +93,9 @@ class StartovneRocnikuDetailView(DetailView):
             kluby[klub][2].setdefault(kategorie, [0, []])
             kluby[klub][2][kategorie][0] += kategorie.startovne
             kluby[klub][2][kategorie][1].append(zavodnik)
-        context = super(StartovneRocnikuDetailView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['kluby'] = kluby
+        context['startovne_celkem'] = sum(klub[0] for klub in kluby.values())
         return context
 
 
@@ -176,7 +172,7 @@ def vysledkova_listina(request, rocnik_pk):
             'sloupce_form': sloupce_form,
             'colspan': colspan
         },
-        
+
     )
 
 
@@ -297,7 +293,7 @@ def startovni_listina(request, rocnik_pk, ordering_str='startovni_cas--cislo--vy
                 'kategorie_list': kategorie_list,
                 'nezarazeni': nezarazeni,
                 'ordering_str': ordering_str},
-            
+
         )
     else:
         return render(request,
@@ -306,7 +302,7 @@ def startovni_listina(request, rocnik_pk, ordering_str='startovni_cas--cislo--vy
                 'kategorie_list': kategorie_list_temp,
                 'nezarazeni': nezarazeni_temp,
                 'ordering_str': ordering_str},
-            
+
         )
 
 
@@ -339,7 +335,7 @@ def pridani_zavodniku(request, pk):
             'rocnik': rocnik,
             'formset': formset
         },
-        
+
     )
 
 
@@ -367,7 +363,7 @@ class StartovniCasyView(DetailView):
         - do kontextu vlozi kategorie_list rocniku
         - do instance kategorie vlozi formset
         """
-        context = super(StartovniCasyView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         kategorie_list = self.object.kategorie.all()
         self.add_nested_formset_to_kategorie(kategorie_list)
         context['kategorie_list'] = kategorie_list
@@ -446,30 +442,62 @@ def formular_startera(request, rocnik_pk, ordering_str='startovni_cas--cislo'):
             'kategorie_list': kategorie_list,
             'formset': formset
         },
-        
+
     )
 
 
-class ImportSouboruCasuTxtView(FormView):
+class ImportCasuTextView(FormView):
+    """ Vkladani casu zkopirovaneho ze stopek do textoveho pole a jeho zpracovani
+        http://play.google.com/store/apps/details?id=uk.co.dedmondson.timer.split
+
+        03:02.4 (ignorovat)
+        01:50.4 (ignorovat)
+        --------------------------------- (ignorovat)
+        3:  00:09.6   00:02.8
+        2:  00:06.7   00:01.9
+        1:  00:04.8   00:04.8
+    """
+    form_class = ImportCasuTextForm
+    template_name = 'zavody/staff/rocnik_import_casu_text.html'
+    subheader = 'import cílových časů z textu'
+
+    def get_context_data(self, **kwargs):
+        " prida do 'rocnik' a 'subheader' "
+        context = super().get_context_data(**kwargs)
+        context['rocnik'] = Rocnik.objects.get(pk=self.kwargs['rocnik_pk'])
+        context['subheader'] = self.subheader
+        return context
+
+    def form_valid(self, form):
+        " zobrazi formset s daty ze souboru "
+        self.request.session['zdrojovy_formular'] = 'zavody:import_textu_casu'
+        context = self.get_context_data()
+        context['formset'] = ImportyCilovehoCasuFormSet(initial=form.cleaned_data)
+        return render(self.request,
+            'zavody/staff/formular_importovanych_casu_txt.html', context
+        )
+
+
+class ImportCasuSouborView(FormView):
     " Importovani souboru casu z mobilu, a jeho nasledne zobrazeni do formsetu "
-    form_class = PouzeTxtSouborCasuFormular
+    form_class = ImportCasuSouborForm
     template_name = 'zavody/staff/rocnik_import_souboru.html'
     subheader = 'import cílových časů z mobilu'
 
     def get_context_data(self, **kwargs):
         " prida do 'rocnik' a 'subheader' "
-        context = super(ImportSouboruCasuTxtView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['rocnik'] = Rocnik.objects.prefetch_related('zavodnici').get(pk=self.kwargs['rocnik_pk'])
         context['subheader'] = self.subheader
         return context
 
     def form_valid(self, form):
         " zobrazi formset s daty ze souboru "
+        self.request.session['zdrojovy_formular'] = 'zavody:import_souboru_casu_txt'
         context = self.get_context_data()
         context['formset'] = ImportyCilovehoCasuFormSet(initial=form.cleaned_data)
-        return render(request,
-            'zavody/staff/formular_importovanych_casu_txt.html', context,
-            context_instance=RequestContext(self.request)
+        return render(self.request,
+            'zavody/staff/formular_importovanych_casu_txt.html', context
         )
 
 
@@ -502,7 +530,8 @@ class ZpracovaniImportovanychCasuTxtView(View):
                 success_message += '<br>- #{}: {}'.format(zavodnik.cislo, desetiny_sekundy(zavodnik.cilovy_cas))
             messages.success(self.request, success_message, extra_tags='safe')
 
-            return HttpResponseRedirect(reverse('zavody:import_souboru_casu_txt', args=[rocnik.id]))
+            return HttpResponseRedirect(
+                reverse(self.request.session['zdrojovy_formular'], args=[rocnik.id]))
 
         else:
             context = {
@@ -510,8 +539,7 @@ class ZpracovaniImportovanychCasuTxtView(View):
                 'formset': formset
             }
             return render(request,
-                'zavody/staff/formular_importovanych_casu_txt.html', context,
-                context_instance=RequestContext(self.request)
+                'zavody/staff/formular_importovanych_casu_txt.html', context
             )
 
 
@@ -539,7 +567,7 @@ def cilovy_formular(request, rocnik_pk):
             'rocnik': Rocnik.objects.prefetch_related('zavodnici').get(pk=rocnik_pk),
             'formset': formset
         },
-        
+
     )
 
 
@@ -573,7 +601,7 @@ def kategorie_export(request, rocnik_pk):
 def sport_autocomplete(request):
     vysledek = []
     if 'query' in request.GET:
-        query = slugify(request.GET['query'].encode('utf8'))
+        query = slugify(request.GET['query'])
         sporty = Sport.objects.filter(slug__contains=query).values_list('nazev', flat=True)
         for sport in sporty:
             vysledek.append({'value': sport})
@@ -585,7 +613,7 @@ def sport_autocomplete(request):
 def zavod_autocomplete(request):
     vysledek = []
     if 'query' in request.GET:
-        query = slugify(request.GET['query'].encode('utf8'))
+        query = slugify(request.GET['query'])
         zavody = Zavod.objects.filter(slug__contains=query)
         for zavod in zavody:
             vysledek.append({
@@ -595,10 +623,11 @@ def zavod_autocomplete(request):
         json.dumps({'suggestions': vysledek}),
         content_type='application/json')
 
-TITLE_TEMPLATE = '{0.znacka} - {0.nazev} &nbsp;&nbsp; nar. {1[0]}-{1[1]} &nbsp;&nbsp; trať: {0.delka_trate}'
+TITLE_TEMPLATE = '{0.znacka} - {0.nazev} &nbsp;&nbsp; {1} &nbsp;&nbsp; trať: {0.delka_trate}'
 
 
 def vysledky_kategorie_PDF(request, kategorie_pk):
+
     kategorie = Kategorie.objects.get(pk=kategorie_pk)
     rows = []
     widths = [1.2, 1.2, 3, 2.5, 1.5, 5, 2.3, 2.3, 1.5]
@@ -618,7 +647,10 @@ def vysledky_kategorie_PDF(request, kategorie_pk):
     right_aligned = [0, 1, 8]
     pdf = pdf_print.sheet(
         [{
-            'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),
+            'title': TITLE_TEMPLATE.format(
+                kategorie,
+                custom_filters.rozsah_narozeni(kategorie.rozsah_narozeni())
+            ),
             'headers': ([
                 'poř.', 'číslo', 'příjmení', 'jméno', 'nar.', 'klub',
                 'výsledný čas', 'časová ztráta', 'na trati'],),
@@ -632,25 +664,30 @@ def vysledky_rocnik_PDF(request, rocnik_pk):
     pdf_print = PdfPrint(BytesIO())
     tables = []
     for kategorie in rocnik.kategorie.all():
-        rows = []
-        for zavodnik in kategorie.serazeni_zavodnici(razeni=None):
-            rows.append([
-                zavodnik.poradi_v_kategorii() or '',
-                zavodnik.cislo or '',
-                zavodnik.clovek.prijmeni,
-                zavodnik.clovek.jmeno,
-                zavodnik.clovek.narozen,
-                zavodnik.klub.nazev if zavodnik.klub else '',
-                zavodnik.nedokoncil or desetiny_sekundy(zavodnik.vysledny_cas),
-                desetiny_sekundy(zavodnik.casova_ztrata) or '',
-                zavodnik.poradi_na_trati() or ''
-                ])
-        tables.append({
-            'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),
-            'headers': ([
-                'poř.', 'číslo', 'příjmení', 'jméno', 'nar.', 'klub',
-                'výsledný čas', 'časová ztráta', 'na trati'],),
-            'rows': rows})
+        serazeni_zavodnici = kategorie.serazeni_zavodnici(razeni=None)
+        if serazeni_zavodnici:
+            rows = []
+            for zavodnik in serazeni_zavodnici:
+                rows.append([
+                    zavodnik.poradi_v_kategorii() or '',
+                    zavodnik.cislo or '',
+                    zavodnik.clovek.prijmeni,
+                    zavodnik.clovek.jmeno,
+                    zavodnik.clovek.narozen,
+                    zavodnik.klub.nazev if zavodnik.klub else '',
+                    zavodnik.nedokoncil or desetiny_sekundy(zavodnik.vysledny_cas),
+                    desetiny_sekundy(zavodnik.casova_ztrata) or '',
+                    zavodnik.poradi_na_trati() or ''
+                    ])
+            tables.append({
+                'title': TITLE_TEMPLATE.format(
+                    kategorie,
+                    custom_filters.rozsah_narozeni(kategorie.rozsah_narozeni())
+                ),
+                'headers': ([
+                    'poř.', 'číslo', 'příjmení', 'jméno', 'nar.', 'klub',
+                    'výsledný čas', 'časová ztráta', 'na trati'],),
+                'rows': rows})
 
     widths = [1.2, 1.2, 3, 2.5, 1.5, 5, 2.3, 2.3, 1.5]
     right_aligned = [0, 1, 8]
@@ -684,7 +721,10 @@ def startovka_kategorie_PDF(request, kategorie_pk):
     pdf_print = PdfPrint(BytesIO())
     pdf = pdf_print.sheet(
         [{
-            'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),
+            'title': TITLE_TEMPLATE.format(
+                kategorie,
+                custom_filters.rozsah_narozeni(kategorie.rozsah_narozeni())
+            ),
             'headers': (['číslo', 'příjmení', 'jméno', 'nar.', 'klub', 'startovní čas'],),
             'rows': rows}],
         widths)
@@ -696,33 +736,38 @@ def startovka_rocnik_PDF(request, rocnik_pk):
     pdf_print = PdfPrint(BytesIO())
     tables = []
     for kategorie in rocnik.kategorie.all():
-        rows = []
-        widths = [1.5, 3, 2.7, 1.5, 6, 3]
-        for zavodnik in kategorie.serazeni_zavodnici(razeni='startovni_cas--cislo', ignoruj_nedokoncil=True):
-            if not zavodnik.nedokoncil:
-                rows.append([
-                        zavodnik.cislo or '',
-                        zavodnik.clovek.prijmeni,
-                        zavodnik.clovek.jmeno,
-                        zavodnik.clovek.narozen,
-                        zavodnik.klub.nazev if zavodnik.klub else '',
-                        zavodnik.startovni_cas or '-',
-                    ])
-            else:
-                rows.append([
-                        zavodnik.cislo or '',
-                        '',
-                        '',
-                        '',
-                        '',
-                        '{} | {}'.format(
-                            zavodnik.startovni_cas or '-', zavodnik.nedokoncil
-                        )
-                    ])
-        tables.append({
-            'title': TITLE_TEMPLATE.format(kategorie, kategorie.rozsah_narozeni()),
-            'headers': (['číslo', 'příjmení', 'jméno', 'nar.', 'klub', 'startovní čas'],),
-            'rows': rows})
+        serazeni_zavodnici = kategorie.serazeni_zavodnici(razeni='startovni_cas--cislo', ignoruj_nedokoncil=True)
+        if serazeni_zavodnici:
+            rows = []
+            widths = [1.5, 3, 2.7, 1.5, 6, 3]
+            for zavodnik in serazeni_zavodnici:
+                if not zavodnik.nedokoncil:
+                    rows.append([
+                            zavodnik.cislo or '',
+                            zavodnik.clovek.prijmeni,
+                            zavodnik.clovek.jmeno,
+                            zavodnik.clovek.narozen,
+                            zavodnik.klub.nazev if zavodnik.klub else '',
+                            zavodnik.startovni_cas or '-',
+                        ])
+                else:
+                    rows.append([
+                            zavodnik.cislo or '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '{} | {}'.format(
+                                zavodnik.startovni_cas or '-', zavodnik.nedokoncil
+                            )
+                        ])
+            tables.append({
+                'title': TITLE_TEMPLATE.format(
+                    kategorie,
+                    custom_filters.rozsah_narozeni(kategorie.rozsah_narozeni())
+                ),
+                'headers': (['číslo', 'příjmení', 'jméno', 'nar.', 'klub', 'startovní čas'],),
+                'rows': rows})
 
     pdf = pdf_print.sheet(tables, widths)
     return HttpResponse(pdf, content_type='application/pdf')

@@ -93,6 +93,8 @@ def clovek_update(request, slug):
             else:
                 # pokud byl klub smazan a nebyl urcen novy klub clenum, pak presmeruj na seznam klubu
                 return HttpResponseRedirect(reverse('lide:lide_list'))
+        else:
+            messages.error(request, 'Chyba ve formuláři!!')
     else:
         if not request.session.get('smazano', None):
         # if 'smazano' not in request.session or not request.session['smazano']:
@@ -130,7 +132,7 @@ def clovek_autocomplete(request, rocnik_pk=None):
         rocnik = Rocnik.objects.get(pk=rocnik_pk)
     if 'query' in request.GET:
         # query rozdeli na dle mezery na prijmeni a jmeno 
-        query = slugify(request.GET['query'].encode('utf8')).split('-')
+        query = slugify(request.GET['query']).split('-')
         lide = Clovek.objects.filter(prijmeni_slug__startswith=query[0])
         if len(query) > 1:
             lide = lide.filter(jmeno_slug__startswith=query[1])

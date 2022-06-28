@@ -16,13 +16,14 @@ def _format_hanes_time(value):
 # -------------
 class CustomTimeInput(forms.TimeInput):
     'Trida pro zaokrouhleni mikrosekund puvodniho `TimeInput` na destiny sekund'
+    supports_microseconds = True
 
     def __init__(self, *args, **kwargs):
-        super(CustomTimeInput, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.format = '%H:%M:%S,%f'
 
-    def _format_value(self, value):
-        value = super(CustomTimeInput, self)._format_value(value)
+    def format_value(self, value):
+        value = super().format_value(value)
         value = desetiny_sekundy(value)
         return value
 

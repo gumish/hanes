@@ -15,14 +15,18 @@ def _string_to_ordering_kwargs(razeni='', ignoruj_nedokoncil=False):
         ignoruj_nedokoncil (bool): zruseni zarazovani DNS na konec
     Returns:
         ordering_kwargs (dict): slovnik pouzity dale u query
+            'prvni': prvni polozky v budoucim 'order_by'
+            'count': dalsi polozky 'order_by', ktere pokud budou prazdne, tak se budou radit na konec
+            'razeni': posledni polozky, ktere se pouze pripoji na konec
     """
-    if not ignoruj_nedokoncil:  # neignoruj nedokoncil - normal
+    # TODO: vyuzit from django.db.models import F | .order_by(F('price').desc(nulls_last=True))
+    if not ignoruj_nedokoncil:  # normalni razeni - neignoruje nedokoncil
         ordering_kwargs = {
-            'prvni': ['nedokoncil'],
-            'count': ['-vysledny_cas'],
+            'prvni': ['nedokoncil'],  # None jde na zacatek
+            'count': ['-vysledny_cas', 'startovni_cas'],
             'razeni': ['vysledny_cas', 'startovni_cas', 'cislo']
         }
-    else:
+    else:  # ignoruje diskvalifikace, radi jen podle casu
         ordering_kwargs = {
             'prvni': [],
             'count': [],
@@ -146,9 +150,12 @@ class Rocnik(models.Model):
         return zpravy
 
     def kategorie_list(self, razeni=None, ignoruj_nedokoncil=False):
+        """ Vrati list kategorii [(kategorie, zavodidnici), ...] """
         kategorie_list = []
         for kategorie in self.kategorie.all():
-            kategorie_list.append([kategorie, kategorie.serazeni_zavodnici(razeni, ignoruj_nedokoncil)])
+            kategorie_list.append(
+                (kategorie, kategorie.serazeni_zavodnici(razeni, ignoruj_nedokoncil))
+            )
         return kategorie_list
 
     def nezarazeni(self, razeni=''):
@@ -192,10 +199,10 @@ class Kategorie(models.Model):
         null=True, blank=True)
     vek_od = models.SmallIntegerField(
         'Věk od', null=True, blank=True,
-        help_text='věk závodníka včetně')
+        help_text='věk závodníka včetně, pokud není vyplněn bere se jako 0')
     vek_do = models.SmallIntegerField(
         'Věk do', null=True, blank=True,
-        help_text='věk závodníka včetně')
+        help_text='věk závodníka včetně, pokud není vyplněn bere se jako neomezený! (nepsat zbytečně 100 atd.)')
     atributy = models.ManyToManyField(
         'lide.Atribut', verbose_name='Požadované atributy člověka', blank=True
         # null=True,
@@ -238,12 +245,19 @@ class Kategorie(models.Model):
         return reverse('zavody:kategorie_detail', args=(self.id,))
 
     def rozsah_narozeni(self):
+        """ vrati tuple roku narozeni
+            pokud neni vek vyplnen vrati 0 nebo aktualni rok
+        """
         rok = self.rocnik.datum.year
         # korekce pro sezonu zari-duben
         if self.rocnik.zavod.korekce_sezony:
             rok += 1
+        if self.vek_do:
+            rok_od = rok - self.vek_do
+        else:
+            rok_od = 0
         return (
-            rok - (self.vek_do or 200),
+            rok_od,
             min((rok - (self.vek_od or 0), date.today().year))
         )
 
@@ -290,6 +304,7 @@ class Kategorie(models.Model):
         annotate_kwargs = {}
         ordering_kwargs = _string_to_ordering_kwargs(razeni, ignoruj_nedokoncil)
         vysledne_razeni = ordering_kwargs['prvni']
+        # print(ordering_kwargs['count'])
         for i in ordering_kwargs['count']:
             actual = i + '_value'
             annotate_kwargs[actual.strip('-')] = Count(i.strip('-'))  # pomoci annotate Count, se radi prazdna pole na konec (null_value = 1 / 0)

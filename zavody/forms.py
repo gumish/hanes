@@ -15,7 +15,40 @@ from zavodnici.custom_fields import CustomTimeField
 # FORMS
 # -----
 
-class PouzeTxtSouborCasuFormular(forms.Form):
+class ImportCasuTextForm(forms.Form):
+    text =  forms.CharField(
+        label='text',
+        help_text='''
+            příklad:
+            03:02.4 (ignorováno)
+            01:50.4 (ignorováno)
+            --------------------------------- (ignorováno)
+            3:  00:09.6   00:02.8
+            2:  00:06.7   00:01.9
+            1:  00:04.8   00:04.8''',
+        required=True,
+        widget=forms.Textarea()
+    )
+
+    def clean(self):
+        """ Zpracuje formular do podoby:
+            [{'cilovy_cas':'0:30:00', 'cislo': ''}, ..]
+        """
+        result = []
+        text_list = self.cleaned_data['text'].split('\n')
+        text_list.reverse()
+        for radek in text_list:
+            if radek.startswith('---'):
+                break
+            radek_list = radek.split()
+            result.append({
+                'cilovy_cas': radek_list[1],
+                'cislo': ''
+            })
+        return result
+
+
+class ImportCasuSouborForm(forms.Form):
     soubor = forms.FileField(
         label='soubor *.txt',
         help_text='soubor s výslednými časy z mobilní aplikace',
@@ -23,6 +56,9 @@ class PouzeTxtSouborCasuFormular(forms.Form):
         widget=forms.FileInput(attrs={'accept': '.txt'}))
 
     def clean(self):
+        """ Zpracuje formular do podoby:
+            [{'cilovy_cas':'0:30:00', 'cislo': '12'}, ..]
+        """
         result = []
         soubor = self.cleaned_data['soubor']
         csvreader = csv.reader(soubor, delimiter='\t')

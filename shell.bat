@@ -1,1 +1,0 @@
-..\virtualenv\Scripts\python.exe manage.py shell

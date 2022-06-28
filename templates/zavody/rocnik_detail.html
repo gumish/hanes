@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load l10n %}
+{% load l10n custom_filters %}
 
 {% block title %}
     DETAIL ROČNÍKU | {{ rocnik }}
@@ -84,7 +84,11 @@
                     </a>
                     <a href="{% url 'zavody:import_souboru_casu_txt' rocnik.id %}" title="import časů txt z mobilní aplikace" class="item">
                         <i class="mobile icon"></i>
-                        import časů z mobilu
+                        import časů ze souboru
+                    </a>
+                    <a href="{% url 'zavody:import_textu_casu' rocnik.id %}" title="import časů z textu mobilní aplikace" class="item">
+                        <i class="mobile icon"></i>
+                        import časů z textu
                     </a>
                 {% endif %}
             </div>
@@ -175,7 +179,7 @@
                             <td>
                                 {{ kategorie.vek_od|default:0 }} - {{ kategorie.vek_do|default:'starší' }}
                             </td>
-                            <td>{{ kategorie.rozsah_narozeni.0|unlocalize }} - {{ kategorie.rozsah_narozeni.1|unlocalize }}</td>
+                            <td>{{ kategorie.rozsah_narozeni|rozsah_narozeni }}</td>
                             <td>
                                 {% if kategorie.atributy.all.exists %}
                                     <ul>
