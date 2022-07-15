@@ -28,4 +28,4 @@ class ClovekAdmin(admin.ModelAdmin):
 
 admin.site.register(Clovek, ClovekAdmin)
 admin.site.register(Atribut)
-# admin.site.register(Clenstvi)
+admin.site.register(Clenstvi)

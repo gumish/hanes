@@ -1,6 +1,7 @@
 
 import csv
 from datetime import datetime
+from io import TextIOWrapper
 
 from django.utils.text import slugify
 from kluby.models import Klub
@@ -13,9 +14,10 @@ from .templatetags.custom_filters import desetiny_sekundy
 
 
 def _csv_reader(soubor):
-    csv_reader = csv.reader(soubor, delimiter=';')
+    soubor_text = TextIOWrapper(soubor, encoding='windows-1250')
+    csv_reader = csv.reader(soubor_text, delimiter=';')
     for row in csv_reader:
-        yield [cell.decode('windows-1250').strip() for cell in row]
+        yield [cell.strip() for cell in row]
 
 def _pohlavi(slovo):
     "preklada muzi/zeny"
@@ -33,14 +35,15 @@ def kategorie_import(soubor):
     chyby = []
     kategorie_list = []
     for i, radek in enumerate(_csv_reader(soubor), start=1):
+        print(radek)
         if i >= 5:
             try:
                 kategorie = Kategorie(
                     nazev=radek[0],
                     znacka=radek[1],
                     pohlavi=radek[2],
-                    vek_od=int(radek[3]),
-                    vek_do=int(radek[4]),
+                    vek_od=int(radek[3]) if radek[3] else None,
+                    vek_do=int(radek[4]) if radek[4] else None,
                     delka_trate=radek[5],
                     startovne=(radek[6] if radek[6] else 0) or 0,
                 )

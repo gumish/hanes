@@ -18,6 +18,7 @@ class KategorieAdmin(admin.ModelAdmin):
     model = Kategorie
     list_display = ('nazev', 'znacka', 'pohlavi', 'vek_od', 'vek_do', 'delka_trate', 'rocnik', 'poradi')
     list_filter = ('pohlavi',)
+    search_fields = ['rocnik__nazev', 'rocnik__zavod__nazev', 'nazev']
 
 
 class ZavodAdmin(admin.ModelAdmin):

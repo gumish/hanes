@@ -1,6 +1,6 @@
 
 import csv
-from lide.models import Clenstvi
+from io import TextIOWrapper
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 
@@ -36,9 +36,10 @@ def _clean_radek(i, radek):
 def clean_lide_import_csv(soubor):
 
     def _csv_reader(soubor):
-        csv_reader = csv.reader(soubor, delimiter=';')
+        soubor_text = TextIOWrapper(soubor, encoding='windows-1250')
+        csv_reader = csv.reader(soubor_text, delimiter=';')
         for row in csv_reader:
-            yield [cell.decode('windows-1250').strip() for cell in row]
+            yield [cell.strip() for cell in row]
 
     radky = []
     chyby = []

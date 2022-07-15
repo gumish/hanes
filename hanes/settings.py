@@ -60,7 +60,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    'hanes.middleware.ExceptionLoggingMiddleware'
+    # 'hanes.middleware.ExceptionLoggingMiddleware'
 ]
 
 ROOT_URLCONF = 'hanes.urls'
