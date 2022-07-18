@@ -19,13 +19,6 @@
                 <div class="column">
                     {{ kategorie.delka_trate|default:'-' }}
                 </div>
-                <div class="three wide column" title="požadované vlastnosti závodníka">
-                    {% if kategorie.atributy.all.exists %}
-                        {% for attr in kategorie.atributy.all %}
-                            {{ attr.nazev }}{% if not forloop.last %}, {% endif %}
-                        {% endfor %}
-                    {% endif %}
-                </div>
                 <div class="three wide column right aligned">
                     <span class="users-count" title="počet závodníků v kategorii">
                         {{ zavodnici|length }}

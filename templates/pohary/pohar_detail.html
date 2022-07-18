@@ -84,11 +84,6 @@
                 <th>název kategorie</th>
                 <th>pohlaví</th>
                 <th>věk</th>
-                <th>
-                    vlastnosti
-                    <i class="help circle icon"
-                        title="požadované vlastnosti na závodníka"></i>
-                </th>
                 <th>závodníků</th>
             </tr>
         </thead>
@@ -108,17 +103,6 @@
                     </td>
                     <td title="narozeni v rozmezí: {{ kategorie.rozsah_narozeni.0|unlocalize }} - {{ kategorie.rozsah_narozeni.1|unlocalize }}">
                         {{ kategorie.vek_od|default:0 }} - {{ kategorie.vek_do|default:'starší' }}
-                    </td>
-                    <td>
-                        {% if kategorie.atributy.all.exists %}
-                            <ul>
-                                {% for attr in kategorie.atributy.all %}
-                                    <li>
-                                        {{ attr.nazev }}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
                     </td>
                     <td>
                         {{ kategorie.zavodnici|length }}

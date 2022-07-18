@@ -17,7 +17,7 @@
             Přidání ročníku
             <div class="sub header">{{ zavod }}</div>
         </div>
-    </h1>    
+    </h1>
 {% endblock header %}
 
 {% block staff %}
@@ -30,7 +30,7 @@
             <h3>Formulář nového ročníku</h3>
             <form method="POST" action="." enctype="multipart/form-data" class="ui form">
                 {% csrf_token %}
-                
+
                 {% for field in form %}
                     {% include "elements/_form_error_field.html" with label=True help=True required=True %}
                 {% endfor %}
@@ -42,8 +42,8 @@
                 <a href="{{ zavod.get_absolute_url }}" title="neuložit a zpět" class="ui icon button">
                     <i class="ui reply mail icon"></i>
                     zrušit
-                </a>           
-            </form>           
+                </a>
+            </form>
         </div>
 
         <div class="ui eight wide column">
@@ -67,11 +67,6 @@
                             <th>název kategorie</th>
                             <th>pohlaví</th>
                             <th>věk</th>
-                            <th>
-                                vlastnosti
-                                <i class="help circle icon"
-                                    title="požadované vlastnosti na závodníka"></i>
-                            </th>
                             <th>délka[m]</th>
                         </tr>
                     </thead>
@@ -91,23 +86,12 @@
                                     {{ kategorie.vek_od|default:0 }} - {{ kategorie.vek_do|default:'starší' }}
                                 </td>
                                 <td>
-                                    {% if kategorie.atributy.all.exists %}
-                                        <ul>
-                                            {% for attr in kategorie.atributy.all %}
-                                                <li>
-                                                    {{ attr.nazev }}    
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                    {% endif %}                        
-                                </td>
-                                <td>
                                     {{ kategorie.delka_trate }}
                                 </td>
                             </tr>
                         {% endfor %}
                     </tbody>
-                </table>            
+                </table>
             {% else %}
                 závod nemá žádný předchozí ročník
             {% endif %}

@@ -41,12 +41,6 @@ class Clovek(models.Model):
         choices=POHLAVI,
         null=True, blank=True)
     narozen = models.PositiveSmallIntegerField('Narozen(a)')
-    atributy = models.ManyToManyField(
-        'Atribut',
-        verbose_name='Atributy člověka',
-        # null=True,
-        blank=True
-        )
     jmeno_slug = models.SlugField(editable=False, unique=False, blank=True)
     prijmeni_slug = models.SlugField(editable=False, unique=False, blank=True)
     slug = models.SlugField(db_index=True, unique=True, blank=True)
@@ -118,23 +112,6 @@ class Clovek(models.Model):
 
         from kluby.models import Klub
         return set(Klub.objects.filter(clenstvi__clovek=self))
-
-
-class Atribut(models.Model):
-
-    """ Vlastnost cloveka,
-    dle ktere muze byt specialne kategorizovan
-    """
-
-    nazev = models.CharField('Název atributu', max_length=30, unique=True)
-    info = models.TextField('Info', null=True, blank=True)
-
-    class Meta:
-        verbose_name = 'Atribut člověka'
-        verbose_name_plural = 'Atributy lidí'
-
-    def __str__(self):
-        return self.nazev
 
 
 class Clenstvi(models.Model):

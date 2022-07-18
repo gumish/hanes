@@ -152,11 +152,6 @@
                         <th>pohlaví</th>
                         <th>věk</th>
                         <th>ročník</th>
-                        <th>
-                            vlastnosti
-                            <i class="help circle icon"
-                                title="požadované vlastnosti na závodníka"></i>
-                        </th>
                         <th>délka[m]</th>
                         <th>startovné</th>
                         <th>závodníků</th>
@@ -180,17 +175,6 @@
                                 {{ kategorie.vek_od|default:0 }} - {{ kategorie.vek_do|default:'starší' }}
                             </td>
                             <td>{{ kategorie.rozsah_narozeni|rozsah_narozeni }}</td>
-                            <td>
-                                {% if kategorie.atributy.all.exists %}
-                                    <ul>
-                                        {% for attr in kategorie.atributy.all %}
-                                            <li>
-                                                {{ attr.nazev }}
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
-                            </td>
                             <td>
                                 {{ kategorie.delka_trate }}
                             </td>

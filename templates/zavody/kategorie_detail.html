@@ -71,15 +71,6 @@
                     <dt>pohlaví závodníků</dt>
                     <dd>{{ kategorie.get_pohlavi_display|default:'unisex' }}</dd>
                     <dt>požadované vlastnosti závodníků</dt>
-                    <dd>
-                        {% if kategorie.atributy.all.exists %}
-                            {% for attr in kategorie.atributy.all %}
-                                {{ attr.nazev }}{% if not forloop.last %}, {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </dd>
                     <dt>délka tratě</dt>
                     <dd>{{ kategorie.delka_trate|default:'-' }}</dd>
                     <dt>počet závodníků:</dt>

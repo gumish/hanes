@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.db.models import Count
 
-from .models import Clovek, Clenstvi, Atribut
+from .models import Clovek, Clenstvi
 
 
 class ClenstviInline(admin.TabularInline):
@@ -12,7 +12,7 @@ class ClenstviInline(admin.TabularInline):
 
 class ClovekAdmin(admin.ModelAdmin):
     list_display = ('prijmeni', 'jmeno', 'narozen', 'pohlavi', 'slug', 'pocet_zavodu')
-    list_filter = ('pohlavi', 'atributy')
+    list_filter = ('pohlavi',)
     search_fields = ['prijmeni', 'jmeno', 'clenstvi__klub__nazev']
     inlines = [ClenstviInline]
 
@@ -27,5 +27,4 @@ class ClovekAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Clovek, ClovekAdmin)
-admin.site.register(Atribut)
 admin.site.register(Clenstvi)

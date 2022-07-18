@@ -22,10 +22,8 @@ class ClovekUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Clovek
-        fields = ('prijmeni', 'jmeno', 'pohlavi', 'narozen', 'atributy')
-        widgets = {
-            'atributy': forms.SelectMultiple(attrs={'class': 'dropdown'})
-        }
+        fields = ('prijmeni', 'jmeno', 'pohlavi', 'narozen')
+
 
     def __init__(self, *arg, **kwargs):
         super().__init__(*arg, **kwargs)

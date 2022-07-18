@@ -39,13 +39,6 @@
                         {{ kategorie.rozsah_narozeni|rozsah_narozeni }}
                     </th>
                     <th>
-                        {% if kategorie.atributy.all.exists %}
-                            {% for attr in kategorie.atributy.all %}
-                                {{ attr.nazev }}{% if not forloop.last %}, {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    </th>
-                    <th>
                         {{ kategorie.get_pohlavi_display|default:'unisex' }}
                     </th>
                     <th colspan="10">

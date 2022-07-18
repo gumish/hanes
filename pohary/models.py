@@ -73,7 +73,7 @@ class Pohar(models.Model):
     def zavodnici_bez_kategorie(self):
         """
         Musi byt volano az po kategoriich,
-        tak aby se nejprve naplnil atribut 'Pohar.zavodnici_s_kategorii' !!
+        tak aby se nejprve naplnila vlastnost 'Pohar.zavodnici_s_kategorii' !!
         """
         return set(list(self.zavodnici_vsichni())) - set(self.zavodnici_s_kategorii)
 
@@ -100,10 +100,6 @@ class KategoriePoharu(models.Model):
         help_text='věk závodníka včetně')
     poradi = models.SmallIntegerField(
         'Pořadí', null=True, blank=True)
-
-    atributy = models.ManyToManyField(
-        'lide.Atribut', verbose_name='Požadované atributy člověka', blank=True
-        )
     zavodu = models.SmallIntegerField(
         'Počet nejlepších výsledků',
         help_text='počet nejlepších závodů jež budou započítany,\
@@ -147,7 +143,7 @@ class KategoriePoharu(models.Model):
         """
         Prefiltruje vsechny zavodniky 'Poharu' a vrati pouze ty, co patri do 'KategoriePoharu'.
         Pokud je vhodny, pak je zarazen do vysledneho listu,
-        a je pridan do listu atributu 'Pohar.zavodnici_s_kategorii'
+        a je pridan do listu vlastnosti 'Pohar.zavodnici_s_kategorii'
 
         Returns:
             zarazeni(list) - list zavodniku kategorie serazene dle zavodu/vysledneho_casu

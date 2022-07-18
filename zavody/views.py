@@ -126,7 +126,6 @@ class KategorieUpdateView(UpdateView):
         'pohlavi',
         'vek_od',
         'vek_do',
-        'atributy',
         'delka_trate',
         'poradi',
         'spusteni_stopek',

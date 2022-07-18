@@ -52,18 +52,6 @@
                 <dd>{{ clovek.get_pohlavi_display }}</dd>
                 <dt>Narozen{% if clovek.pohlavi == 'z' %}a{% endif %}</dt>
                 <dd>{{ clovek.narozen|unlocalize }}</dd>
-                <dt>Vlastnosti</dt>
-                <dd>
-                    {% if clovek.atributy.all %}
-                        <ul>
-                            {% for atr in clovek.atributy.all %}
-                                <li>{{ atr }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        -
-                    {% endif %}
-                </dd>
                 <dt>Kluby</dt>
                 <dd>
                     {% with clovek.jednotlive_kluby as kluby %}

@@ -126,13 +126,8 @@ class Rocnik(models.Model):
         return self.misto or self.zavod.misto
 
     def rozkategorizovat_zavodniky(self):
-        def _kategorie_sorter(kategorie):
-            return kategorie.atributy.all().count()
 
         kategorie = list(self.kategorie.all())
-        # srovnani kategorii dle dulezitosti pri rozdleovani zavodniku
-        kategorie.sort(key=_kategorie_sorter)
-        kategorie.reverse()
         nezarazeni = list(self.zavodnici.all())
         duplikati = set()
         zpravy = []
@@ -173,11 +168,6 @@ def kategorie_test_cloveka(kategorie, zavodnik, narozeni):
         if kategorie.pohlavi:
             if zavodnik.clovek.pohlavi != kategorie.pohlavi:
                 vhodny = False
-        if kategorie.atributy:
-            atributy_cloveka = zavodnik.clovek.atributy.all()
-            for attr in kategorie.atributy.all():
-                if attr not in atributy_cloveka:
-                    vhodny = False
         return vhodny
     else:
         return False
@@ -203,10 +193,6 @@ class Kategorie(models.Model):
     vek_do = models.SmallIntegerField(
         'Věk do', null=True, blank=True,
         help_text='věk závodníka včetně, pokud není vyplněn bere se jako neomezený! (nepsat zbytečně 100 atd.)')
-    atributy = models.ManyToManyField(
-        'lide.Atribut', verbose_name='Požadované atributy člověka', blank=True
-        # null=True,
-        )
     delka_trate = models.CharField(
         'Délka tratě', null=True, blank=True, max_length=20)
     rocnik = models.ForeignKey(
