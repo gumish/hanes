@@ -7,6 +7,12 @@ from django.utils.safestring import mark_safe
 
 register = template.Library()
 
+@register.filter
+def include_if_exists(template_name):
+    try:
+        return template.loader.get_template(template_name).render()
+    except template.TemplateDoesNotExist:
+        return f'{template_name} neexistuje'
 
 @register.filter
 def desetiny_sekundy(val):

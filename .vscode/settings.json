@@ -1,5 +1,4 @@
 {
-    "python.pythonPath": "_virtenv\\Scripts\\python.exe",
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
     "files.exclude": {
@@ -13,5 +12,8 @@
         "**/_BACKUP_": true,
         "**/_import": true,
         "**/_sablony": true
+    },
+    "emmet.includeLanguages": {
+        "django-html": "html"
     }
 }

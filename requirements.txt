@@ -11,12 +11,12 @@ flup==1.0.3
 isort==5.10.1
 lazy-object-proxy==1.7.1
 mccabe==0.7.0
-Pillow==9.1.1
+Pillow
 platformdirs==2.5.2
-pylint==2.14.3
-pylint-django==2.5.3
-pylint-plugin-utils==0.7
-reportlab==3.6.10
+pylint
+pylint-django
+pylint-plugin-utils
+reportlab==3.6.12
 six==1.16.0
 sqlparse==0.4.2
 tomli==2.0.1

@@ -10,6 +10,12 @@ from .forms import *
 from zavody.templatetags.custom_filters import desetiny_sekundy
 from lide.views import _referer_do_session
 
+def is_ajax(request):
+    """ pomocna fce nahrazuji depredecated self.request.is_ajax()
+    """
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+
+
 # FORMs
 def editace_zavodnika(request, zavodnik_pk):
     zavodnik = Zavodnik.objects.get(pk=zavodnik_pk)
@@ -33,7 +39,7 @@ def editace_zavodnika(request, zavodnik_pk):
             'rocnik': rocnik,
             'form': form
         },
-        
+
     )
 
 
@@ -75,13 +81,13 @@ class ZavodnikUpdateView(UpdateView):
 
     def form_invalid(self, form):
         response = super(ZavodnikUpdateView, self).form_invalid(form)
-        if self.request.is_ajax():
+        if is_ajax(self.request):
             return JsonResponse(form.errors, status=400)
         else:
             return response
 
     def form_valid(self, form):
-        if self.request.is_ajax():
+        if is_ajax(self.request):
             zavodnik = form.save()
             html = render_to_string(
                 'zavody/staff/_startovka_zavodnik_form.html',

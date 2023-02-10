@@ -1,4 +1,4 @@
-{% load i18n static %}
+{% load i18n static custom_filters %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
@@ -30,7 +30,9 @@
 <body id="{% block section %}section_uvod{% endblock %}" class="{% block body_class %}{% endblock %}">
 
     <div class="ui blue inverted stackable menu" id="main_menu">
-        <div class="header item" id="menu_uvod" title="{% include 'git_sha.txt' %} - {% include 'git_msg.txt' %}">
+        <div class="header item" id="menu_uvod"
+            title="{{ 'git_sha.txt'|include_if_exists }} - {{ 'git_msg.txt'|include_if_exists }}"
+        >
             <a href="{% url 'uvod' %}">
                 <i class="icon sun"></i>HANES 1.0
             </a>
