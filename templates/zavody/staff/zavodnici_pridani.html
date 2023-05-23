@@ -51,8 +51,7 @@
     <form autocomplete="off" action="" method="POST" id="zavodnici_forms" class="ui {% if formset.errors %}error{% endif %} form">
         {% if formset.non_form_errors %}
             <div class="ui error message">
-                {{ formsets.0.non_form_errors }}
-                {{ formsets.1.non_form_errors }}
+                {{ formset.non_form_errors.as_ul }}
             </div>
         {% endif %}
         <table class="ui unstackable celled table">

@@ -1,4 +1,5 @@
 
+from datetime import date
 from django import forms
 
 
@@ -15,7 +16,7 @@ class ZavodnikPridaniForm(forms.ModelForm):
     prijmeni = forms.CharField(label='Příjmení')
     jmeno = forms.CharField(label='Jméno')
     pohlavi = forms.ChoiceField(label='Pohlaví', choices=POHLAVI, required=False)
-    narozen = forms.IntegerField(label='Narozen(a)', min_value=1920, max_value=2020)
+    narozen = forms.IntegerField(label='Narozen(a)', min_value=date.today().year - 120, max_value=date.today().year)
     klub_nazev = forms.CharField(label='Klub', required=False)
 
     class Meta:
@@ -71,7 +72,8 @@ class ZavodnikPridaniForm(forms.ModelForm):
 
     def save(self):
         """
-        - pokud existuje uz zavodnik, pak jenom upravi jeho cislo, klub, kategorii
+        - pokud existuje uz zavodnik se stejnym cislem, pak jenom upravi kategorii na novou z formulare
+        - # pokud existuje uz zavodnik, pak jenom upravi jeho cislo, klub, kategorii (upraveno 2023-05-22 na prani)
         - automaticky zarazuje cloveka do klubu
         - pokud neexistuje vytvari nove clenstvi
         - dovyplnuje `zavodnika` a uklada ho
@@ -80,10 +82,10 @@ class ZavodnikPridaniForm(forms.ModelForm):
         if data:
             # existuje uz zavodnik?
             existujici = Zavodnik.objects.filter(
-                clovek=self.instance.clovek, rocnik=self.instance.rocnik).first()
+                clovek=self.instance.clovek, rocnik=self.instance.rocnik, cislo=self.instance.cislo).first()
             if existujici:
                 self.instance = existujici
-                for attr in ('cislo', 'kategorie'):
+                for attr in ('kategorie',):
                     if data[attr]:
                         setattr(self.instance, attr, data[attr])
             # pokud je vyplnena kategorie, pak ho rovnou i prirad
@@ -91,12 +93,14 @@ class ZavodnikPridaniForm(forms.ModelForm):
                 self.instance.kategorie_temp = self.instance.kategorie
 
             if data['klub_nazev']:
-                klub, created = Klub.objects.get_or_create(
-                    slug=slugify(data['klub_nazev']),
-                    defaults={
-                        'sport': self.instance.rocnik.zavod.sport,
-                        'nazev': data['klub_nazev']
-                    })
+                slug = slugify(data['klub_nazev'])
+                klub, _ = Klub.objects.get_or_create(
+                    nazev=data['klub_nazev'],
+                    defaults=dict(
+                        slug=slug,
+                        sport=self.instance.rocnik.zavod.sport,
+                        nazev=data['klub_nazev']
+                    ))
                 self.instance.klub = klub
 
             self.instance.save()

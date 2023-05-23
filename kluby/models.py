@@ -30,7 +30,9 @@ class Klub(models.Model):
             return reverse('kluby:klub_detail',args=(self.slug,))
 
     def save(self, *args, **kwargs):
+        """ Pri ukladani nastavi slug a nazev_slug_sorting
+        """
         from lide.models import _get_sorting_slug
         self.slug = slugify(self.nazev)
         self.nazev_slug_sorting = _get_sorting_slug(self.nazev)
-        super(Klub, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
