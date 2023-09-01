@@ -31,6 +31,6 @@ class Klub(models.Model):
 
     def save(self, *args, **kwargs):
         from lide.models import _get_sorting_slug
-        self.slug = slugify(self.nazev)
+        self.slug = slugify(self.nazev) or '-'
         self.nazev_slug_sorting = _get_sorting_slug(self.nazev)
         super(Klub, self).save(*args, **kwargs)

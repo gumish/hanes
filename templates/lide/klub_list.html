@@ -14,7 +14,7 @@
             Kluby
             <div class="sub header">přehled {{ kluby|length }} registrovaných klubů</div>
         </div>
-    </h1>    
+    </h1>
 {% endblock header %}
 
 {% block content %}
@@ -23,7 +23,7 @@
         {% for pismeno in kluby_abc %}
             <a href=".#{{ pismeno.grouper }}" class="item">
                 {{ pismeno.grouper|upper }}
-            </a>    
+            </a>
         {% endfor %}
     </div>
 
@@ -48,7 +48,7 @@
                             <a href="{% detail_url klub %}" title="na detail klub">
                                 {{ klub.nazev }}
                             </a>
-                            
+
                         </td>
                         <td>
                             {{ klub.sport.nazev|default:'' }}

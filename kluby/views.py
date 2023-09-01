@@ -17,7 +17,9 @@ from lide.views import _referer_do_session
 
 class KlubyListView(ListView):
     context_object_name = 'kluby'
-    queryset = Klub.objects.annotate(pocet_clenstvi=Count('clenstvi'))
+    queryset = Klub.objects \
+        .annotate(pocet_clenstvi=Count('clenstvi')) \
+        .order_by('nazev_slug_sorting')
     template_name = 'lide/klub_list.html'
 
 
