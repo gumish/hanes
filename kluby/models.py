@@ -33,6 +33,7 @@ class Klub(models.Model):
         """ Pri ukladani nastavi slug a nazev_slug_sorting
         """
         from lide.models import _get_sorting_slug
+        self.nazev = self.nazev.strip()
         self.slug = slugify(self.nazev) or '-'
         self.nazev_slug_sorting = _get_sorting_slug(self.nazev)
         super().save(*args, **kwargs)

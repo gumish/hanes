@@ -95,7 +95,7 @@ class ZavodnikPridaniForm(forms.ModelForm):
             if data['klub_nazev']:
                 slug = slugify(data['klub_nazev'])
                 klub, _ = Klub.objects.get_or_create(
-                    nazev=data['klub_nazev'],
+                    nazev=data['klub_nazev'].strip(),
                     defaults=dict(
                         slug=slug,
                         sport=self.instance.rocnik.zavod.sport,
