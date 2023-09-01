@@ -18,11 +18,11 @@ echo manage.py >> .git/info/sparse-checkout
 echo requirements.txt >> .git/info/sparse-checkout
 
 echo #!/bin/sh >> .git\hooks\post-merge
-echo git show --no-patch --format=%h ^> templates/git_sha.txt >> .git\hooks\post-merge
-echo git show --no-patch --format=%B ^> templates/git_msg.txt >> .git\hooks\post-merge
+echo git show --no-patch --format=%%h ^> templates/git_sha.txt >> .git\hooks\post-merge
+echo git show --no-patch --format=%%B ^> templates/git_msg.txt >> .git\hooks\post-merge
 echo #!/bin/sh >> .git\hooks\post-commit
-echo git show --no-patch --format=%h ^> templates/git_sha.txt >> .git\hooks\post-commit
-echo git show --no-patch --format=%B ^> templates/git_msg.txt >> .git\hooks\post-commit
+echo git show --no-patch --format=%%h ^> templates/git_sha.txt >> .git\hooks\post-commit
+echo git show --no-patch --format=%%B ^> templates/git_msg.txt >> .git\hooks\post-commit
 
 
 git pull hanes master

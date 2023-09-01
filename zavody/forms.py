@@ -294,38 +294,38 @@ class CisloStartovniCasZavodnikaForm(forms.ModelForm):
 # -----
 class KontrolaKolonekFormSet(BaseFormSet):
     kontrolovano_list = []
-    errror_hlaska = None
+    chybova_hlaska = None
 
     def clean(self):
-        'hleda jestli ve formularich nejsou dve stejne hodnoty'
-        # nezabivej se dalsi validaci, pokud je problem v nejakem formu
+        """ kontrola, zda se neopakuji hodnoty v kolonkach
+            - kontrolovano_list: seznam nazvu kolonek, ktere se maji kontrolovat
+        """
         if any(self.errors):
             return
-        values = []
+        list_listu_hodnot = []  # listu listu hodnot formularu
         for form in self.forms:
-            value_list = []
+            hodnoty = []  # list hodnot v jednom formu
             for kolonka in self.kontrolovano_list:
                 value = form.cleaned_data.get(kolonka, '')
                 if isinstance(value, int):
                     value = str(value)
                 elif not value:
                     value = ''
-                value_list.append(value)
-            if all(value_list):
-                value = ' '.join(value_list)
-                if value in values:
-                    raise forms.ValidationError(self.errror_hlaska.format(value))
-                values.append(value)
+                hodnoty.append(value)
+            if all(hodnoty):
+                if hodnoty in list_listu_hodnot:
+                    raise forms.ValidationError(self.chybova_hlaska.format(*hodnoty))
+                list_listu_hodnot.append(hodnoty)
 
 
 class KontrolaCiselFormSet(KontrolaKolonekFormSet):
     kontrolovano_list = ('cislo',)
-    errror_hlaska = 'Číslo {} ve formuláři musí být pouze jednou!'
+    chybova_hlaska = 'Číslo {0} ve formuláři musí být pouze jednou!'
 
 
 class KontrolaLidiFormSet(KontrolaKolonekFormSet):
-    kontrolovano_list = ('prijmeni', 'jmeno', 'narozen')
-    errror_hlaska = '{} ve formuláři musí být pouze jednou!'
+    kontrolovano_list = ('prijmeni', 'jmeno', 'narozen', 'cislo')
+    chybova_hlaska = '{0} {1} ({2}) s číslem {3} může být ve formuláři pouze jednou!'
 
 
 class PridaniZavodnikuFormSet(KontrolaLidiFormSet):
