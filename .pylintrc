@@ -1,1 +1,5 @@
-DJANGO_SETTINGS_MODULE=hanes.settings
+[pylint]
+load-plugins=pylint_django
+django-settings-module=hanes.settings
+disable=E1131
+errors-only=yes

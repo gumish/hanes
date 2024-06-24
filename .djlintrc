@@ -1,0 +1,10 @@
+{
+    "ignore": 
+        "T002,H006,H020,H023,H021,H031,H037",
+    "format_css": true,
+    "format_js": true,
+    "format_attribute_template_tags": true,
+    "close_void_tags": true,
+    "max_blank_lines": 2,
+    "exclude": ".venv,*.py"
+}

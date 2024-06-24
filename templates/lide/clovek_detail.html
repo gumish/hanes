@@ -5,7 +5,7 @@
     ČLOVĚK | {{ clovek }}
 {% endblock title %}
 
-{% block section %}section_lide{% endblock %}
+{% block section %}section_lide{% endblock section %}
 
 {% block breadcrumb %}
     <div class="ui breadcrumb">
@@ -143,11 +143,11 @@
                                     {{ zavodnik.kategorie_temp.zavodnici_temp.count }}
                                 </td>
                                 <td class="right aligned">
-                                    {{ zavodnik.poradi_na_trati|default:''}}
+                                    {{ zavodnik.poradi_na_trati|default:'' }}
                                 </td>
                                 <td class="right aligned">
                                     {% if zavodnik.zavodniku_na_trati %}
-                                        {{ zavodnik.zavodniku_na_trati|default:''}}
+                                        {{ zavodnik.zavodniku_na_trati|default:'' }}
                                     {% endif %}
                                 </td>
                             </tr>
