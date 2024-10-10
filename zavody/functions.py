@@ -30,7 +30,7 @@ def _pohlavi(slovo):
 # IMPORTY
 # -------
 
-def kategorie_import(soubor):
+def csv_kategorie_import(soubor):
     "pouziti pri zakladani noveho rocniku"
     chyby = []
     kategorie_list = []
@@ -87,7 +87,7 @@ def rocnik_import(soubor):
                 print(i, 'hlavicka zavodniku')
                 predchozi_radek = 'hlavicka zavodniku'
             elif predchozi_radek == 'prazdny' and radek[0]:
-                # kategorie_import
+                # csv_kategorie_import
                 print(i, 'kategorie')
                 od_do = list(map(int, radek[2].split(' - ')))
                 od_do = [rocnik.datum.year - x for x in od_do]

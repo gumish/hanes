@@ -5,46 +5,81 @@ from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 
 
-def _clean_radek(i, radek):
-    # jednali se o hlavicku nic nevracej
-    if not any(radek) or slugify(radek[0]) == 'prijmeni':
-        return None
-    else:
-        try:
-            narozen = int(radek[3])
-            slug = slugify('-'.join([radek[0], radek[1], radek[3]]))
-            return {
-                'slug': slug,
-                'defaults': {
-                    'prijmeni': radek[0],
-                    'jmeno': radek[1],
-                    'narozen': narozen,
-                    'pohlavi': radek[2],
-                    },
-                'klub': radek[4] or None,
-                'cislo': radek[5] or None
-                # 'startovni_cas': radek[6] or None,
-                # 'cilovy_cas': radek[7] or None
-            }
-        except:
-            return ValidationError(
-                '#{0}: chybějící údaj u člověka: {1[0]},  {1[1]},  {1[2]},  {1[3]}'.format(
-                    i,
-                    ['???' if not r else r for r in radek]))
-
-
-def clean_lide_import_csv(soubor):
+def zavodnici_import_clean_csv(soubor) -> tuple[list, list]:
+    """ startovni_cislo
+        prijmeni *
+        jmeno *
+        narozen * [rok]
+        pohlavi * [m/z]
+        klub_nazev
+        klub_zkratka
+        klub_id
+        vysledny_cas
+        kategorie_nazev
+        kategorie_vek_od
+        kategorie_vek_do_vcetne
+        kategorie_delka_trate
+        kategorie_znacka
+    """
 
     def _csv_reader(soubor):
-        soubor_text = TextIOWrapper(soubor, encoding='windows-1250')
-        csv_reader = csv.reader(soubor_text, delimiter=';')
-        for row in csv_reader:
-            yield [cell.strip() for cell in row]
+        """ prevede csv soubor, ktery muze byt ve formatu:
+            - windows-1250 (cp1250)
+            - utf-8
+            vraci list radku, kde kazdy radek je list
+        """
+        encodings = ['windows-1250', 'utf-8']
+        for encoding in encodings:
+            try:
+                soubor.seek(0)
+                soubor_text = TextIOWrapper(soubor, encoding=encoding)
+                csv_reader = csv.reader(soubor_text, delimiter=';')
+                for row in csv_reader:
+                    yield [cell.strip() for cell in row]
+                break
+            except UnicodeDecodeError:
+                continue
+        else:
+            raise ValueError("Nepodařilo se dekódovat soubor. Podporované kódování: " + ", ".join(encodings))
+
+
+    def _clean_radek(i, hlavicka, radek) -> dict | ValidationError | None:
+
+        # namapovani dat do slovniku
+        data = {}
+        for index, promenna in enumerate(hlavicka):
+            if index < len(radek):
+                data[promenna] = radek[index]
+            else:
+                data[promenna] = None
+
+        try:
+            return {
+                'slug': slugify(f'{data["prijmeni"]}-{data["jmeno"]}-{data["narozen"]}'),
+                'defaults': {
+                    'prijmeni': data.pop('prijmeni'),
+                    'jmeno': data.pop('jmeno'),
+                    'narozen': int(data.pop('narozen')),
+                    'pohlavi': data['pohlavi']
+                },
+                **data
+            }
+        except Exception as e:
+            return ValidationError(
+                '#{0}: chybějící údaj u člověka: {1}'.format(
+                    i,
+                    ', '.join(['???' if not r else r for r in radek])))
 
     radky = []
     chyby = []
     for i, radek in enumerate(_csv_reader(soubor), start=1):
-        data = _clean_radek(i, radek)
+
+        if i == 1:  # hlavicka, prvni radek
+            hlavicka = [r.split(maxsplit=1)[0] for r in radek] # odstraneni vseho za mezerou
+            continue
+
+        data = _clean_radek(i, hlavicka, radek)
+
         if isinstance(data, ValidationError):
             chyby.append(data)
         elif data:

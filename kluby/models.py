@@ -5,6 +5,8 @@ from django.utils.text import slugify
 
 class Klub(models.Model):
     nazev = models.CharField('Název', max_length=50, unique=True)
+    zkratka = models.CharField('Zkratka', max_length=20, null=True, blank=True, default='')
+    klub_id = models.PositiveSmallIntegerField('Klubové ID', null=True, blank=True)
     slug = models.SlugField(editable=False, unique=True)
     nazev_slug_sorting = models.SlugField(editable=False, unique=False)
     sport = models.ForeignKey(

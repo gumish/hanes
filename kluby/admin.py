@@ -12,6 +12,6 @@ class ClenInline(admin.TabularInline):
 
 class KlubAdmin(admin.ModelAdmin):
     inlines = [ClenInline]
-    search_fields = ['nazev']
+    search_fields = ['nazev', 'zkratka']
 
 admin.site.register(Klub, KlubAdmin)

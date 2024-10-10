@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from io import BytesIO
-from urllib import request
+import json
 
 from django.contrib import messages
 from django.db.models import Count, Min
@@ -8,7 +8,6 @@ from django.forms.formsets import formset_factory
 from django.forms.models import inlineformset_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils.text import slugify
@@ -206,8 +205,9 @@ class RocnikPridejView(CreateView):
 
     def form_valid(self, form):
         posledni_rocnik = self.zavod.posledni_rocnik()
-        rocnik, kategorie = form.save()
-        if not kategorie:
+        rocnik = form.save()
+        kategorie = form.cleaned_data['csv_kategorie']
+        if not kategorie and form.cleaned_data['kopirovat_kategorie']:
             kategorie = Kategorie.objects.filter(rocnik=posledni_rocnik)
         for kat in kategorie:
             kat.pk = None
@@ -255,7 +255,7 @@ class ImportZavodnikuView(FormView):
             messages.warning(
                 self.request,
                 'Nebylo nic přidáno!')
-        return super(ImportZavodnikuView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 def rozkategorizovat_zavodniky(request, rocnik_pk):

@@ -1,33 +1,35 @@
 {% load l10n custom_filters %}
-<div id="kat_{{kategorie.id|safe}}" class="ui sortable unstackable large table" style="border-top: 1px solid {% if kategorie.pohlavi == 'm' %}blue{% endif %}{% if kategorie.pohlavi == 'z' %}red{% endif %}">
+<div id="kat_{{ kategorie.id|safe }}"
+     class="ui sortable unstackable large table"
+     style="border-top: 1px solid
+            {% if kategorie.pohlavi == 'm' %}blue{% endif %}
+            {% if kategorie.pohlavi == 'z' %}red{% endif %}">
     <div class="caption">
         {% if kategorie %}
             <div class="ui grid">
                 <div class="one wide column">
-                    {% if kategorie.znacka %}
-                        {{ kategorie.znacka }}
-                    {% endif %}
+                    {% if kategorie.znacka %}{{ kategorie.znacka }}{% endif %}
                 </div>
                 <div class="five wide column">
-                    <a href="{{ kategorie.get_absolute_url }}" title="na detail kategorie">
-                        {{ kategorie.nazev }}
-                    </a>
+                    <a href="{{ kategorie.get_absolute_url }}" title="na detail kategorie">{{ kategorie.nazev }}</a>
                 </div>
-                <div class="three wide column">
-                    {{ kategorie.rozsah_narozeni|rozsah_narozeni }}
-                </div>
-                <div class="column">
-                    {{ kategorie.delka_trate|default:'-' }}
-                </div>
+                <div class="three wide column">{{ kategorie.rozsah_narozeni|rozsah_narozeni }}</div>
+                <div class="column">{{ kategorie.delka_trate|default:'-' }}</div>
                 <div class="three wide column right aligned">
                     <span class="users-count" title="počet závodníků v kategorii">
                         {{ zavodnici|length }}
                         <i class="user icon"></i>
                     </span>
-                    <a onclick="printPage('{% url 'zavody:startovka_kategorie_PDF' kategorie.pk %}')" title="rovnou vytiskne stránku PDF se startovkou kategorie" class="auto-print" data-url="{% url 'zavody:vysledky_kategorie_PDF' kategorie.pk %}">
+                    <a onclick="printPage('{% url 'zavody:startovka_kategorie_PDF' kategorie.pk %}')"
+                       title="rovnou vytiskne stránku PDF se startovkou kategorie"
+                       class="auto-print"
+                       data-url="{% url 'zavody:vysledky_kategorie_PDF' kategorie.pk %}">
                         <i class="print link icon"></i>
                     </a>
-                    <a href="{% url 'zavody:startovka_kategorie_PDF' kategorie.pk %}" target="_blank" title="zobrazit startovku kategorie na nové kartě prohlížeče ve formátu PDF" class="auto-pdf">
+                    <a href="{% url 'zavody:startovka_kategorie_PDF' kategorie.pk %}"
+                       target="_blank"
+                       title="zobrazit startovku kategorie na nové kartě prohlížeče ve formátu PDF"
+                       class="auto-pdf">
                         <i class="file pdf outline icon"></i>
                     </a>
                 </div>

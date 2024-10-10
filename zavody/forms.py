@@ -1,6 +1,7 @@
 
 import csv
 from django import forms
+from django.db.models import Q
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.core.exceptions import ValidationError, MultipleObjectsReturned
 from django.db import transaction
@@ -8,7 +9,7 @@ from django.forms.models import inlineformset_factory, BaseInlineFormSet
 
 from lide.forms import LideImportCSVForm
 from .models import Zavodnik, Zavod, Sport, Rocnik, Kategorie
-from .functions import kategorie_import
+from .functions import csv_kategorie_import
 from zavodnici.custom_fields import CustomTimeField
 
 
@@ -18,14 +19,14 @@ from zavodnici.custom_fields import CustomTimeField
 class ImportCasuTextForm(forms.Form):
     text =  forms.CharField(
         label='text',
-        help_text='''
+        help_text="""
             příklad:
             03:02.4 (ignorováno)
             01:50.4 (ignorováno)
             --------------------------------- (ignorováno)
             3:  00:09.6   00:02.8
             2:  00:06.7   00:01.9
-            1:  00:04.8   00:04.8''',
+            1:  00:04.8   00:04.8""",
         required=True,
         widget=forms.Textarea()
     )
@@ -95,13 +96,13 @@ class ImportCilovehoCasuFormular(forms.Form):
         if self.zavodnik and not self.cleaned_data['prepsat']:
             if self.zavodnik.cilovy_cas:
                 raise forms.ValidationError(
-                    {'cilovy_cas': '''<u>Závodník má již zadaný čas.</u><br>
-                    Pokud ho chceš přepsat, zatrhni políčko vpravo.'''})
+                    {'cilovy_cas': """<u>Závodník má již zadaný čas.</u><br>
+                    Pokud ho chceš přepsat, zatrhni políčko vpravo."""})
             elif self.zavodnik.nedokoncil:
                 raise forms.ValidationError(
-                    {'cilovy_cas': '''<u>Závodník závod nedokončil!</u><br>
+                    {'cilovy_cas': """<u>Závodník závod nedokončil!</u><br>
                     Pokud i tak chceš cílový čas zapsat,<br>
-                    zatrhni políčko vpravo.'''})
+                    zatrhni políčko vpravo."""})
         return self.cleaned_data
 
     def save(self):
@@ -153,13 +154,13 @@ class CilovyFormular(forms.Form):
         if hasattr(self, 'zavodnik') and not self.cleaned_data['prepsat']:
             if self.zavodnik.cilovy_cas:
                 raise forms.ValidationError(
-                    {'cilovy_cas': '''<u>Závodník má již zadaný čas.</u><br>
-                    Pokud ho chceš přepsat, zatrhni políčko vpravo.'''})
+                    {'cilovy_cas': """<u>Závodník má již zadaný čas.</u><br>
+                    Pokud ho chceš přepsat, zatrhni políčko vpravo."""})
             elif self.zavodnik.nedokoncil:
                 raise forms.ValidationError(
-                    {'cilovy_cas': '''<u>Závodník závod nedokončil!</u><br>
+                    {'cilovy_cas': """<u>Závodník závod nedokončil!</u><br>
                     Pokud i tak chceš cílový čas zapsat,<br>
-                    zatrhni políčko vpravo.'''})
+                    zatrhni políčko vpravo."""})
         return self.cleaned_data
 
     def save(self):
@@ -188,52 +189,78 @@ class ZavodCreateForm(forms.ModelForm):
 
 
 class RocnikCreateForm(forms.ModelForm):
-    kategorie = forms.FileField(
+    csv_kategorie = forms.FileField(
         label='Import kategorií z *.csv', required=False,
         widget=forms.FileInput(attrs={'accept': '.csv'}),
-        help_text='pro nové kategorie nahrát soubor CSV, jinak se budou dědit z předcházejícího ročníku')
+        help_text='pro nové kategorie nahrát soubor CSV')
+    kopirovat_kategorie = forms.BooleanField(
+        label='Kopírovat kategorie z předchozího ročníku?',
+        help_text='pokud není zaškrtnut, a není určen CSV soubor, pak nejsou vytvořeny žádné kategorie',
+        required=False, initial=True)
 
     class Meta:
         model = Rocnik
         fields = ('zavod', 'datum', 'cas', 'misto', 'nazev', 'info')
 
-    def clean_kategorie(self):
-        soubor = self.cleaned_data['kategorie']
+    def clean_csv_kategorie(self):
+        """ import kategorii ze souboru, vratí list kategorii
+        """
+        soubor = self.cleaned_data['csv_kategorie']
         if soubor:
-            kategorie_list, chyby = kategorie_import(soubor)
+            kategorie_list, chyby = csv_kategorie_import(soubor)
             if chyby:
                 raise ValidationError({
-                    'kategorie': chyby[0]
+                    'csv_kategorie': chyby[0]
                 })
             else:
                 return kategorie_list
         else:
-            return None
-
-    def save(self, *args, **kwargs):
-        rocnik = super(RocnikCreateForm, self).save(*args, **kwargs)
-        return (rocnik, self.cleaned_data['kategorie'])
-
+            return []
 
 class ImportZavodnikuCSVForm(LideImportCSVForm):
-    '''naimportuje zavodniky, treba i kategoriemi'''
+    """ naimportuje zavodniky, treba i s kategoriemi, kluby a casy
+    """
 
     @transaction.atomic
     def save(self, rocnik):
         # ulozi lidi a kluby
-        lide = super(ImportZavodnikuCSVForm, self).save()
+        lide = super().save()
         zavodnici = []
-        for radek in lide:
-            clovek, klub, novy_clovek, novy_klub, radek = radek
+        kategorie = None
+
+        for clovek, klub, _novy_clovek, _novy_klub, radek in lide:
             try:
-                zavodnik, zavodnik_novy = Zavodnik.objects.get_or_create(
+
+                # Kategorie
+                if any([radek['kategorie_nazev'], radek['kategorie_znacka']]):
+
+                    # pokusi se najit kategorii
+                    kategorie = Kategorie.objects.filter(
+                        Q(nazev=radek['kategorie_nazev']) if radek['kategorie_nazev'] else Q() |
+                        Q(znacka=radek['kategorie_znacka']) if radek['kategorie_znacka'] else Q()
+                    ).first()
+
+                    # pokud nenajde, pokusi se Kategorie vytvorit
+                    if not kategorie:
+                        kategorie = Kategorie.objects.create(
+                            rocnik=rocnik,
+                            nazev=radek['kategorie_nazev'] or radek['kategorie_znacka'],
+                            znacka=radek['kategorie_znacka'],
+                            pohlavi=radek['pohlavi'],
+                            vek_od=radek['kategorie_vek_od'] or None,
+                            vek_do=radek['kategorie_vek_do_vcetne'] or None,
+                            delka_trate=radek['kategorie_delka_trate'],
+                        )
+
+                # Zavodnik
+                zavodnik, zavodnik_novy = Zavodnik.objects.update_or_create(
                     clovek=clovek,
                     rocnik=rocnik,
                     defaults={
                         'klub': klub,
-                        'cislo': radek['cislo']
-                        # 'startovni_cas': radek['startovni_cas'],
-                        # 'cilovy_cas': radek['cilovy_cas']
+                        'kategorie': None,
+                        'kategorie_temp': kategorie,
+                        'cislo': radek['startovni_cislo'],
                     })
                 zavodnici.append(
                     (zavodnik, zavodnik_novy, radek['defaults']))

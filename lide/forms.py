@@ -1,11 +1,11 @@
 
 from django import forms
 from django.db import transaction
-from django.utils.text import slugify
+from django.db.models import Q
 
 from .models import Clovek, Clenstvi
 from kluby.models import Klub
-from .functions import clean_lide_import_csv
+from .functions import zavodnici_import_clean_csv
 from zavody.models import Zavodnik
 
 
@@ -64,13 +64,11 @@ class CSVsouborFormular(forms.Form):
 class LideImportCSVForm(forms.Form):
     soubor = forms.FileField(
         label='soubor *.csv',
-        help_text='csv soubor seznamu lidí (může být i s hlavičkou) v pořadí:\
-        příjmení, jméno, pohlaví, rok narození, klub',
         required=True,
         widget=forms.FileInput(attrs={'accept': '.csv'}))
 
     def clean_soubor(self):
-        radky, chyby = clean_lide_import_csv(self.cleaned_data['soubor'])
+        radky, chyby = zavodnici_import_clean_csv(self.cleaned_data['soubor'])
         if chyby:
             raise forms.ValidationError(chyby)
         else:
@@ -85,10 +83,24 @@ class LideImportCSVForm(forms.Form):
                 slug__startswith=radek['slug'],
                 defaults=radek['defaults'])
 
-            if radek['klub']:
-                klub, novy_klub = Klub.objects.get_or_create(
-                    slug=slugify(radek['klub']),
-                    defaults={'nazev': radek['klub']})
+            if any([radek['klub_nazev'], radek['klub_zkratka'], radek['klub_id']]):
+
+                # pokusi se najit klub dle nenulovych hodnot: klub_nazev, klub_zkratka, klub_id
+                klub = Klub.objects.filter(
+                    Q(nazev=radek['klub_nazev']) if radek['klub_nazev'] else Q() |
+                    Q(zkratka=radek['klub_zkratka']) if radek['klub_zkratka'] else Q() |
+                    Q(klub_id=radek['klub_id']) if radek['klub_id'] else Q()
+                ).first()
+                novy_klub = False
+
+                # pokud nenajde, pokusi se Klub vytvorit
+                if not klub:
+                    klub = Klub.objects.create(
+                        # do nazev dosadi prvni nenulovou hodnotu z klub_nazev, klub_zkratka, klub_id
+                        nazev=radek['klub_nazev'] or radek['klub_zkratka'] or radek['klub_id'],
+                        zkratka=radek['klub_zkratka'],
+                        klub_id=radek['klub_id'] or None)
+                    novy_klub = True
 
                 if not Clenstvi.objects.filter(clovek=clovek, klub=klub).exists():
                     Clenstvi.objects.create(
