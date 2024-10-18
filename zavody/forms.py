@@ -10,7 +10,7 @@ from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from lide.forms import LideImportCSVForm
 from .models import Zavodnik, Zavod, Sport, Rocnik, Kategorie
 from .functions import csv_kategorie_import
-from zavodnici.custom_fields import CustomTimeField
+from zavodnici.custom_fields import CustomTimeField, _format_hanes_time
 
 
 # FORMS
@@ -228,6 +228,8 @@ class ImportZavodnikuCSVForm(LideImportCSVForm):
         zavodnici = []
         kategorie = None
 
+        custom_time_field = CustomTimeField()
+
         for clovek, klub, _novy_clovek, _novy_klub, radek in lide:
             try:
 
@@ -261,6 +263,7 @@ class ImportZavodnikuCSVForm(LideImportCSVForm):
                         'kategorie': None,
                         'kategorie_temp': kategorie,
                         'cislo': radek['startovni_cislo'],
+                        'cilovy_cas': custom_time_field.to_python(radek['cilovy_cas'])  # použití CustomTimeField pro převod na čas
                     })
                 zavodnici.append(
                     (zavodnik, zavodnik_novy, radek['defaults']))
