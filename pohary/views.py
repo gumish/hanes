@@ -21,6 +21,24 @@ class PoharDetailView(DetailView):
     model = Pohar
     template_name = 'pohary/pohar_detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        pohar = self.object
+        zavodnici = pohar.zavodnici_vsichni()
+        context['rocniky'] = []
+        context['kluby'] = []
+
+        for rocnik in pohar.rocniky.all():
+            zavodniku = zavodnici.filter(rocnik=rocnik).count()
+            context['rocniky'].append((rocnik, zavodniku))
+
+        for klub in pohar.kluby.all():
+            zavodniku = zavodnici.filter(klub=klub).count()
+            context['kluby'].append((klub, zavodniku))
+
+        return context
+
 
 class KategoriePoharuDetailView(DetailView):
     model = KategoriePoharu
@@ -82,7 +100,7 @@ def vysledky_kategorie_pdf(request, kategorie_pk):
     pdf = pdf_print.sheet(
         [{
             'title': TITLE_TEMPLATE.format(
-                kategorie, 
+                kategorie,
                 custom_filters.rozsah_narozeni(kategorie.rozsah_narozeni())
             ),
             'headers': (['pořadí', 'číslo', 'příjmení', 'jméno', 'nar.', 'klub', 'výsledný čas', 'na trati'],),

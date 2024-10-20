@@ -5,7 +5,7 @@
     POHÁR | {{ pohar.nazev }}
 {% endblock title %}
 
-{% block section %}section_pohary{% endblock %}
+{% block section %}section_pohary{% endblock section %}
 
 {% block breadcrumb %}
     <div class="ui breadcrumb">
@@ -57,11 +57,12 @@
         <thead class="full-width">
             <tr>
                 <th>ročník</th>
-                <th>počet závodníků</th>
+                <th>závodníků celkem</th>
+                <th>závodníků v pohárů</th>
             </tr>
         </thead>
         <tbody>
-            {% for rocnik in pohar.rocniky.all %}
+            {% for rocnik, zavodniku in rocniky %}
                 <tr>
                     <td>
                         <a href="{{ rocnik.get_absolute_url }}">
@@ -69,7 +70,10 @@
                         </a>
                     </td>
                     <td>
-                        {{ rocnik.zavodnici.all.count }}
+                        {{ rocnik.zavodnici.count }}
+                    </td>
+                    <td>
+                        {{ zavodniku }}
                     </td>
                 </tr>
             {% endfor %}
@@ -123,4 +127,25 @@
             {% endwith %}
         </tbody>
     </table>
+
+    {% if kluby %}
+        <h3>Kluby poháru</h3>
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>název klubu</th>
+                    <th>počet závodníků v poháru</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for klub, zavodniku in kluby %}
+                <tr>
+                    <td>{{ klub.nazev }}</td>
+                    <td>{{ zavodniku }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
 {% endblock content %}

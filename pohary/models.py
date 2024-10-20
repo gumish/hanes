@@ -5,6 +5,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 
+import kluby
 from zavodnici.models import Zavodnik
 from zavody.models import kategorie_test_cloveka
 
@@ -32,6 +33,9 @@ class Pohar(models.Model):
         blank=True, null=True)
     rocniky = models.ManyToManyField(
         'zavody.Rocnik', verbose_name='Ročníky', related_name='pohary')
+    kluby = models.ManyToManyField(
+        'kluby.Klub', verbose_name='Kluby',
+        related_name='pohary', blank=True, help_text='pokud není zadán žádný Klub, pak se použijí všechny')
 
     class Meta:
         verbose_name = 'Pohár'
@@ -68,6 +72,11 @@ class Pohar(models.Model):
             )
             .order_by('rocnik__datum', 'vysledny_cas')
         )
+        # pokud je zadáno kluby, pak se použijí jen tyto Kluby
+        if self.kluby.exists():
+            zavodnici = zavodnici.filter(
+                klub__in=self.kluby.all()
+            )
         return zavodnici
 
     def zavodnici_bez_kategorie(self):
