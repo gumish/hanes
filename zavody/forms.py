@@ -237,10 +237,14 @@ class ImportZavodnikuCSVForm(LideImportCSVForm):
                 if any([radek['kategorie_nazev'], radek['kategorie_znacka']]):
 
                     # pokusi se najit kategorii
-                    kategorie = Kategorie.objects.filter(
-                        Q(nazev=radek['kategorie_nazev']) if radek['kategorie_nazev'] else Q() |
-                        Q(znacka=radek['kategorie_znacka']) if radek['kategorie_znacka'] else Q()
-                    ).first()
+                    kategorie = (
+                        Kategorie.objects
+                        .filter(rocnik=rocnik)
+                        .filter(
+                            Q(nazev=radek['kategorie_nazev']) if radek['kategorie_nazev'] else Q() |
+                            Q(znacka=radek['kategorie_znacka']) if radek['kategorie_znacka'] else Q())
+                        .first()
+                    )
 
                     # pokud nenajde, pokusi se Kategorie vytvorit
                     if not kategorie:

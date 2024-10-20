@@ -9,9 +9,9 @@
     <script type="text/javascript">
         var clovek_autocomplete_url = "{% url 'lide:clovek_autocomplete' %}";
     </script>
-{% endblock %}
+{% endblock custom_js %}
 
-{% block section %}section_lide{% endblock %}
+{% block section %}section_lide{% endblock section %}
 
 {% block breadcrumb %}
     <div class="ui breadcrumb">
@@ -66,7 +66,7 @@
 {% endblock staff %}
 
 {% block content %}
-    <form action="" method="POST" class="ui {% if form.errors or clenstvi_formset.errors %}error{% endif %} form" id="clovek_form">
+    <form action="" method="post" class="ui {% if form.errors or clenstvi_formset.errors %}error{% endif %} form" id="clovek_form">
 
         <div class="ui stackable grid">
 
@@ -85,7 +85,6 @@
                     {% include "elements/_form_error_field.html" with label=True help=True %}
                 {% endfor %}
             </div>
-
 
             {# DRUHY SLOUPEC #}
             <div class="sixteen wide tablet six wide computer column">
@@ -112,7 +111,6 @@
                     </div>
                 {% endfor %}
             </div>
-
 
             {# TRETI SLOUPEC #}
             <div class="sixteen wide tablet four wide computer column">
@@ -191,11 +189,11 @@
                             {{ zavodnik.kategorie_temp.zavodnici_temp.count }}
                         </td>
                         <td class="right aligned">
-                            {{ zavodnik.poradi_na_trati|default:''}}
+                            {{ zavodnik.poradi_na_trati|default:'' }}
                         </td>
                         <td class="right aligned">
                             {% if zavodnik.zavodniku_na_trati %}
-                                {{ zavodnik.zavodniku_na_trati|default:''}}
+                                {{ zavodnik.zavodniku_na_trati|default:'' }}
                             {% endif %}
                         </td>
                     </tr>

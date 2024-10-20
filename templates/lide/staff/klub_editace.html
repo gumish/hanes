@@ -5,20 +5,20 @@
     <script type="text/javascript">
         var klub_autocomplete_url = "{% url 'kluby:klub_autocomplete' %}";
     </script>
-{% endblock %}
+{% endblock custom_js %}
 
 {% block title %}
     EDITACE | {{ klub.nazev }}
 {% endblock title %}
 
-{% block section %}section_kluby{% endblock %}
+{% block section %}section_kluby{% endblock section %}
 
 {% block breadcrumb %}
     <div class="ui breadcrumb">
         <a href="{% url 'kluby:kluby_list' %}" class="section">kluby</a>
         <i class="right chevron icon divider"></i>
         <div class="active section">editace klubu</div>
-    </div>    
+    </div>
 {% endblock breadcrumb %}
 
 {% block header %}
@@ -42,14 +42,14 @@
             {% endif %}
             <div class="sub header">editace klubu</div>
         </div>
-    </h1>    
+    </h1>
 {% endblock header %}
 
 {% block content %}
     <div class="ui stackable grid">
         <div class="sixteen wide tablet ten wide computer column">
 
-            <form action="" method="POST" class="ui form" id="klub_form">
+            <form action="" method="post" class="ui form" id="klub_form">
                 {% csrf_token %}
                 {% for field in form %}
                     {% include "elements/_form_error_field.html" with label=True %}
@@ -79,7 +79,7 @@
                     <thead>
                         <tr>
                             <th colspan="3">
-                                celkem {{ clenove|length }}  závodníků    
+                                celkem {{ clenove|length }}  závodníků
                             </th>
                         </tr>
                         <tr>

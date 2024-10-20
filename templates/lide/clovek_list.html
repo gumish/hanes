@@ -5,7 +5,7 @@
     LIDÉ | přehled
 {% endblock title %}
 
-{% block section %}section_lide{% endblock %}
+{% block section %}section_lide{% endblock section %}
 
 {% block header %}
     <h1 class="ui header">
@@ -14,7 +14,7 @@
             Lidé
             <div class="sub header">přehled {{ lide|length }} registrovaných lidí</div>
         </div>
-    </h1>    
+    </h1>
 {% endblock header %}
 
 {% block staff %}
@@ -23,9 +23,9 @@
             <a href="{% url 'lide:import_csv' %}" class="ui blue icon button">
                 <i class="plus link icon"></i>
                 import lidí
-            </a>       
+            </a>
         </div>
-    {% endif %}    
+    {% endif %}
 {% endblock staff %}
 
 {% block content %}
@@ -34,7 +34,7 @@
         {% for pismeno in lide_abc %}
             <a href=".#{{ pismeno.grouper }}" class="item">
                 {{ pismeno.grouper|upper }}
-            </a>    
+            </a>
         {% endfor %}
     </div>
 

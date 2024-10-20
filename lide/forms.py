@@ -1,7 +1,8 @@
 
 from django import forms
+from django.core.exceptions import MultipleObjectsReturned
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q, Count
 
 from .models import Clovek, Clenstvi
 from kluby.models import Klub
@@ -79,9 +80,18 @@ class LideImportCSVForm(forms.Form):
         lide = []
         radky = self.cleaned_data['soubor']
         for radek in radky:
-            clovek, novy_clovek = Clovek.objects.get_or_create(
-                slug__startswith=radek['slug'],
-                defaults=radek['defaults'])
+            try:
+                clovek, novy_clovek = Clovek.objects.get_or_create(
+                    slug__startswith=radek['slug'],
+                    defaults=radek['defaults'])
+            except MultipleObjectsReturned:
+                # v případě nalezení vícero Človků, přiřadí vybere Člověk s větším počtem účasti v Ročník
+                clovek = (
+                    Clovek.objects
+                    .filter(slug__startswith=radek['slug'])
+                    .annotate(pocet_zavodu=Count('zavodnici'))
+                    .order_by('-pocet_zavodu').first())
+                novy_clovek = False
 
             if any([radek['klub_nazev'], radek['klub_zkratka'], radek['klub_id']]):
 

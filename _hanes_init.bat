@@ -25,6 +25,6 @@ echo git show --no-patch --format=%%h ^> templates/git_sha.txt >> .git\hooks\pos
 echo git show --no-patch --format=%%B ^> templates/git_msg.txt >> .git\hooks\post-commit
 
 
-git pull hanes master
+git pull hanes Import
 python -m venv _virtenv
 _virtenv\Scripts\pip install -r requirements.txt

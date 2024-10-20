@@ -17,7 +17,7 @@ class KlubUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Klub
-        fields = ('nazev', 'sport', 'info')
+        fields = '__all__'
 
     def save(self, *args, **kwargs):
         '''-prevadi cleny a zavodniky do novych klubu

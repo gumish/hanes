@@ -83,6 +83,8 @@ def th_sortable(context, verbose, order, width=None, kat=0):
 
 @register.simple_tag(takes_context=True)
 def detail_url(context, objekt):
+    if not objekt:
+        return ''
     user = context['user']
     return objekt.get_absolute_url(user)
 
