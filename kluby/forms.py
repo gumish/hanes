@@ -32,7 +32,15 @@ class KlubUpdateForm(forms.ModelForm):
                 slug=slugify(data['presunout_do']),
                 defaults={'nazev': data['presunout_do']}
             )[0]
-            Clenstvi.objects.filter(klub=self.instance).update(klub=klub)
+
+            for clenstvi in Clenstvi.objects.filter(klub=self.instance):
+                Clenstvi.objects.update_or_create(
+                    clovek=clenstvi.clovek,
+                    klub=klub,
+                    sport=clenstvi.sport
+                )
+                clenstvi.delete()
+
             Zavodnik.objects.filter(klub=self.instance).update(klub=klub)
             zpravy.append(
                 "členové a závodnici přesunuti z klubu '{0}'' do klubu '{1}'".format(self.instance, klub))

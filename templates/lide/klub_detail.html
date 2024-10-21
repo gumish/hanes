@@ -5,14 +5,14 @@
     KLUB | {{ klub.nazev }}
 {% endblock title %}
 
-{% block section %}section_kluby{% endblock %}
+{% block section %}section_kluby{% endblock section %}
 
 {% block breadcrumb %}
     <div class="ui breadcrumb">
         <a href="{% url 'kluby:kluby_list' %}#{{ klub.nazev.0 }}" class="section">kluby</a>
         <i class="right chevron icon divider"></i>
         <div class="active section">detail klubu</div>
-    </div>    
+    </div>
 {% endblock breadcrumb %}
 
 {% block header %}
@@ -31,13 +31,16 @@
             <i class="ui users big icon"></i>
             {{ klub.nazev }}
             {% if user.is_staff %}
+                <a href="{% url 'kluby:klub_update' klub.slug %}" title="editovat klub" class="ui icon button">
+                    <i class="edit link icon"></i>
+                </a>
                 <a href="{% url 'admin:kluby_klub_change' klub.id %}" title="editovat klub v administraci" target="_blank" class="ui icon button">
                     <i class="settings link icon"></i>
                 </a>
             {% endif %}
             <div class="sub header">detail klubu</div>
         </div>
-    </h1>    
+    </h1>
 {% endblock header %}
 
 {% block content %}
@@ -50,7 +53,7 @@
                 <dd>{{ klub.sport|default:'-' }}</dd>
                 {% if klub.info %}
                     <dt>Info</dt>
-                    <dd>{{ klub.info|safe|urlize|linebreaks }}</dd>                    
+                    <dd>{{ klub.info|safe|urlize|linebreaks }}</dd>
                 {% endif %}
             </dl>
         </div>
@@ -60,7 +63,7 @@
                 <thead>
                     <tr>
                         <th colspan="3">
-                            celkem {{ clenove|length }}  závodníků    
+                            celkem {{ clenove|length }}  závodníků
                         </th>
                     </tr>
                     <tr>

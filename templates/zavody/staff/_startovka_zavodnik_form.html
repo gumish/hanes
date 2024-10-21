@@ -1,7 +1,7 @@
 {% load l10n custom_filters %}
 <form
         action="{% url 'zavodnici:uprav_zavodnika_ze_startovky' zavodnik.id %}"
-        method="POST"
+        method="post"
         class="{{ zavodnik.nedokoncil|lower }} tr ui small {% if formset.errors %}error{% endif %} form" id="zavodnik_{{ zavodnik.id|safe }}">
     <span class="td">
         <i class="ui blue refresh link icon" title="aktualizovat řádek dle uložených dat" data-url="{% url 'zavodnici:aktualizuj_data_startovky' zavodnik.id %}"></i>
@@ -28,7 +28,7 @@
                 {{ zavodnik.clovek.prijmeni }}
             </a>
             {% if zavodnik.kategorie %}
-                <i class="warning circle icon" title="kategorie '{{zavodnik.kategorie.nazev}}' je vynucena - není automaticky přiřazena"></i>
+                <i class="warning circle icon" title="kategorie '{{ zavodnik.kategorie.nazev }}' je vynucena - není automaticky přiřazena"></i>
             {% endif %}
         </span>
         <span class="td dns-hide">
@@ -49,7 +49,6 @@
             </a>
         {% endif %}
     </span>
-
 
     <span class="td">
         {{ formular.startovni_cas }}
