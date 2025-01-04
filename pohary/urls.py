@@ -19,4 +19,9 @@ urlpatterns = [
     path('pridat/',
         views.PoharCreateView.as_view(),
         name='pohar_create'),
+
+    # PDF
+    path('kategorie/<int:kategorie_pk>/pdf/',
+         views.vysledky_kategorie_pdf,
+         name='kategorie_poharu_pdf'),
 ]

@@ -5,7 +5,7 @@
     KATEGORIE POHÁRU | {{ kategorie.nazev }}
 {% endblock title %}
 
-{% block section %}section_pohary{% endblock %}
+{% block section %}section_pohary{% endblock section %}
 
 {% block breadcrumb %}
     <div class="ui breadcrumb">
@@ -36,6 +36,10 @@
             <a href="{% url 'admin:pohary_kategoriepoharu_change' kategorie.id %}" title="editovat kategorii poháru v administraci" target="_blank" class="ui icon black button">
                 <i class="settings icon"></i>
                 admin kategorie
+            </a>
+            <a href="{% url 'pohary:kategorie_poharu_pdf' kategorie.pk %}" target="_blank" class="ui icon grey button" title="">
+                <i class="file pdf outline icon"></i>
+                výsledky v PDF
             </a>
         </div>
     {% endif %}
@@ -81,7 +85,7 @@
                                     title="pořadí: {{ zavodnik.poradi }}   čas: {{ zavodnik.vysledny_cas }}  kategorie: {{ zavodnik.kategorie_temp.znacka }}">
                                     {{ zavodnik.body }}
                                     {% if zavodnik.kategorie %}
-                                        <i class="warning circle icon" title="kategorie '{{zavodnik.kategorie.nazev}}' je vynucena - není automaticky přiřazena"></i>
+                                        <i class="warning circle icon" title="kategorie '{{ zavodnik.kategorie.nazev }}' je vynucena - není automaticky přiřazena"></i>
                                     {% endif %}
                                     {% comment %}{% if user.is_staff %}
                                         <a href="{{ zavodnik.get_absolute_url }}">

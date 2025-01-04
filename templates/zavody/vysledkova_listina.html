@@ -5,11 +5,9 @@
     VÝSLEDKOVÁ LISTINA | {{ rocnik }}
 {% endblock title %}
 
-{% block custom_js %}
-    
-{% endblock custom_js %}
+{% block custom_js %}{% endblock custom_js %}
 
-{% block section %}section_zavody{% endblock %}
+{% block section %}section_zavody{% endblock section %}
 
 {% block breadcrumb %}
     <div class="ui breadcrumb">
@@ -20,7 +18,7 @@
         <a href="{{ rocnik.get_absolute_url }}" class="section">detail ročníku</a>
         <i class="right chevron icon divider"></i>
         <div class="active section">výsledková listina</div>
-    </div>    
+    </div>
 {% endblock breadcrumb %}
 
 {% block header %}
@@ -33,7 +31,7 @@
             {{ rocnik }}
             <div class="sub header">výsledková listina ročníku</div>
         </div>
-    </h1>    
+    </h1>
 {% endblock header %}
 
 {% block staff %}
@@ -55,7 +53,7 @@
             výsledky v PDF
         </a>
 
-        <form action="" method="POST" class="ui form" style="float:right;">
+        <form action="" method="post" class="ui form" style="float:right;">
             {% csrf_token %}
             <div class="inline fields">
             {% for field in sloupce_form %}
@@ -69,7 +67,7 @@
                 </button>
             </div>
         </form>
-     </div>    
+     </div>
 {% endblock staff %}
 
 {% block content %}

@@ -14,16 +14,16 @@
                 editace objektu
             </div>
         </div>
-    </h1>    
+    </h1>
 {% endblock header %}
 
 {% block custom_js %}
-    {% wysiwyg_setup %}    
+    {% wysiwyg_setup %}
 {% endblock custom_js %}
 
 {% block content %}
     <div class="ui container">
-        <form action="" method="POST" class="ui form" {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
+        <form action="" method="post" class="ui form" {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
             {% csrf_token %}
             {% for field in form %}
                 {% include "elements/_form_error_field.html" with label=True %}
@@ -41,9 +41,9 @@
                 <a href="{{ object.get_delete_url }}" title="smazat objekt" class="ui icon red button">
                     <i class="trash icon"></i>
                     smazat
-                </a>            
+                </a>
             {% endif %}
         </form>
-        {% wysiwyg_editor "id_content" %}        
+        {% wysiwyg_editor "id_content" %}
     </div>
 {% endblock content %}

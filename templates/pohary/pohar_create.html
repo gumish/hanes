@@ -1,11 +1,8 @@
 {% extends 'base.html' %}
 {% load l10n %}
 
-{% block title %}
-    PŘIDÁNÍ POHÁRŮ
-{% endblock title %}
-
-{% block section %}section_pohary{% endblock %}
+{% block title %}PŘIDÁNÍ POHÁRŮ{% endblock title %}
+{% block section %}section_pohary{% endblock section %}
 
 {% block custom_js %}
     {% comment %}
@@ -24,7 +21,7 @@
         });
     </script>
     {% endcomment %}
-{% endblock %}
+{% endblock custom_js %}
 
 {% block header %}
     <h1 class="ui header">
@@ -32,30 +29,69 @@
             <i class="trophy big icon"></i>
             Přidání poháru
         </div>
-    </h1>    
+    </h1>
 {% endblock header %}
 
-{% block staff %}
-{% endblock staff %}
+{% block staff %}{% endblock staff %}
 
 {% block content %}
     <div class="ui grid">
         <div class="ui ten wide column">
             <h3>Přidání nového poháru</h3>
-            <form action="" method="POST" class="ui form">
+            <form action="" method="post" class="ui form">
                 {% csrf_token %}
-                {% for field in form %}
-                    {% include "elements/_form_error_field.html" with label=True required=True %}
-                {% endfor %}
+
+                {% with label=True required=True %}
+                    {% include "elements/_form_error_field.html" with field=form.nazev %}
+                    {% include "elements/_form_error_field.html" with field=form.datum %}
+                    {% include "elements/_form_error_field.html" with field=form.info %}
+                    {% include "elements/_form_error_field.html" with field=form.bod_hodnoceni %}
+                    {% include "elements/_form_error_field.html" with field=form.rocniky %}
+                    {% include "elements/_form_error_field.html" with field=form.kluby %}
+                    {% include "elements/_form_error_field.html" with field=form.zavodu %}
+                {% endwith %}
+
+                {{ pocet_zavodu_poharu_sportu.management_form }}
+                <table class="ui unstackable small table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Sport s vyjímkou
+                            </th>
+                            <th title="počet nejlepších výsledků konkrétního sportu jež budou do poháru započítany, při prázdné kolonce budou použity všechny závody">
+                                Počet výsledků
+                            </th>
+                            <th title="záznam o sportu smazat">
+                                <i class="trash icon"></i>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for form in pocet_zavodu_poharu_sportu %}
+                            <tr>
+                                <td>
+                                    {% include "elements/_form_error_field.html" with field=form.sport %}
+                                </td>
+                                <td>
+                                    {% include "elements/_form_error_field.html" with field=form.zavodu %}
+                                </td>
+                                <td>
+                                    {% include "elements/_form_error_field.html" with field=form.DELETE %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
                 <button type="submit" class="ui primary icon button">
                     <i class="save icon"></i>
                     odeslat
-                </button>        
+                </button>
                 <a href="{% url 'pohary:pohary_list' %}" title="neuložit a zpět na seznam pohárů" class="ui icon button">
                     <i class="ui reply mail icon"></i>
                     zrušit
                 </a>
-            </form>            
+            </form>
         </div>
         <div class="ui six wide column">
             <h3>Seznam již registrovných pohárů</h3>
