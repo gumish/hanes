@@ -182,27 +182,38 @@ class KategoriePoharu(models.Model):
                 self.pohar.zavodnici_s_kategorii.append(zavodnik)
         return zarazeni
 
-    def get_pocet_zapocitanych_zavodu(self):
-        """
-        Vrati pocet zavodu/vysledku, ktere jsou pocitany do poharu
-        """
-        return self.zavodu or self.pohar.zavodu or False
-
     def bodove_hodnoceni(self):
         """
         Vrati pocet zavodu, ktere jsou pocitany do poharu
         """
         return self.bod_hodnoceni or self.pohar.bod_hodnoceni
 
-    def poradi_zavodniku(self):
-        """
-        Vrati serazany list-zebricek zavodniku.
-        Lide se radi v poharu dle tohoto systemu:
 
+    def poradi_zavodniku(self) -> list:
+        """
+        1. Upraví pořadí závodníka na základě jeho výkonu a roku.
+        2. Přidá závodníka do slovníku lidí.
+        3. Označí závody, které se započítají do poháru.
+        4. Vrátí slovník lidí a jejich závodníků s nejlepšími závody.
+        5. Projede slovník lidí, oboduje závody a seřadí lidi do listu dle bodů.
+        6. Vyřeší lidi se stejným počtem bodů.
+        7. Doplní nezúčastněné závody hodnotou None.
+        8. Vrátí list: Seřazený žebříček závodníků ve formátu [(pozice, Clovek, [zavody,...]),...]
         """
 
-        def _uprav_poradi_zavodnika(zavodnik, rocnik, i, umisteni, minuly_cas):
-            """ Upravi poradi zavodnika """
+        def _uprav_poradi_zavodnika(zavodnik, rocnik, i, umisteni, minuly_cas) -> tuple:
+            """ Upraví pořadí závodníka na základě jeho výkonu a roku.
+
+                Args:
+                    zavodnik: Objekt reprezentující závodníka, který by měl mít atributy `rocnik` a `vysledny_cas`.
+                    rocnik: Aktuální rok soutěže.
+                    i: Aktuální index nebo pozice v pořadí.
+                    umisteni: Aktuální pořadí závodníka.
+                    minuly_cas: Předchozí zaznamenaný čas závodníka.
+
+                Returns:
+                    tuple: N-tice obsahující aktualizované hodnoty pro rocnik, i, umisteni a minuly_cas.
+            """
             if rocnik == zavodnik.rocnik:
                 i += 1
                 if minuly_cas < zavodnik.vysledny_cas:
@@ -218,22 +229,67 @@ class KategoriePoharu(models.Model):
             minuly_cas = zavodnik.vysledny_cas
             return rocnik, i, umisteni, minuly_cas
 
-        def _pridej_zavodniky_lidem(lide: dict, zavodnik: Zavodnik):
-            """ Prida zavodnika do slovniku lidi """
+        def _pridej_zavodniky_lidem(lide: dict, zavodnik: Zavodnik) -> dict:
+            """
+            Přidá závodníka do odpovídající osoby ve slovníku.
+
+            Tato funkce vezme slovník lidí a objekt závodníka,
+            a přidá závodníka do seznamu závodníků pro odpovídající osobu.
+
+            Args:
+                lide (dict): Slovník, kde klíčem je osoba a hodnotou je seznam závodníků.
+                zavodnik (Zavodnik): Objekt závodníka, který obsahuje odkaz na osobu.
+
+            Returns:
+                dict: Aktualizovaný slovník s přidaným závodníkem k odpovídající osobě.
+            """
             clovek = zavodnik.clovek
             lide.setdefault(clovek, [])
             lide[clovek].append(zavodnik)
             return lide
 
-        def _oznac_zapocitane_zavody(lide):
-            """ Oznaci zavody, ktere se zapocitaji do poharu """
-            for _, zavodnici_cloveka in list(lide.items()):
-                zapocitane = sorted(zavodnici_cloveka, key=attrgetter("poradi"))
-                for zavodnik in zapocitane[: self.get_pocet_zapocitanych_zavodu()]:
-                    zavodnik.zapocitane = True
+        def _oznac_zapocitane_zavody(lide: dict):
+            """
+            Označí závody, které se započítají do poháru pro každou osobu ve slovníku.
+            Args:
+                lide (dict): Slovník, kde klíčem je identifikátor osoby a hodnotou je list závodníků.
+                            Každý závodník musí mít atribut 'poradi', který udává pořadí závodu.
+            Funkce seřadí závodníky pro každého člověka podle atributu 'poradi' a označí nejlepší závody (až do počtu
+            defaultni_pocet_zavodu = self.zavodu nebo self.pohar.zavodu) jako započítané nastavením jejich atributu 'zapocitane' na True.
+            Pokud závody poháru obsahují více sportů (např. běh a lyžování), pak se množství započítaných závodů pro každý sport odvíjí od hodnot defaultni_pocet_zavodu.
+            Pokud je defaultni_pocet_zavodu False, pak se započítají všechny závody.
+            Pokud má pohár nějaké related pohar.pocet_zavodu_sportu, pak se pro každý sport použije jeho hodnota zavodu.
+            """
+            defaultni_pocet_zavodu = self.zavodu or self.pohar.zavodu or False
 
-        def _get_lide_s_nejlepsimi_zavody(zavodnici):
-            """ Vrati slovnik lidi a jejich zavodnik s nejlepsimi zavody """
+            for zavodnici_cloveka in lide.values():
+                serazeni_zavodnici_dle_poradi = sorted(zavodnici_cloveka, key=attrgetter("poradi"))  # atribut 'poradi' je nastaven v '_uprav_poradi_zavodnika()'
+
+                # Získání počtu závodů pro každý sport objevený se v poháru
+                sport_pocet_zavodu = {}
+                for zavodnik in serazeni_zavodnici_dle_poradi:
+                    sport = zavodnik.sport
+                    if sport not in sport_pocet_zavodu:
+                        pocet_zavodu_poharu_sportu = PocetZavoduPoharuSportu.objects.filter(pohar=self.pohar, sport=sport).first()
+                        if pocet_zavodu_poharu_sportu:
+                            sport_pocet_zavodu[sport] = pocet_zavodu_poharu_sportu.zavodu
+                        else:
+                            sport_pocet_zavodu[sport] = defaultni_pocet_zavodu
+
+                # Označení započítaných závodů
+                for sport, pocet_zavodu in sport_pocet_zavodu.items():
+                    zavodnici_sportu = [z for z in serazeni_zavodnici_dle_poradi if z.sport == sport]
+                    for zavodnik in zavodnici_sportu[:pocet_zavodu]:
+                        zavodnik.zapocitane = True
+
+        def _get_lide_s_nejlepsimi_zavody(zavodnici: list) -> dict:
+            """
+            Zpracuje seznam závodníků a vrátí slovník lidí s jejich nejlepšími závody.
+            Args:
+                zavodnici (list): Seznam závodníků.
+            Returns:
+                dict: Slovník, kde klíče jsou lidé a hodnoty jsou jejich nejlepší závody.
+            """
             lide = {}
             rocnik = None
             i = 1
@@ -282,9 +338,17 @@ class KategoriePoharu(models.Model):
             zebricek = sorted(zebricek, key=lambda x: x[2], reverse=True)
             return zebricek
 
-        def _stejne_body(zebricek):
+        def _stejne_body(zebricek: list) -> list:
             """
-            Vyresi lidi se stejnym poctem bodu
+            Zpracuje žebříček závodníků a řeší případy shodných bodů porovnáním časů jednotlivých závodníků.
+                Args:
+                    zebricek (list): Seznam seznamů, kde každý vnitřní seznam představuje data závodníka.
+                                    Každý vnitřní seznam by měl obsahovat alespoň tři prvky:
+                                    - Objekt s atributem 'varovani'.
+                                    - Seznam závodníků, z nichž každý má atributy 'rocnik' a 'vysledny_cas'.
+                                    - Číselné skóre.
+                Returns:
+                    list: Zpracovaný žebříček s aktualizovanými skóre a pozicemi a varováními pro případy shod.
             """
 
             def _stejne_soucty(zebricek):

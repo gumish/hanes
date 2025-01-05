@@ -57,6 +57,7 @@
         <thead class="full-width">
             <tr>
                 <th>ročník</th>
+                <th>sport</th>
                 <th>závodníků celkem</th>
                 <th>závodníků v pohárů</th>
             </tr>
@@ -68,6 +69,9 @@
                         <a href="{{ rocnik.get_absolute_url }}">
                             {{ rocnik }}
                         </a>
+                    </td>
+                    <td>
+                        {{ rocnik.zavod.sport }}
                     </td>
                     <td>
                         {{ rocnik.zavodnici.count }}

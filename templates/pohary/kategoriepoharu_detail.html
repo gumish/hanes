@@ -58,7 +58,7 @@
                     <th style="width: 4em;">místo</th>
                     <th style="width: 20em;">člověk</th>
                     {% for rocnik in rocniky %}
-                        <th class="rocnik">
+                        <th class="rocnik" title="sport: {{ rocnik.zavod.sport }}">
                             <a href="{{ rocnik.get_absolute_url }}">
                                 {{ rocnik }}
                             </a>
@@ -113,7 +113,7 @@
                     <th>místo</th>
                     <th>člověk</th>
                     {% for rocnik in rocniky %}
-                        <th>
+                        <th title="sport: {{ rocnik.zavod.sport }}">
                             <a href="{{ rocnik.get_absolute_url }}">
                                 {{ rocnik }}
                             </a>

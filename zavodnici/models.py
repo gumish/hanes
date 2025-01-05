@@ -91,6 +91,9 @@ class Zavodnik(models.Model):
     def __str__(self):
         return '{0} - {1}'.format(self.clovek or '???', self.rocnik)
 
+    @property
+    def sport(self):
+        return self.rocnik.zavod.sport
 
     def clean(self):
 
