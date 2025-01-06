@@ -12,6 +12,12 @@ class PoharCreateForm(forms.ModelForm):
     class Meta:
         model = Pohar
         fields = "__all__"
+        widgets = {
+            'kluby': forms.Select({'class': 'ui search dropdown', 'multiple': 'multiple'}),
+            'rocniky': forms.Select({'class': 'ui search dropdown', 'multiple': 'multiple'}),
+            'datum': forms.DateInput({'type': 'date'}),
+            'info': forms.Textarea({'rows': 5}),
+        }
 
 
 class PocetZavoduPoharuSportuInline(InlineFormSetFactory):

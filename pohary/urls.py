@@ -16,9 +16,14 @@ urlpatterns = [
     path('kategorie/<int:pk>/',
         views.KategoriePoharuDetailView.as_view(),
         name='kategorie-poharu_detail'),
+
+    # CREATEs / UPDATEs
     path('pridat/',
         views.PoharCreateView.as_view(),
         name='pohar_create'),
+    path('editovat/<int:pk>/',
+        views.PoharUpdateView.as_view(),
+        name='pohar_update'),
 
     # PDF
     path('kategorie/<int:kategorie_pk>/pdf/',

@@ -1,7 +1,8 @@
 from django.http import HttpResponse
+from django.template import context
 from django.views.generic import DetailView, ListView
 from io import BytesIO
-from extra_views import CreateWithInlinesView, NamedFormsetsMixin
+from extra_views import CreateWithInlinesView, UpdateWithInlinesView, NamedFormsetsMixin
 
 from zavody.pdf import PdfPrint
 from zavody.views import TITLE_TEMPLATE
@@ -53,7 +54,7 @@ class KategoriePoharuDetailView(DetailView):
         return context
 
 
-class PoharCreateView(NamedFormsetsMixin, CreateWithInlinesView):
+class PoharCreateUpdateMixin(NamedFormsetsMixin):
     model = Pohar
     form_class = PoharCreateForm
     inlines_names = ["pocet_zavodu_poharu_sportu"]
@@ -61,7 +62,7 @@ class PoharCreateView(NamedFormsetsMixin, CreateWithInlinesView):
     template_name = "pohary/pohar_create.html"
 
     def get_context_data(self, **kwargs):
-        context = super(PoharCreateView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context["pohary"] = Pohar.objects.all()
         return context
 
@@ -69,17 +70,24 @@ class PoharCreateView(NamedFormsetsMixin, CreateWithInlinesView):
         """Nakopirovani hodnot kategorii z prvniho zavodu"""
         response = super().form_valid(form)
         pohar = self.object
+        notcopy_values = ["id", "delka_trate", "rocnik_id", "spusteni_stopek", "startovne"]
         if form.cleaned_data["kopirovat_kategorie"]:
             rocnik = pohar.rocniky.first()
-            for values in list(rocnik.kategorie.all().values()):
-                del values["id"]
-                del values["delka_trate"]
-                del values["rocnik_id"]
-                del values["spusteni_stopek"]
-                del values["startovne"]
+            kategorie_values = rocnik.kategorie.all().values()
+            for values in kategorie_values:
+                values = {key: value for key, value in values.items() if key not in notcopy_values}
                 values["pohar"] = pohar
                 KategoriePoharu.objects.create(**values)
         return response
+
+
+class PoharCreateView(PoharCreateUpdateMixin, CreateWithInlinesView):
+    pass
+
+
+class PoharUpdateView(PoharCreateUpdateMixin, UpdateWithInlinesView):
+    pass
+
 
 
 # Function Based Views

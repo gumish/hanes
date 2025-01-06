@@ -30,19 +30,11 @@
 
 {% block staff %}
     <div class="ui stacked secondary segment noprint">
-    {% comment %}
-        {% if user.is_active %}
-            <a href="{% url 'pohary:rocnik_pridani' pohar.slug %}" class="ui blue icon button">
-                <i class="plus icon"></i>
-                nový ročník
-            </a>
-            <a href="{% url 'pohary:pohar_editace' pohar.id %}" class="ui black icon button">
+        {% if user.is_staff %}
+            <a href="{% url 'pohary:pohar_update' pohar.id %}" class="ui black icon button">
                 <i class="edit icon"></i>
                 editace poháru
             </a>
-        {% endif %}
-    {% endcomment %}
-        {% if user.is_staff %}
             <a href="{% url 'admin:pohary_pohar_change' pohar.id %}" title="editovat pohár v administraci" target="_blank" class="ui icon black button">
                 <i class="settings icon"></i>
                 admin poháru

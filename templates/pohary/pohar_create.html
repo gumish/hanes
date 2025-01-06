@@ -1,33 +1,16 @@
 {% extends 'base.html' %}
 {% load l10n %}
 
-{% block title %}PŘIDÁNÍ POHÁRŮ{% endblock title %}
+{% block title %}{% if pohar.id %}ÚPRAVA POHÁRU{% else %}PŘIDÁNÍ POHÁRU{% endif %}{% endblock title %}
 {% block section %}section_pohary{% endblock section %}
 
-{% block custom_js %}
-    {% comment %}
-    <script type="text/javascript">
-        $(document).ready(function(){
-            $("#id_sport").devbridgeAutocomplete({
-                serviceUrl: "{% url 'pohary:sport_autocomplete' %}",
-                minChars: 1,
-                deferRequestBy: 0,
-                maxHeight: 600,
-                preventBadQueries: false,
-                triggerSelectOnValidInput: false,
-                noCache: false,
-                width: 300,
-            });
-        });
-    </script>
-    {% endcomment %}
-{% endblock custom_js %}
+{% block custom_js %}{% endblock custom_js %}
 
 {% block header %}
     <h1 class="ui header">
         <div class="content">
             <i class="trophy big icon"></i>
-            Přidání poháru
+            {% if pohar.id %}Úprava poháru{% else %}Přidání poháru{% endif %}
         </div>
     </h1>
 {% endblock header %}
@@ -37,15 +20,21 @@
 {% block content %}
     <div class="ui grid">
         <div class="ui ten wide column">
-            <h3>Přidání nového poháru</h3>
+            <h3>{% if pohar.id %}Úprava poháru: {{ pohar }}{% else %}Přidání nového poháru{% endif %}</h3>
             <form action="" method="post" class="ui form">
                 {% csrf_token %}
 
                 {% with label=True required=True %}
                     {% include "elements/_form_error_field.html" with field=form.nazev %}
-                    {% include "elements/_form_error_field.html" with field=form.datum %}
-                    {% include "elements/_form_error_field.html" with field=form.info %}
-                    {% include "elements/_form_error_field.html" with field=form.bod_hodnoceni %}
+                    <div class="ui grid">
+                        <div class="ui eight wide column">
+                            {% include "elements/_form_error_field.html" with field=form.datum %}
+                            {% include "elements/_form_error_field.html" with field=form.bod_hodnoceni %}
+                        </div>
+                        <div class="ui eight wide column">
+                            {% include "elements/_form_error_field.html" with field=form.info %}
+                        </div>
+                    </div>
                     {% include "elements/_form_error_field.html" with field=form.rocniky %}
                     {% include "elements/_form_error_field.html" with field=form.kluby %}
                     {% include "elements/_form_error_field.html" with field=form.zavodu %}

@@ -6,7 +6,6 @@ from django.db.models import Count
 from django.forms.models import inlineformset_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.template import RequestContext
 from django.urls import reverse, reverse_lazy
 from django.utils.text import slugify
 from django.views.generic import DetailView
@@ -131,7 +130,7 @@ def clovek_autocomplete(request, rocnik_pk=None):
     if rocnik_pk:
         rocnik = Rocnik.objects.get(pk=rocnik_pk)
     if 'query' in request.GET:
-        # query rozdeli na dle mezery na prijmeni a jmeno 
+        # query rozdeli na dle mezery na prijmeni a jmeno
         query = slugify(request.GET['query']).split('-')
         lide = Clovek.objects.filter(prijmeni_slug__startswith=query[0])
         if len(query) > 1:
