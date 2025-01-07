@@ -22,21 +22,26 @@
         <div class="ui ten wide column">
             <h3>{% if pohar.id %}Úprava poháru: {{ pohar }}{% else %}Přidání nového poháru{% endif %}</h3>
             <form action="" method="post" class="ui form">
+                {% comment %} {{ form.hidden_fields.as_p }} {% endcomment %}
+                {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
                 {% csrf_token %}
 
                 {% with label=True required=True %}
-                    {% include "elements/_form_error_field.html" with field=form.nazev %}
                     <div class="ui grid">
                         <div class="ui eight wide column">
+                            {% include "elements/_form_error_field.html" with field=form.nazev %}
                             {% include "elements/_form_error_field.html" with field=form.datum %}
                             {% include "elements/_form_error_field.html" with field=form.bod_hodnoceni %}
                         </div>
                         <div class="ui eight wide column">
                             {% include "elements/_form_error_field.html" with field=form.info %}
+                            {% if not pohar.id %}{% include "elements/_form_error_field.html" with field=form.kopirovat_kategorie %}{% endif %}
                         </div>
                     </div>
+                    <hr>
                     {% include "elements/_form_error_field.html" with field=form.rocniky %}
                     {% include "elements/_form_error_field.html" with field=form.kluby %}
+                    <hr>
                     {% include "elements/_form_error_field.html" with field=form.zavodu %}
                 {% endwith %}
 
@@ -59,6 +64,7 @@
                         {% for form in pocet_zavodu_poharu_sportu %}
                             <tr>
                                 <td>
+                                    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
                                     {% include "elements/_form_error_field.html" with field=form.sport %}
                                 </td>
                                 <td>

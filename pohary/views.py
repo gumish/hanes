@@ -66,6 +66,9 @@ class PoharCreateUpdateMixin(NamedFormsetsMixin):
         context["pohary"] = Pohar.objects.all()
         return context
 
+
+class PoharCreateView(PoharCreateUpdateMixin, CreateWithInlinesView):
+
     def form_valid(self, form):
         """Nakopirovani hodnot kategorii z prvniho zavodu"""
         response = super().form_valid(form)
@@ -79,10 +82,6 @@ class PoharCreateUpdateMixin(NamedFormsetsMixin):
                 values["pohar"] = pohar
                 KategoriePoharu.objects.create(**values)
         return response
-
-
-class PoharCreateView(PoharCreateUpdateMixin, CreateWithInlinesView):
-    pass
 
 
 class PoharUpdateView(PoharCreateUpdateMixin, UpdateWithInlinesView):
