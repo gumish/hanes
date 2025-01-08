@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from functools import cache, cached_property
 from operator import attrgetter
 
 from django.db import models
@@ -67,21 +68,25 @@ class Pohar(models.Model):
     def prvni_rocnik(self):
         return self.rocniky_chronologicky().first()
 
+    @cached_property
     def zavodnici_vsichni(self):
         zavodnici = Zavodnik.objects.filter(
             rocnik__in=self.rocniky.all(), vysledny_cas__isnull=False, nedokoncil=None
-        ).order_by("rocnik__datum", "vysledny_cas")
+        )
+
         # pokud je zadáno kluby, pak se použijí jen tyto Kluby
         if self.kluby.exists():
             zavodnici = zavodnici.filter(klub__in=self.kluby.all())
-        return zavodnici
+
+        return zavodnici.select_related('rocnik', 'klub').prefetch_related('clovek').order_by("rocnik__datum", "vysledny_cas")
+
 
     def zavodnici_bez_kategorie(self):
         """
         Musi byt volano az po kategoriich,
         tak aby se nejprve naplnila vlastnost 'Pohar.zavodnici_s_kategorii' !!
         """
-        return set(list(self.zavodnici_vsichni())) - set(self.zavodnici_s_kategorii)
+        return set(list(self.zavodnici_vsichni)) - set(self.zavodnici_s_kategorii)
 
 
 class KategoriePoharu(models.Model):
@@ -167,7 +172,7 @@ class KategoriePoharu(models.Model):
             )
 
         zarazeni = []
-        for zavodnik in self.pohar.zavodnici_vsichni():
+        for zavodnik in self.pohar.zavodnici_vsichni:
             vhodny = False
             if (
                 zavodnik.kategorie

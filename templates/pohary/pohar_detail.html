@@ -55,7 +55,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for rocnik, zavodniku in rocniky %}
+            {% for rocnik in rocniky %}
                 <tr>
                     <td>
                         <a href="{{ rocnik.get_absolute_url }}">
@@ -69,7 +69,7 @@
                         {{ rocnik.zavodnici.count }}
                     </td>
                     <td>
-                        {{ zavodniku }}
+                        {{ rocnik.zavodniku_count }}
                     </td>
                 </tr>
             {% endfor %}
@@ -88,7 +88,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for kategorie in pohar.kategorie_poharu.all %}
+            {% for kategorie in kategorie_poharu %}
                 <tr>
                     <td>
                         {{ kategorie.znacka }}
@@ -134,10 +134,10 @@
                 </tr>
             </thead>
             <tbody>
-            {% for klub, zavodniku in kluby %}
+            {% for klub in kluby %}
                 <tr>
                     <td>{{ klub.nazev }}</td>
-                    <td>{{ zavodniku }}</td>
+                    <td>{{ klub.zavodniku_count }}</td>
                 </tr>
             {% endfor %}
             </tbody>

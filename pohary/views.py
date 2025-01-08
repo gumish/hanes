@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.template import context
+from django.db.models import Count, Q
 from django.views.generic import DetailView, ListView
 from io import BytesIO
 from extra_views import CreateWithInlinesView, UpdateWithInlinesView, NamedFormsetsMixin
@@ -8,6 +8,7 @@ from zavody.pdf import PdfPrint
 from zavody.views import TITLE_TEMPLATE
 from zavodnici.views import desetiny_sekundy
 
+from kluby.models import Klub
 from .forms import PoharCreateForm, PocetZavoduPoharuSportuInline
 from .models import KategoriePoharu, Pohar
 
@@ -19,6 +20,9 @@ class PoharyListView(ListView):
     model = Pohar
     template_name = "pohary/pohar_list.html"
 
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("rocniky", "rocniky__zavod")
+
 
 class PoharDetailView(DetailView):
     model = Pohar
@@ -28,17 +32,26 @@ class PoharDetailView(DetailView):
         context = super().get_context_data(**kwargs)
 
         pohar = self.object
-        zavodnici = pohar.zavodnici_vsichni()
-        context["rocniky"] = []
-        context["kluby"] = []
+        rocniky = pohar.rocniky.all()
+        kluby = pohar.kluby.all()
 
-        for rocnik in pohar.rocniky.all():
-            zavodniku = zavodnici.filter(rocnik=rocnik).count()
-            context["rocniky"].append((rocnik, zavodniku))
+        # Annotate counts for rocniky
+        context["rocniky"] = rocniky.annotate(
+            zavodniku_count=Count("zavodnici", filter=Q(
+                zavodnici__klub__in=kluby or Klub.objects.all(),
+                zavodnici__vysledny_cas__isnull=False,
+                zavodnici__nedokoncil=None))
+        )
 
-        for klub in pohar.kluby.all():
-            zavodniku = zavodnici.filter(klub=klub).count()
-            context["kluby"].append((klub, zavodniku))
+        # Annotate counts for kluby
+        context["kluby"] = kluby.annotate(
+            zavodniku_count=Count("zavodnici", filter=Q(
+                zavodnici__rocnik__in=rocniky,
+                zavodnici__vysledny_cas__isnull=False,
+                zavodnici__nedokoncil=None))
+        )
+
+        context["kategorie_poharu"] = pohar.kategorie_poharu.all()
 
         return context
 
