@@ -11,3 +11,4 @@ _virtenv
 templates/git_sha.txt
 templates/git_msg.txt
 db *.sql
+_hanes_update.bat
