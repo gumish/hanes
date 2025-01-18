@@ -16,6 +16,9 @@ urlpatterns = [
     path('kategorie/<int:pk>/',
         views.KategoriePoharuDetailView.as_view(),
         name='kategorie-poharu_detail'),
+    path('vsechny-kategorie-poharu/<str:slug>/',
+        views.VsechnyKategoriePoharuView.as_view(),
+        name='vsechny_kategorie_poharu'),
 
     # CREATEs / UPDATEs
     path('pridat/',

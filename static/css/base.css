@@ -74,6 +74,12 @@ ul.errorlist li {
     color: red;
 }
 
+.mb-1 {margin-bottom: 1em !important;}
+.mb-2 {margin-bottom: 2em !important;}
+.mb-3 {margin-bottom: 3em !important;}
+.mb-4 {margin-bottom: 4em !important;}
+.mb-5 {margin-bottom: 5em !important;}
+
 /* MENU */
 #section_uvod #menu_uvod,
 #section_zavody #menu_zavody,
@@ -281,22 +287,22 @@ dl.vlastnosti dd {
     background-color: hsl(206, 73%, 30%);
 }
 
-#zebricek_kategorie tr.warning {
+table.kategoriepoharu-tabulka tr.warning {
     background-color: hsl(40, 70%, 93%)!important;
 }
 
-#zebricek_kategorie tr.error {
+table.kategoriepoharu-tabulka tr.error {
     background-color: hsl(0, 100%, 84%)!important;
 }
 
-#zebricek_kategorie tr.jmeno td {
+table.kategoriepoharu-tabulka tr.jmeno td {
     font-weight: bold;
     background-color: black;
     color: white;
 }
 
-#zebricek_kategorie tr.warning.pozice:not(.zmena-varovani) td,
-#zebricek_kategorie tr.error.pozice:not(.zmena-varovani) td {
+table.kategoriepoharu-tabulka tr.warning.pozice:not(.zmena-varovani) td,
+table.kategoriepoharu-tabulka tr.error.pozice:not(.zmena-varovani) td {
     border-top-color: hsl(0, 0%, 65%);
 }
 

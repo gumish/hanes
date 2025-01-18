@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}
+    KATEGORIE POHÁRU | {{ pohar.nazev }}
+{% endblock title %}
+
+{% block section %}section_pohary{% endblock section %}
+
+{% block breadcrumb %}
+    <div class="ui breadcrumb">
+        <a href="{% url 'pohary:pohary_list' %}" class="section">poháry</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">kategorie poháru</div>
+    </div>
+{% endblock breadcrumb %}
+
+{% block header %}
+    <h1 class="ui header">
+        <a href="{% url 'pohary:pohary_list' %}" title="na seznam pohárů">
+            <i class="ui reply mail link big icon"></i>
+        </a>
+        <div class="content">
+            <i class="ui trophy big icon"></i>
+            {{ pohar }}
+            <div class="sub header">ktegorie poháru</div>
+        </div>
+    </h1>
+{% endblock header %}
+
+{% block staff %}
+    {% if user.is_staff %}
+    <div class="ui stacked secondary segment noprint">
+            <a href="{% url 'pohary:pohar_update' pohar.id %}" class="ui black icon button">
+                <i class="edit icon"></i>
+                editace poháru
+            </a>
+            <a href="{% url 'admin:pohary_pohar_change' pohar.id %}" title="editovat pohár v administraci" target="_blank" class="ui icon black button">
+                <i class="settings icon"></i>
+                admin poháru
+            </a>
+    </div>
+    {% endif %}
+{% endblock staff %}
+
+{% block content %}
+
+    {% for kategorie in kategorie_poharu %}
+        <div class="ui segment mb-3">
+            {% include "pohary/_kategoriepoharu_tabulka.html" %}
+        </div>
+    {% endfor %}
+
+{% endblock content %}

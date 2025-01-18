@@ -29,18 +29,18 @@
 {% endblock header %}
 
 {% block staff %}
+    {% if user.is_staff %}
     <div class="ui stacked secondary segment noprint">
-        {% if user.is_staff %}
-            <a href="{% url 'pohary:pohar_update' pohar.id %}" class="ui black icon button">
-                <i class="edit icon"></i>
-                editace poháru
-            </a>
-            <a href="{% url 'admin:pohary_pohar_change' pohar.id %}" title="editovat pohár v administraci" target="_blank" class="ui icon black button">
-                <i class="settings icon"></i>
-                admin poháru
-            </a>
-        {% endif %}
+        <a href="{% url 'pohary:pohar_update' pohar.id %}" class="ui black icon button">
+            <i class="edit icon"></i>
+            editace poháru
+        </a>
+        <a href="{% url 'admin:pohary_pohar_change' pohar.id %}" title="editovat pohár v administraci" target="_blank" class="ui icon black button">
+            <i class="settings icon"></i>
+            admin poháru
+        </a>
     </div>
+    {% endif %}
 {% endblock staff %}
 
 {% block content %}
@@ -76,7 +76,9 @@
         </tbody>
     </table>
 
-    <h3>Kategorie poháru</h3>
+    <h3>
+        Kategorie poháru
+    </h3>
     <table class="ui celled table">
         <thead>
             <tr>
@@ -123,6 +125,10 @@
             {% endwith %}
         </tbody>
     </table>
+    <a href="{% url 'pohary:vsechny_kategorie_poharu' pohar.slug %}" class="ui icon primary button">
+        <i class="list icon"></i>
+        tabulky všech kategorií poháru
+    </a>
 
     {% if kluby %}
         <h3>Kluby poháru</h3>

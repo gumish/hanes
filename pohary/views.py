@@ -62,8 +62,22 @@ class KategoriePoharuDetailView(DetailView):
     template_name = "pohary/kategoriepoharu_detail.html"
 
     def get_context_data(self, **kwargs):
-        context = super(KategoriePoharuDetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context["pohar"] = self.object.pohar
+        return context
+
+
+class VsechnyKategoriePoharuView(DetailView):
+    """ Zobrazi vsechny kategorie poharu
+        vice tabulek KategoriePoharu pod sebou
+    """
+
+    model = Pohar
+    template_name = "pohary/vsechny_kategorie_poharu.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["kategorie_poharu"] = self.object.kategorie_poharu.all()
         return context
 
 
