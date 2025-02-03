@@ -241,6 +241,8 @@ class KategoriePoharu(models.Model):
             Tato funkce vezme slovník lidí a objekt závodníka,
             a přidá závodníka do seznamu závodníků pro odpovídající osobu.
 
+            Do Clovek se přidá atribut 'kluby_pohary', který obsahuje zkratky klubů, ve kterých závodník startoval.
+
             Args:
                 lide (dict): Slovník, kde klíčem je osoba a hodnotou je seznam závodníků.
                 zavodnik (Zavodnik): Objekt závodníka, který obsahuje odkaz na osobu.
@@ -249,6 +251,10 @@ class KategoriePoharu(models.Model):
                 dict: Aktualizovaný slovník s přidaným závodníkem k odpovídající osobě.
             """
             clovek = zavodnik.clovek
+            if zavodnik.klub:
+                if not hasattr(clovek, 'kluby_pohary'):
+                    clovek.kluby_poharu = set()
+                clovek.kluby_poharu.add(zavodnik.klub.zkratka)
             lide.setdefault(clovek, [])
             lide[clovek].append(zavodnik)
             return lide

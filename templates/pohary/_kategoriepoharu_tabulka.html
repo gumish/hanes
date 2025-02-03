@@ -6,6 +6,7 @@
         <tr>
             <th style="width: 4em;">místo</th>
             <th style="width: 20em;">člověk</th>
+            <th style="width: 4em;">klub(y)</th>
             {% for rocnik in rocniky %}
                 <th title="sport: {{ rocnik.zavod.sport }}">
                     <a href="{{ rocnik.get_absolute_url }}">
@@ -25,9 +26,11 @@
                 <td class="right aligned">{{ pozice }}.</td>
                 <td>
                     <a href="{{ clovek.get_absolute_url }}">
-                        {{ clovek }}
+                        {{ clovek.cele_jmeno }}
                     </a>
                 </td>
+                <td>{{ clovek.kluby_poharu|join:", " }}</td>
+
                 {% for zavodnik in zavody %}
                     {% if zavodnik %}
                         <td class="{% if zavodnik.zapocitane %}active bold{% endif %} center aligned"
@@ -57,19 +60,5 @@
             </tr>
         {% endfor %}
     </tbody>
-    <tfoot class="full-width">
-        <tr>
-            <th>místo</th>
-            <th>člověk</th>
-            {% for rocnik in rocniky %}
-                <th title="sport: {{ rocnik.zavod.sport }}">
-                    <a href="{{ rocnik.get_absolute_url }}">
-                        {{ rocnik }}
-                    </a>
-                </th>
-            {% endfor %}
-            <th>body</th>
-        </tr>
-    </tfoot>
 </table>
 {% endwith %}
