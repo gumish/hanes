@@ -8,7 +8,7 @@
             <th style="width: 20em;">člověk</th>
             <th style="width: 4em;">klub(y)</th>
             {% for rocnik in rocniky %}
-                <th title="sport: {{ rocnik.zavod.sport }}">
+                <th title="sport: {{ rocnik.zavod.sport }} | datum: {{ rocnik.datum }}">
                     <a href="{{ rocnik.get_absolute_url }}">
                         {{ rocnik }}
                     </a>

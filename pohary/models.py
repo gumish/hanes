@@ -42,6 +42,10 @@ class Pohar(models.Model):
         blank=True,
         help_text="pokud není zadán žádný Klub, pak se použijí všechny",
     )
+    ignorovat_kategorie_zavodnika = models.BooleanField(
+        "Ignorovat kategorie závodníků", default=False,
+        help_text="pokud je povoleno, pak při filtrování závodníku do kategorií není přihlíženo k jejich kategoriím",
+    )
 
     class Meta:
         verbose_name = "Pohár"
@@ -174,9 +178,8 @@ class KategoriePoharu(models.Model):
         zarazeni = []
         for zavodnik in self.pohar.zavodnici_vsichni:
             vhodny = False
-            if (
-                zavodnik.kategorie
-            ):  # podminka pridana pro pripad dvojich kategorii pro cloveka
+
+            if zavodnik.kategorie and not self.pohar.ignorovat_kategorie_zavodnika:  # podminka pridana pro pripad dvojich kategorii pro cloveka
                 vhodny = zavodnik.kategorie.znacka == self.znacka
             else:
                 vhodny = kategorie_test_cloveka(

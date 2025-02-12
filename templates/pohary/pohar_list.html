@@ -51,7 +51,7 @@
                     </td>
                     <td>
                         {% for rocnik in pohar.rocniky.all %}
-                            <a href="{{ rocnik.get_absolute_url }}">
+                            <a href="{{ rocnik.get_absolute_url }}" title="{{ rocnik.datum }}">
                                 {{ rocnik }}
                             </a>
                             {% if not forloop.last %}

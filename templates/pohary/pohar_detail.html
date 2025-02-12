@@ -44,7 +44,7 @@
 {% endblock staff %}
 
 {% block content %}
-    <h3>Závody</h3>
+    <h3 class="ui header">Závody</h3>
     <table class="ui celled definition collapsing large table">
         <thead class="full-width">
             <tr>
@@ -76,8 +76,11 @@
         </tbody>
     </table>
 
-    <h3>
+    <h3 class="ui header">
         Kategorie poháru
+        {% if pohar.ignorovat_kategorie_zavodnika %}
+            <div class="sub header">řazení do kategorií v tomto poháru ignoruje kategorie závodníka ze závodů</div>
+        {% endif %}
     </h3>
     <table class="ui celled table">
         <thead>
@@ -115,8 +118,8 @@
                 {% if bez_kategorie %}
                     <tr class="red">
                         <td>-</td>
-                        <td colspan="4">nezařazení do žádné z kategorií</td>
-                        <td title="{{ bez_kategorie|join:'/n' }}" style="cursor: help;">
+                        <td colspan="3">nezařazení do žádné z kategorií</td>
+                        <td title="{{ bez_kategorie|join:'<br>' }}" style="cursor: help;">
                             {{ bez_kategorie|length }}
                             <i class="ui users icon"></i>
                         </td>
@@ -131,7 +134,7 @@
     </a>
 
     {% if kluby %}
-        <h3>Kluby poháru</h3>
+        <h3 class="ui header">Kluby poháru</h3>
         <table class="ui celled table">
             <thead>
                 <tr>

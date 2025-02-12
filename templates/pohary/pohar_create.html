@@ -43,6 +43,7 @@
                     {% include "elements/_form_error_field.html" with field=form.kluby %}
                     <hr>
                     {% include "elements/_form_error_field.html" with field=form.zavodu %}
+                    {% include "elements/_form_error_field.html" with field=form.ignorovat_kategorie_zavodnika %}
                 {% endwith %}
 
                 {{ pocet_zavodu_poharu_sportu.management_form }}
