@@ -1,14 +1,15 @@
-
 from datetime import date
+
 from django import forms
+from django.utils.text import slugify
 
-
-from .models import Zavodnik
-from zavody.models import Kategorie
+from hanes.mixins import disable_fields
 from kluby.models import Klub
 from lide.models import POHLAVI, Clovek
+from zavody.models import Kategorie
+
 from .custom_fields import CustomTimeField
-from django.utils.text import slugify
+from .models import Zavodnik
 
 
 # FORMS
@@ -32,14 +33,22 @@ class ZavodnikPridaniForm(forms.ModelForm):
 
     def clean(self):
         'z důvodu validace se `Clovek` vytvari uz v `clean` funkci'
-        data = super(ZavodnikPridaniForm, self).clean()
-        clovek, created = Clovek.objects.get_or_create(
-            prijmeni=data['prijmeni'],
-            jmeno=data['jmeno'],
-            narozen=data['narozen'],
-            defaults={'pohlavi': data['pohlavi']}
-        )
-        self.instance.clovek = clovek
+        data = super().clean()
+        if self.instance.clovek:
+            Clovek.objects.filter(id=self.instance.clovek.id).update(
+                prijmeni=data['prijmeni'],
+                jmeno=data['jmeno'],
+                narozen=data['narozen'],
+                pohlavi=data['pohlavi']
+            )
+        else:
+            clovek, _ = Clovek.objects.get_or_create(
+                prijmeni=data['prijmeni'],
+                jmeno=data['jmeno'],
+                narozen=data['narozen'],
+                defaults={'pohlavi': data['pohlavi']}
+            )
+            self.instance.clovek = clovek
         return data
 
     def full_clean(self):
@@ -68,7 +77,7 @@ class ZavodnikPridaniForm(forms.ModelForm):
                 error.error_dict['prijmeni'] = error.error_dict.pop('clovek')
         except:
             pass
-        super(ZavodnikPridaniForm, self).add_error(field, error)
+        super().add_error(field, error)
 
     def save(self):
         """
@@ -79,30 +88,36 @@ class ZavodnikPridaniForm(forms.ModelForm):
         - dovyplnuje `zavodnika` a uklada ho
         """
         data = self.cleaned_data
-        if data:
-            # existuje uz zavodnik?
-            existujici = Zavodnik.objects.filter(
-                clovek=self.instance.clovek, rocnik=self.instance.rocnik, cislo=self.instance.cislo).first()
-            if existujici:
-                self.instance = existujici
-                for attr in ('kategorie',):
-                    if data[attr]:
-                        setattr(self.instance, attr, data[attr])
-            # pokud je vyplnena kategorie, pak ho rovnou i prirad
-            if self.instance.kategorie:
-                self.instance.kategorie_temp = self.instance.kategorie
 
-            if data['klub_nazev']:
-                slug = slugify(data['klub_nazev'])
-                klub, _ = Klub.objects.get_or_create(
-                    slug=slug,
-                    defaults=dict(
-                        nazev=data['klub_nazev'].strip(),
-                        sport=self.instance.rocnik.zavod.sport,
-                    ))
-                self.instance.klub = klub
+        # existuje uz obdobny zavodnik?
+        existujici = (
+            Zavodnik.objects
+            .filter(clovek=self.instance.clovek, rocnik=self.instance.rocnik, cislo=self.instance.cislo)
+            .exclude(id=self.instance.id)
+            .first()
+        )
+        if existujici:
+            self.instance = existujici
+            for attr in ('kategorie',):
+                if data[attr]:
+                    setattr(self.instance, attr, data[attr])
 
-            self.instance.save()
+        # pokud je vyplnena kategorie, pak ho rovnou i prirad
+        if self.instance.kategorie:
+            self.instance.kategorie_temp = self.instance.kategorie
+
+        # vytvor klub pokud neexistuje a prirad ho zavodnikovi
+        if data['klub_nazev']:
+            slug = slugify(data['klub_nazev'])
+            klub, _ = Klub.objects.get_or_create(
+                slug=slug,
+                defaults=dict(
+                    nazev=data['klub_nazev'].strip(),
+                    sport=self.instance.rocnik.zavod.sport,
+                ))
+            self.instance.klub = klub
+
+        self.instance.save()
 
 
 class ZavodnikEditaceForm(ZavodnikPridaniForm):
@@ -119,6 +134,7 @@ class ZavodnikEditaceForm(ZavodnikPridaniForm):
             'cislo',
             'klub_nazev',
             'kategorie',
+            'kategorie_temp',
             'startovni_cas',
             'cilovy_cas',
             'nedokoncil',
@@ -127,7 +143,7 @@ class ZavodnikEditaceForm(ZavodnikPridaniForm):
 
     def __init__(self, *args, **kwargs):
         "editace závodníka > dle `instance` vyplni pole `prijemni, jmeno, atd.`"
-        super(ZavodnikPridaniForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.instance:
             zavodnik = self.instance
             self.rocnik = zavodnik.rocnik
@@ -137,8 +153,8 @@ class ZavodnikEditaceForm(ZavodnikPridaniForm):
                 self.initial['narozen'] = zavodnik.clovek.narozen
                 self.initial['pohlavi'] = zavodnik.clovek.pohlavi
             self.initial['klub_nazev'] = zavodnik.klub
-            self.initial['kategorie'] = zavodnik.kategorie_temp
             self.fields['kategorie'].queryset = Kategorie.objects.filter(rocnik=self.rocnik)
+        disable_fields(self, ['kategorie_temp'])
 
 
 class ZavodnikForm(forms.ModelForm):

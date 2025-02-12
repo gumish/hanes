@@ -1,6 +1,22 @@
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 
+def disable_fields(form, fields: list):
+    """
+    Disables all fields in a form.
+
+    Args:
+        form: The form object.
+        fields (list): A list of field names or field objects to be disabled.
+            If a string is provided, the corresponding field in the form will be disabled.
+            If a field object is provided, that field will be disabled.
+    """
+    for f in fields:
+        if isinstance(f, str):
+            form.fields[f].disabled = True
+        else:
+            f.field.disabled = True
+
 
 class AjaxFormMixin():
 
@@ -64,4 +80,3 @@ class AjaxFormMixin():
             'new_html': new_html
         }
         return JsonResponse(data)
-

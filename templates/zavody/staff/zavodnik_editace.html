@@ -5,14 +5,14 @@
     EDITACE ZÁVODNÍKA | {{ rocnik }}
 {% endblock title %}
 
-{% block section %}section_zavody{% endblock %}
+{% block section %}section_zavody{% endblock section %}
 
 {% block custom_js %}
 <script type="text/javascript">
     var clovek_autocomplete_url = "{% url 'lide:clovek_autocomplete' zavodnik.rocnik.pk %}";
     var klub_autocomplete_url = "{% url 'kluby:klub_autocomplete' %}";
 </script>
-{% endblock %}
+{% endblock custom_js %}
 
 {% block breadcrumb %}
     <div class="ui breadcrumb">
@@ -56,7 +56,7 @@
 {% endblock staff %}
 
 {% block content %}
-<form action="" method="POST" enctype="multipart/form-data" class="ui form" id="zavodnici_forms">
+<form action="" method="post" enctype="multipart/form-data" class="ui form" id="zavodnici_forms">
     <div class="ui stackable grid">
         <div class="six wide column">
             <h4 class="ui dividing header">
@@ -90,6 +90,7 @@
             {% include "elements/_form_error_field.html" with field=form.cislo label=True %}
             {% include "elements/_form_error_field.html" with field=form.klub_nazev label=True %}
             {% include "elements/_form_error_field.html" with field=form.kategorie label=True %}
+            {% include "elements/_form_error_field.html" with field=form.kategorie_temp label=True %}
         </div>
         <div class="four wide column">
             <h4 class="ui dividing header">
