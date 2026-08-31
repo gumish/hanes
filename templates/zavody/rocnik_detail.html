@@ -5,7 +5,7 @@
     DETAIL ROČNÍKU | {{ rocnik }}
 {% endblock title %}
 
-{% block section %}section_zavody{% endblock %}
+{% block section %}section_zavody{% endblock section %}
 
 {% block breadcrumb %}
     <div class="ui breadcrumb">
@@ -31,7 +31,6 @@
         </div>
     </h1>
 {% endblock header %}
-
 
 {% block content %}
 
@@ -107,6 +106,12 @@
                         export kategorií
                     </a>
                 {% endif %}
+                {% if user.is_staff %}
+                    <a href="{% url 'zavody:kategorie_export_xlsx' rocnik.id %}" title="export kategorií do xlsx pro SLCR" class="item">
+                        <i class="file excel outline icon"></i>
+                        export pro SLCR
+                    </a>
+                {% endif %}
             </div>
 
             {# ADMIN #}
@@ -136,7 +141,7 @@
                 <p>čas: <b>{{ rocnik.cas|default:'' }}</b> </p>
                 <p>místo: <b>{{ rocnik.get_misto|default:'' }}</b></p>
                 <p>
-                    {{ rocnik.info|safe|urlize|linebreaksbr  }}
+                    {{ rocnik.info|safe|urlize|linebreaksbr }}
                 </p>
             </div>
 
@@ -187,8 +192,4 @@
         </div>
     </div>
 
-
-
-
-</div>
 {% endblock content %}

@@ -1,6 +1,6 @@
+import json
 from collections import OrderedDict
 from io import BytesIO
-import json
 
 from django.contrib import messages
 from django.db.models import Count, Min
@@ -11,16 +11,27 @@ from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils.text import slugify
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView, View
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+    View,
+)
 from django.views.generic.edit import FormView
+
 from lide.views import _referer_do_session
 from zavodnici.forms import StarterZavodnikForm, ZavodnikForm, ZavodnikPridaniForm
-
 from zavody.templatetags.custom_filters import desetiny_sekundy
 
 from .forms import *
-from .functions import (exportuj_kategorie, exportuj_startovku,
-                        exportuj_vysledky)
+from .functions import (
+    exportuj_kategorie,
+    exportuj_kategorie_xlsx,
+    exportuj_startovku,
+    exportuj_vysledky,
+)
 from .models import Kategorie, Rocnik, Sport, Zavod
 from .pdf import PdfPrint
 from .templatetags import custom_filters
@@ -48,7 +59,7 @@ class RocnikDetailView(DetailView):
     template_name = 'zavody/rocnik_detail.html'
 
     def get_context_data(self, *args, **kwargs):
-        context = super(RocnikDetailView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['kategorie_all'] = self.object.kategorie.annotate(zavodniku=Count('zavodnici_temp'))
         return context
 
@@ -180,7 +191,7 @@ class ZavodPridejView(CreateView):
     template_name = 'zavody/staff/zavod_pridani.html'
 
     def get_context_data(self, **kwargs):
-        context = super(ZavodPridejView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update({'zavody': Zavod.objects.all()})
         return context
 
@@ -198,7 +209,7 @@ class RocnikPridejView(CreateView):
         return {'zavod': self.zavod}
 
     def get_context_data(self, **kwargs):
-        context = super(RocnikPridejView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['posledni_rocnik'] = self.zavod.posledni_rocnik()
         context['zavod'] = self.zavod
         return context
@@ -245,12 +256,12 @@ class ImportZavodnikuView(FormView):
         if prirazenych:
             messages.success(
                 self.request,
-                'Do ročníku přiřazeno {0} lidí z interního seznamu.'.format(prirazenych))
+                f'Do ročníku přiřazeno {prirazenych} lidí z interního seznamu.')
         if novych:
             messages.success(
                 self.request,
-                'Do ročníku přidáno {0} nových lidí,\
-                kteří byli i zaregistrování do seznamu lidí.'.format(novych))
+                f'Do ročníku přidáno {novych} nových lidí,\
+                kteří byli i zaregistrování do seznamu lidí.')
         if not any((prirazenych, novych)):
             messages.warning(
                 self.request,
@@ -524,9 +535,9 @@ class ZpracovaniImportovanychCasuTxtView(View):
 
             # potvrzujici zprava pro Messages
             doplneni_zavodnici = list(filter(bool, doplneni_zavodnici))  # odfiltrovani None zavodniku
-            success_message = 'Úspěšně naimportováno {} cílových časů:'.format(len(doplneni_zavodnici))
+            success_message = f'Úspěšně naimportováno {len(doplneni_zavodnici)} cílových časů:'
             for zavodnik in doplneni_zavodnici:
-                success_message += '<br>- #{}: {}'.format(zavodnik.cislo, desetiny_sekundy(zavodnik.cilovy_cas))
+                success_message += f'<br>- #{zavodnik.cislo}: {desetiny_sekundy(zavodnik.cilovy_cas)}'
             messages.success(self.request, success_message, extra_tags='safe')
 
             return HttpResponseRedirect(
@@ -572,28 +583,38 @@ def cilovy_formular(request, rocnik_pk):
 
 def startovka_export(request, rocnik_pk, ordering_str='cislo'):
     rocnik = Rocnik.objects.get(pk=rocnik_pk)
-    filename = '{0}__{1}__startovka'.format(slugify(rocnik.zavod), rocnik.datum.year)
+    filename = f'{slugify(rocnik.zavod)}__{rocnik.datum.year}__startovka'
     response = HttpResponse(content_type='text/csv', charset='cp1250')
-    response['Content-Disposition'] = 'attachment; filename={0}.csv'.format(filename)
+    response['Content-Disposition'] = f'attachment; filename={filename}.csv'
     response = exportuj_startovku(response, rocnik, ordering_str)
     return response
 
 
 def vysledky_export(request, rocnik_pk):
     rocnik = Rocnik.objects.get(pk=rocnik_pk)
-    filename = '{0}__{1}__vysledky'.format(slugify(rocnik.zavod), rocnik.datum.year)
+    filename = f'{slugify(rocnik.zavod)}__{rocnik.datum.year}__vysledky'
     response = HttpResponse(content_type='text/csv', charset='cp1250')
-    response['Content-Disposition'] = 'attachment; filename={0}.csv'.format(filename)
+    response['Content-Disposition'] = f'attachment; filename={filename}.csv'
     response = exportuj_vysledky(response, rocnik)
     return response
 
 
 def kategorie_export(request, rocnik_pk):
     rocnik = Rocnik.objects.get(pk=rocnik_pk)
-    filename = '{0}__{1}__kategorie'.format(slugify(rocnik.zavod), rocnik.datum.year)
+    filename = f'{slugify(rocnik.zavod)}__{rocnik.datum.year}__kategorie'
     response = HttpResponse(content_type='text/csv', charset='cp1250')
-    response['Content-Disposition'] = 'attachment; filename={0}.csv'.format(filename)
+    response['Content-Disposition'] = f'attachment; filename={filename}.csv'
     response = exportuj_kategorie(response, rocnik)
+    return response
+
+
+def kategorie_export_xlsx(request, rocnik_pk):
+    rocnik = Rocnik.objects.get(pk=rocnik_pk)
+    filename = f'{slugify(rocnik.zavod)}__{rocnik.datum.year}__kategorie_SLCR'
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename={filename}.xlsx'
+    response = exportuj_kategorie_xlsx(response, rocnik)
     return response
 
 

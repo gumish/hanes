@@ -1,5 +1,5 @@
-from django.urls import path, include
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.urls import path
 
 from .views import *
 
@@ -110,6 +110,9 @@ urlpatterns = [
     path('rocnik/<int:rocnik_pk>/kategorie_export/',
         kategorie_export,
         name='kategorie_export'),
+    path('rocnik/<int:rocnik_pk>/kategorie_export_xlsx/',
+        user_passes_test(lambda u: u.is_staff)(kategorie_export_xlsx),
+        name='kategorie_export_xlsx'),
 
     path('kategorie/<int:kategorie_pk>/pdf/vysledkova_listina/',
         vysledky_kategorie_PDF,

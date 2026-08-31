@@ -2,12 +2,13 @@
 from django import forms
 from django.core.exceptions import MultipleObjectsReturned
 from django.db import transaction
-from django.db.models import Q, Count
+from django.db.models import Count, Q
 
-from .models import Clovek, Clenstvi
 from kluby.models import Klub
-from .functions import zavodnici_import_clean_csv
 from zavody.models import Zavodnik
+
+from .functions import zavodnici_import_clean_csv
+from .models import Clenstvi, Clovek
 
 
 class ClovekUpdateForm(forms.ModelForm):
@@ -23,7 +24,7 @@ class ClovekUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Clovek
-        fields = ('prijmeni', 'jmeno', 'pohlavi', 'narozen')
+        fields = ('prijmeni', 'jmeno', 'pohlavi', 'narozen', 'stat',)
 
 
     def __init__(self, *arg, **kwargs):
@@ -41,10 +42,10 @@ class ClovekUpdateForm(forms.ModelForm):
             clovek = data['presunout_vysledky']
             Zavodnik.objects.filter(clovek=self.instance).update(clovek=clovek)
             zpravy.append(
-                "Výsledky přesunuty z člověka '{0}'' na '{1}'".format(self.instance, clovek))
+                f"Výsledky přesunuty z člověka '{self.instance}'' na '{clovek}'")
 
         if data['smazat']:
-            zpravy.append("Člověk '{0}' smazán".format(self.instance))
+            zpravy.append(f"Člověk '{self.instance}' smazán")
             self.instance.delete()
             smazan = True
         else:

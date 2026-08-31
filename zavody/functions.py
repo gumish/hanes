@@ -4,13 +4,16 @@ from datetime import datetime
 from io import TextIOWrapper
 
 from django.utils.text import slugify
+from openpyxl import Workbook
+from openpyxl.styles import Alignment
+
 from kluby.models import Klub
 from lide.models import Clenstvi, Clovek
 from zavodnici.models import Zavodnik
 
 from .models import Kategorie, Rocnik, Sport, Zavod
 from .templatetags import custom_filters
-from .templatetags.custom_filters import desetiny_sekundy
+from .templatetags.custom_filters import desetiny_sekundy, rozsah_narozeni
 
 
 def _csv_reader(soubor):
@@ -49,7 +52,7 @@ def csv_kategorie_import(soubor):
                 )
                 kategorie_list.append(kategorie)
             except Exception as error:
-                chyby.append('#{0} {1}'.format(i, error))
+                chyby.append(f'#{i} {error}')
     return (kategorie_list, chyby)
 
 def rocnik_import(soubor):
@@ -74,10 +77,10 @@ def rocnik_import(soubor):
                 # hlavicka
                 sport, created = Sport.objects.get_or_create(nazev=radek[2])
                 if created:
-                    zpravy.append('#{0} uložen nový sport: {1}'.format(i, sport))
+                    zpravy.append(f'#{i} uložen nový sport: {sport}')
                 zavod, created = Zavod.objects.get_or_create(nazev=radek[0], sport=sport)
                 if created:
-                    zpravy.append('#{0} uložen nový závod: {1}'.format(i, zavod))
+                    zpravy.append(f'#{i} uložen nový závod: {zavod}')
                 rocnik, created = Rocnik.objects.get_or_create(
                     zavod=zavod,
                     datum=datetime.strptime(radek[1], '%Y-%m-%d').date()
@@ -103,7 +106,7 @@ def rocnik_import(soubor):
                 )
                 predchozi_radek = 'kategorie'
                 if created:
-                    zpravy.append('#{0} uložena nová kategorie: {1}'.format(i, kategorie))
+                    zpravy.append(f'#{i} uložena nová kategorie: {kategorie}')
             elif predchozi_radek in ('hlavicka zavodniku', 'zavodnik'):
                 # Zavodnik
                 print(i, 'zavodnik')
@@ -111,14 +114,14 @@ def rocnik_import(soubor):
                     slug=slugify(radek[5]),
                     defaults={'nazev': radek[5].strip()})
                 if created:
-                    zpravy.append('#{0} uložen nový klub: {1}'.format(i, klub))
+                    zpravy.append(f'#{i} uložen nový klub: {klub}')
                 clovek, created = Clovek.objects.get_or_create(
                     jmeno=radek[3],
                     prijmeni=radek[2],
                     narozen=int(radek[4])
                 )
                 if created:
-                    zpravy.append('#{0} uložen nový člověk: {1}'.format(i, clovek))
+                    zpravy.append(f'#{i} uložen nový člověk: {clovek}')
                 try:
                     _clenstvi, _created = Clenstvi.objects.get_or_create(
                         clovek=clovek,
@@ -284,4 +287,48 @@ def exportuj_kategorie(response, rocnik):
             kategorie.startovne or 0,
         ])
 
+    return response
+
+
+def exportuj_kategorie_xlsx(response, rocnik):
+    wb = Workbook()
+    wb.remove(wb.active)
+
+    headers = [
+        'Pořadí', 'Start. číslo', 'Kód závodníka', 'Příjmení', 'Jméno',
+        'Rok nar.', 'Pohlaví', 'Stát', 'FIS kód', 'Název klubu', 'Čas'
+    ]
+
+    for kategorie in rocnik.kategorie.all():
+        znacka = kategorie.znacka or str(kategorie.id)
+        sheet_title = f'{znacka} - {kategorie.nazev}'
+        ws = wb.create_sheet(title=sheet_title[:31])
+
+        datum_str = f'{rocnik.datum.day}. {rocnik.datum.month}. {rocnik.datum.year}'
+        rozsah = rozsah_narozeni(kategorie.rozsah_narozeni())
+        titulek = f'{datum_str} \u2013 {rocnik.zavod.nazev}\n{kategorie.nazev} ({rozsah})'
+        ws['A1'] = titulek
+        ws.merge_cells('A1:K1')
+        ws['A1'].alignment = Alignment(vertical='center', wrap_text=True)
+        ws.row_dimensions[1].height = 40
+
+        for col, header in enumerate(headers, 1):
+            ws.cell(row=2, column=col, value=header)
+
+        zavodnici = kategorie.serazeni_zavodnici(razeni=None)
+        for row_idx, zavodnik in enumerate(zavodnici, 3):
+            ws.cell(row=row_idx, column=1, value=zavodnik.poradi_v_kategorii())
+            ws.cell(row=row_idx, column=2, value=zavodnik.cislo)
+            ws.cell(row=row_idx, column=4, value=zavodnik.clovek.prijmeni)
+            ws.cell(row=row_idx, column=5, value=zavodnik.clovek.jmeno)
+            ws.cell(row=row_idx, column=6, value=zavodnik.clovek.narozen)
+            ws.cell(
+                row=row_idx, column=7,
+                value=zavodnik.clovek.get_pohlavi_display() if zavodnik.clovek.pohlavi else '')
+            if zavodnik.clovek.stat:
+                ws.cell(row=row_idx, column=8, value=zavodnik.clovek.stat.zkratka)
+            ws.cell(row=row_idx, column=10, value=zavodnik.klub.nazev if zavodnik.klub else '')
+            ws.cell(row=row_idx, column=11, value=desetiny_sekundy(zavodnik.vysledny_cas))
+
+    wb.save(response)
     return response
