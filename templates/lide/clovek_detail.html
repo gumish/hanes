@@ -128,10 +128,10 @@
                                     </a>
                                 </td>
                                 <td>
-                                    {{ zavodnik.kategorie_temp.nazev }}
+                                    {{ zavodnik.kategorie.nazev }}
                                 </td>
                                 <td>
-                                    {{ zavodnik.kategorie_temp.delka_trate }}
+                                    {{ zavodnik.kategorie.delka_trate }}
                                 </td>
                                 <td>
                                     {{ zavodnik.vysledny_cas|desetiny_sekundy|default:'' }}
@@ -140,7 +140,7 @@
                                     {{ zavodnik.poradi_v_kategorii|default:'' }}
                                 </td>
                                 <td class="right aligned">
-                                    {{ zavodnik.kategorie_temp.zavodnici_temp.count }}
+                                    {{ zavodnik.kategorie.zavodnici_temp.count }}
                                 </td>
                                 <td class="right aligned">
                                     {{ zavodnik.poradi_na_trati|default:'' }}

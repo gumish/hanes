@@ -1,8 +1,7 @@
 from django.db import models
 from django.db.models import Q
-from django.utils.text import slugify
 from django.urls import reverse
-
+from django.utils.text import slugify
 
 POHLAVI = (
     ('', '---'),
@@ -27,6 +26,24 @@ def _get_sorting_slug(slovo):
     return slugify(vysledek)
 
 
+class Stat(models.Model):
+
+    """ Statni prislusnost cloveka
+    """
+
+    nazev = models.CharField('Název', max_length=30, unique=True, blank=True)
+    zkratka = models.SlugField(unique=True, blank=True)
+    poradi = models.PositiveSmallIntegerField('Pořadí', default=100, help_text='určuje pořadí států v nabídkách')
+
+    class Meta:
+        verbose_name = 'Stát'
+        verbose_name_plural = 'Státy'
+        ordering = ('poradi', 'zkratka', 'nazev')
+
+    def __str__(self):
+        return f'{self.nazev} ({self.zkratka})'
+    
+
 class Clovek(models.Model):
 
     """ Clovek
@@ -40,6 +57,9 @@ class Clovek(models.Model):
         'Pohlaví', max_length=1,
         choices=POHLAVI,
         null=True, blank=True)
+    stat = models.ForeignKey(
+        'Stat', verbose_name='Stát', related_name='lidi',
+        on_delete=models.SET_NULL, null=True)
     narozen = models.PositiveSmallIntegerField('Narozen(a)')
     jmeno_slug = models.SlugField(editable=False, unique=False, blank=True)
     prijmeni_slug = models.SlugField(editable=False, unique=False, blank=True)
@@ -56,7 +76,7 @@ class Clovek(models.Model):
 
 
     def __str__(self):
-        return '{0} {1} {2}'.format(self.prijmeni, self.jmeno, self.narozen)
+        return f'{self.prijmeni} {self.jmeno} {self.narozen}'
 
 
     def get_absolute_url(self, user=None):
@@ -82,14 +102,13 @@ class Clovek(models.Model):
         self.prijmeni_slug_sorting = self.prijmeni_slug
         self.prijmeni_slug_sorting = _get_sorting_slug(self.prijmeni)
         self.jmeno_slug = slugify(self.jmeno)
-        super(Clovek, self).save(*args, **kwargs)  # nejprve ulozi pro zjisteni ID
-        self.slug = '{}-{}-{}_{}'.format(
-            self.prijmeni_slug, self.jmeno_slug, str(self.narozen), str(self.id))
-        return super(Clovek, self).save(update_fields=['slug']) #updatuje SLUG
+        super().save(*args, **kwargs)  # nejprve ulozi pro zjisteni ID
+        self.slug = f'{self.prijmeni_slug}-{self.jmeno_slug}-{self.narozen!s}_{self.id!s}'
+        return super().save(update_fields=['slug']) #updatuje SLUG
 
 
     def cele_jmeno(self):
-        return '{0} {1}'.format(self.prijmeni, self.jmeno)
+        return f'{self.prijmeni} {self.jmeno}'
 
 
     def serazene_clenstvi_pro_zavod(self, zavod):
@@ -146,4 +165,4 @@ class Clenstvi(models.Model):
 
 
     def __str__(self):
-        return '{0} - {1}'.format(self.clovek, self.klub)
+        return f'{self.clovek} - {self.klub}'

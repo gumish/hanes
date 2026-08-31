@@ -30,7 +30,7 @@ class ClovekDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ClovekDetailView, self).get_context_data(**kwargs)
-        context['zavodnici'] = self.object.zavodnici.filter(kategorie_temp__isnull=False).order_by('-rocnik__datum')
+        context['zavodnici'] = self.object.zavodnici.filter(kategorie__isnull=False).order_by('-rocnik__datum')
         context['jmenovci'] = Clovek.objects.filter(
             prijmeni__istartswith=self.object.prijmeni.rstrip('ová')).exclude(pk=self.object.pk)
         _referer_do_session(self.request)
@@ -69,7 +69,7 @@ class LideImportCSV(FormView):
 def clovek_update(request, slug):
     'editace cloveka'
     clovek = Clovek.objects.get(slug=slug)
-    zavodnici = clovek.zavodnici.filter(kategorie_temp__isnull=False).order_by('-rocnik__datum')
+    zavodnici = clovek.zavodnici.filter(kategorie__isnull=False).order_by('-rocnik__datum')
     jmenovci = Clovek.objects.filter(
             prijmeni__istartswith=clovek.prijmeni.rstrip('ová')).exclude(slug=clovek.slug)
     ClenstviFormSet = inlineformset_factory(
