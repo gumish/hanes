@@ -29,7 +29,7 @@
 {% endblock staff %}
 
 {% block content %}
-    {% regroup lide by prijmeni_slug.0 as lide_abc %}
+    {% regroup lide by prijmeni_slug_sorting|slice:":1" as lide_abc %}
     <div class="ui divided relaxed horizontal list">
         {% for pismeno in lide_abc %}
             <a href=".#{{ pismeno.grouper }}" class="item">

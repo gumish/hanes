@@ -81,6 +81,7 @@ $(document)
                     tr.find("input[name$='jmeno']").val(data.jmeno);
                     tr.find("input[name$='narozen']").val(data.narozen);
                     tr.find("select[name$='pohlavi']").val(data.pohlavi);
+                    tr.find("select[name$='stat']").val(data.stat || '');
                     tr.find("input[name$='klub_nazev']").val(data.klub);
                     tr.next().find("input[name$='cislo']").focus();
                     // vyplneni 'clovek_id' do autocomplete klubu

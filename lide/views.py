@@ -29,7 +29,7 @@ class ClovekDetailView(DetailView):
     template_name = 'lide/clovek_detail.html'
 
     def get_context_data(self, **kwargs):
-        context = super(ClovekDetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['zavodnici'] = self.object.zavodnici.filter(kategorie__isnull=False).order_by('-rocnik__datum')
         context['jmenovci'] = Clovek.objects.filter(
             prijmeni__istartswith=self.object.prijmeni.rstrip('ová')).exclude(pk=self.object.pk)
@@ -54,16 +54,16 @@ class LideImportCSV(FormView):
         if novy_lide:
             messages.success(
                 self.request,
-                'Přidáno {0} lidí do seznamu.'.format(novy_lide))
+                f'Přidáno {novy_lide} lidí do seznamu.')
         if nove_kluby:
             messages.success(
                 self.request,
-                'Přidáno {0} klubů do seznamu.'.format(nove_kluby))
+                f'Přidáno {nove_kluby} klubů do seznamu.')
         if not any((novy_lide, nove_kluby)):
             messages.warning(
                 self.request,
                 'Nebylo nic přidáno!')
-        return super(LideImportCSV, self).form_valid(form)
+        return super().form_valid(form)
 
 
 def clovek_update(request, slug):
@@ -115,8 +115,11 @@ def clovek_update(request, slug):
 
 
 def clovek_list(request):
-    lide = Clovek.objects.all().annotate(
-        pocet_zavodu=Count('zavodnici'))
+    lide = (
+        Clovek.objects
+        .order_by('prijmeni_slug_sorting', 'jmeno_slug')
+        .annotate(pocet_zavodu=Count('zavodnici'))
+    )
     for clovek in lide:
         clovek.kluby = clovek.clenstvi.values_list('klub', flat=True).distinct()
     return render(request,
@@ -152,6 +155,7 @@ def clovek_autocomplete(request, rocnik_pk=None):
                     'jmeno': clovek.jmeno,
                     'pohlavi': clovek.pohlavi,
                     'narozen': clovek.narozen,
+                    'stat': clovek.stat_id,
                     'klub': serazene_clenstvi[0].klub.nazev if serazene_clenstvi else '',
                     'zavodnik': zavodnik_oznac,
                     'clovek_id': clovek.id

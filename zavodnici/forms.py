@@ -5,7 +5,7 @@ from django.utils.text import slugify
 
 from hanes.mixins import disable_fields
 from kluby.models import Klub
-from lide.models import POHLAVI, Clovek
+from lide.models import POHLAVI, Clovek, Stat
 from zavody.models import Kategorie
 
 from .custom_fields import CustomTimeField
@@ -18,6 +18,12 @@ class ZavodnikPridaniForm(forms.ModelForm):
     jmeno = forms.CharField(label='Jméno')
     pohlavi = forms.ChoiceField(label='Pohlaví', choices=POHLAVI, required=False)
     narozen = forms.IntegerField(label='Narozen(a)', min_value=date.today().year - 120, max_value=date.today().year)
+    stat = forms.ModelChoiceField(
+        label='Stát',
+        queryset=Stat.objects.none(),
+        required=False,
+        empty_label='---',
+    )
     klub_nazev = forms.CharField(label='Klub', required=False)
 
     class Meta:
@@ -28,25 +34,35 @@ class ZavodnikPridaniForm(forms.ModelForm):
             'jmeno',
             'pohlavi',
             'narozen',
+            'stat',
             'klub_nazev',
             'kategorie')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['stat'].queryset = Stat.objects.order_by('poradi', 'nazev')
+        if self.instance and getattr(self.instance, 'clovek_id', None):
+            self.initial['stat'] = self.instance.clovek.stat_id
 
     def clean(self):
         'z důvodu validace se `Clovek` vytvari uz v `clean` funkci'
         data = super().clean()
+        stat = data.get('stat')
         if self.instance.clovek:
             Clovek.objects.filter(id=self.instance.clovek.id).update(
                 prijmeni=data['prijmeni'],
                 jmeno=data['jmeno'],
                 narozen=data['narozen'],
-                pohlavi=data['pohlavi']
+                pohlavi=data['pohlavi'],
+                stat=stat,
             )
+            self.instance.clovek.stat = stat
         else:
             clovek, _ = Clovek.objects.get_or_create(
                 prijmeni=data['prijmeni'],
                 jmeno=data['jmeno'],
                 narozen=data['narozen'],
-                defaults={'pohlavi': data['pohlavi']}
+                defaults={'pohlavi': data['pohlavi'], 'stat': stat}
             )
             self.instance.clovek = clovek
         return data
@@ -75,7 +91,7 @@ class ZavodnikPridaniForm(forms.ModelForm):
         try:
             if 'clovek' in error.error_dict:
                 error.error_dict['prijmeni'] = error.error_dict.pop('clovek')
-        except:
+        except Exception:
             pass
         super().add_error(field, error)
 
@@ -99,7 +115,7 @@ class ZavodnikPridaniForm(forms.ModelForm):
         if existujici:
             self.instance = existujici
             for attr in ('kategorie',):
-                if data[attr]:
+                if data.get('attr'):
                     setattr(self.instance, attr, data[attr])
 
         # pokud je vyplnena kategorie, pak ho rovnou i prirad
@@ -107,14 +123,14 @@ class ZavodnikPridaniForm(forms.ModelForm):
             self.instance.kategorie_temp = self.instance.kategorie
 
         # vytvor klub pokud neexistuje a prirad ho zavodnikovi
-        if data['klub_nazev']:
+        if data.get('klub_nazev'):
             slug = slugify(data['klub_nazev'])
             klub, _ = Klub.objects.get_or_create(
                 slug=slug,
-                defaults=dict(
-                    nazev=data['klub_nazev'].strip(),
-                    sport=self.instance.rocnik.zavod.sport,
-                ))
+                defaults={
+                    'nazev': data['klub_nazev'].strip(),
+                    'sport': self.instance.rocnik.zavod.sport,
+                })
             self.instance.klub = klub
 
         self.instance.save()
@@ -131,6 +147,7 @@ class ZavodnikEditaceForm(ZavodnikPridaniForm):
             'jmeno',
             'pohlavi',
             'narozen',
+            'stat',
             'cislo',
             'klub_nazev',
             'kategorie',
@@ -152,6 +169,7 @@ class ZavodnikEditaceForm(ZavodnikPridaniForm):
                 self.initial['jmeno'] = zavodnik.clovek.jmeno
                 self.initial['narozen'] = zavodnik.clovek.narozen
                 self.initial['pohlavi'] = zavodnik.clovek.pohlavi
+                self.initial['stat'] = zavodnik.clovek.stat_id
             self.initial['klub_nazev'] = zavodnik.klub
             self.fields['kategorie'].queryset = Kategorie.objects.filter(rocnik=self.rocnik)
         disable_fields(self, ['kategorie_temp'])
@@ -172,7 +190,7 @@ class ZavodnikForm(forms.ModelForm):
                 del error.error_dict['clovek']
         except:
             pass
-        super(ZavodnikForm, self).add_error(field, error)
+        super().add_error(field, error)
 
 
 class StarterZavodnikForm(forms.ModelForm):
@@ -181,11 +199,9 @@ class StarterZavodnikForm(forms.ModelForm):
     class Meta:
         model = Zavodnik
         fields = ('odstartoval',)
-        widgets = {
-            'odstartoval': forms.HiddenInput()
-        }
+        widgets = {'odstartoval': forms.HiddenInput()}
 
     def save(self, commit=True):
-        zavodnik = super(StarterZavodnikForm, self).save(commit=False)
+        zavodnik = super().save(commit=False)
         zavodnik.save(nekontroluj=True)
         return zavodnik

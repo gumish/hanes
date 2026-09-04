@@ -19,6 +19,12 @@ class CustomTimeInput(forms.TimeInput):
     supports_microseconds = True
 
     def __init__(self, *args, **kwargs):
+        attrs = kwargs.setdefault('attrs', {})
+        attrs.setdefault('autocomplete', 'off')
+        attrs.setdefault('autocorrect', 'off')
+        attrs.setdefault('autocapitalize', 'off')
+        attrs.setdefault('spellcheck', 'false')
+        # attrs.setdefault('inputmode', 'numeric')
         super().__init__(*args, **kwargs)
         self.format = '%H:%M:%S,%f'
 

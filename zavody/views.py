@@ -333,7 +333,8 @@ def pridani_zavodniku(request, pk):
             form.instance.rocnik = rocnik
         if formset.is_valid():
             for form in formset:
-                form.save()
+                if form.has_changed():
+                    form.save()
             formset = ZavodnikPridaniFormSet()
     else:
         formset = ZavodnikPridaniFormSet()

@@ -17,8 +17,8 @@ admin.site.register(Stat, StatAdmin)
 
 
 class ClovekAdmin(admin.ModelAdmin):
-    list_display = ('prijmeni', 'jmeno', 'narozen', 'pohlavi', 'slug', 'pocet_zavodu')
-    list_filter = ('pohlavi',)
+    list_display = ('prijmeni', 'jmeno', 'narozen', 'pohlavi', 'stat', 'slug', 'pocet_zavodu')
+    list_filter = ('pohlavi', 'stat')
     search_fields = ('prijmeni', 'jmeno', 'clenstvi__klub__nazev')
     inlines = (ClenstviInline,)
 

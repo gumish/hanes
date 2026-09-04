@@ -39,7 +39,6 @@
     </h1>
 {% endblock header %}
 
-
 {% block content %}
     <div class="ui info icon message">
         <i class="close icon"></i>
@@ -57,7 +56,7 @@
         <table class="ui unstackable celled table">
             <thead>
                 <tr>
-                    <th colspan=6>
+                    <th colspan=7>
                         <h2>zapsat nové závodníky</h2>
                     </th>
                     <th colspan=2>
@@ -80,6 +79,7 @@
                             title="pokud není pohlaví vyplněno, pak se určí dle posledího písmene příjmení, tj.: 'á'=žena jinak muž"></i>
                     </th>
                     <th style="width:8em;" title="povinné pole">narozen*</th>
+                    <th style="width:8em;">stát</th>
                     <th>
                         klub
                         <i class="help circle icon"
@@ -108,7 +108,7 @@
                     </tr>
                     {% if form.non_field_errors %}
                         <tr>
-                            <td colspan=7>
+                            <td colspan=9>
                                 {% include "elements/_error_pointing_ label.html" with error=form.non_field_errors.0|safe %}
                             </td>
                         </tr>
