@@ -58,7 +58,7 @@ class Clovek(models.Model):
         choices=POHLAVI,
         null=True, blank=True)
     stat = models.ForeignKey(
-        'Stat', verbose_name='Stát', related_name='lidi',
+        'Stat', verbose_name='Stát', related_name='lidi', default=0,
         on_delete=models.SET_NULL, null=True)
     narozen = models.PositiveSmallIntegerField('Narozen(a)')
     jmeno_slug = models.SlugField(editable=False, unique=False, blank=True)

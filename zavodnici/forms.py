@@ -20,9 +20,8 @@ class ZavodnikPridaniForm(forms.ModelForm):
     narozen = forms.IntegerField(label='Narozen(a)', min_value=date.today().year - 120, max_value=date.today().year)
     stat = forms.ModelChoiceField(
         label='Stát',
-        queryset=Stat.objects.none(),
-        required=False,
-        empty_label='---',
+        queryset=Stat.objects.all(),
+        required=False, initial=Stat.objects.first()
     )
     klub_nazev = forms.CharField(label='Klub', required=False)
 
